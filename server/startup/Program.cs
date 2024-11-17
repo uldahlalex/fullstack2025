@@ -1,12 +1,20 @@
+using realtimeapi;
 using restapi;
 
-var builder = WebApplication.CreateBuilder(args);
+public static class Program
+{
+    public static void Main()
+    {
+        var builder = WebApplication.CreateBuilder();
 
-builder.AddDependenciesForRestApi();
+        builder.AddDependenciesForRestApi();
+        builder.AddDependenciesForRealtimeApi();
 
+        var app = builder.Build();
 
-var app = builder.Build();
+        app.AddMiddlewareForRestApi();
+        app.AddMiddlewareForRealtimeApi();
 
-app.AddMiddlewareForRestApi();
-
-app.Run();
+        app.Run();
+    }
+}

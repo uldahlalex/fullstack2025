@@ -8,6 +8,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\restapi\restapi.csproj" />
+    <ProjectReference Include="..\realtimeapi\realtimeapi.csproj" />
   </ItemGroup>
 
 </Project>

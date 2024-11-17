@@ -2,6 +2,5 @@
   <Project Path="server/realtimeapi/realtimeapi.csproj" />
   <Project Path="server/restapi/restapi.csproj" />
   <Project Path="server/service/service.csproj" />
-  <Project Path="startup\startup.csproj" Type="Classic C#" />
   <Project Path="server/startup/startup.csproj" />
 </Solution>
