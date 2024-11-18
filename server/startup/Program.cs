@@ -14,6 +14,7 @@ public static class Program
 
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
+        app.UseCors(opts => opts.AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true));
 
         app.Run();
     }
