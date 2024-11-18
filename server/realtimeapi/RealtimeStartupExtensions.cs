@@ -11,6 +11,8 @@ namespace realtimeapi;
 public static class RealtimeStartupExtensions
 {
     
+    public static HashSet<Type> Services { get; set; } = new();
+    
     public static WebApplicationBuilder AddDependenciesForRealtimeApi(this WebApplicationBuilder builder)
     {
         builder.Services.AddSingleton<State>();
@@ -19,16 +21,11 @@ public static class RealtimeStartupExtensions
 
         return builder;
     }
-
-    public static HashSet<Type> Services { get; set; } = new();
+    
 
     public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app)
     {
         app.UseRouting();
-         // app.MapHub<ChatHub>("/chatHub");
-      //   app.MapAsyncApiDocuments();
-        // app.MapAsyncApiUi();
-        Console.WriteLine(JsonSerializer.Serialize(Services.FirstOrDefault().Name));
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         server.Start(ws =>
         {
