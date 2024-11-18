@@ -9,7 +9,8 @@ public static class Program
 
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
-
+        
+        
         var app = builder.Build();
 
         app.AddMiddlewareForRestApi();
