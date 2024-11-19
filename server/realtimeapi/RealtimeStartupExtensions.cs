@@ -15,6 +15,15 @@ public static class RealtimeStartupExtensions
     
     public static WebApplicationBuilder AddDependenciesForRealtimeApi(this WebApplicationBuilder builder)
     {
+        builder.Services.AddAsyncApiSchemaGeneration(o =>
+        {
+            o.AssemblyMarkerTypes = new[] { typeof(ClientWantsToEcho) };
+            o.Middleware.UiTitle = "API Documentation";
+            o.AsyncApi = new AsyncApiDocument
+            {
+                Info = new Info { Title = "My application", Description = "Fullstack 2025"}
+            }; 
+        });
         builder.Services.AddSingleton<State>();
         var assembly = typeof(ClientWantsToEcho).Assembly;
         Services = builder.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
@@ -25,6 +34,8 @@ public static class RealtimeStartupExtensions
 
     public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app)
     {
+        app.MapAsyncApiDocuments();
+        app.MapAsyncApiUi();
         app.UseRouting();
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         server.Start(ws =>
