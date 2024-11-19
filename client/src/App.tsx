@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
-import useWebSocket, { ReadyState } from 'react-use-websocket';
+
 import { sendJsonMessage } from './wsclient';
+
 export interface ClientWantsToEchoDto {
     Message: string;
 }
 
 export  const App = () => {
-    // const [messageHistory, setMessageHistory] = useState<MessageEvent<ClientWantsToEchoDto>[]>([]);
 
 
 
