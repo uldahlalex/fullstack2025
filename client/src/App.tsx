@@ -1,9 +1,7 @@
 
 import { sendJsonMessage } from './wsclient';
+import ClientWantsToEchoDto from "./models/generated/ClientWantsToEchoDto.ts";
 
-export interface ClientWantsToEchoDto {
-    Message: string;
-}
 
 export  const App = () => {
 
@@ -11,7 +9,7 @@ export  const App = () => {
 
 
     const handleClickSendMessage = () => {
-        var dto = {Message: "hello world", eventType: "ClientWantsToEcho"};
+        var dto = {message: "hello world", eventType: "ClientWantsToEcho"};
         sendJsonMessage<ClientWantsToEchoDto>(dto);
 
     };

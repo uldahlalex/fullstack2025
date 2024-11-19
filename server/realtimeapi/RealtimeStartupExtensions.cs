@@ -59,11 +59,13 @@ public static class RealtimeStartupExtensions
             {
                 try
                 {
-                    await app.InvokeClientEventHandler(Services, ws, message);
+                    await app.InvokeClientEventHandler(Services, ws, message, ServiceLifetime.Scoped);
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.InnerException);
+                    Console.WriteLine(ex.StackTrace);
                 }
             }; 
         });
