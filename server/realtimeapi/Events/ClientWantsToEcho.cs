@@ -5,12 +5,13 @@ using realtimeapi;
 
 public class ClientWantsToEchoDto : BaseDto
 {
-    public string Message { get; set; }
+    public string message { get; set; }
 }
 
 public class ServerSendsEchoDto : BaseDto
 {
-    public string Message { get; set; }
+    public string message { get; set; }
+    public Guid client { get; set; }
 }
 
 [SubscribeOperation<ClientWantsToEchoDto>(nameof(ClientWantsToEcho))]
@@ -19,7 +20,7 @@ public class ClientWantsToEcho(State state) : BaseEventHandler<ClientWantsToEcho
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {
-        socket.SendDto(new ServerSendsEchoDto() { Message = dto.Message });
+        socket.SendDto(new ServerSendsEchoDto() { message = dto.message, client = socket.ConnectionInfo.Id});
         return Task.CompletedTask;
     }
 }
