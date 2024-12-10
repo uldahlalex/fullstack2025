@@ -1,3 +1,4 @@
+using Infrastructure.Repositories;
 using realtimeapi;
 using restapi;
 using service;
@@ -8,7 +9,8 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder();
 
-        builder.Services.AddDataSource();
+        builder.Services.AddDataSource("Host=localhost;Database=testdb;Username=testuser;Password=testpass");
+        builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
@@ -18,7 +20,6 @@ public static class Program
 
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
-        app.UseCors(opts => opts.AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(_ => true));
 
         app.Run();
     }

@@ -11,6 +11,7 @@ public static class RestStartupExtensions
     public static WebApplication AddMiddlewareForRestApi(this WebApplication app)
     {
         app.MapControllers();
+        app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;
     } 
 }

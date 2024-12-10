@@ -9,7 +9,8 @@
   <ItemGroup>
     <ProjectReference Include="..\apis\restapi\restapi.csproj" />
     <ProjectReference Include="..\apis\realtimeapi\realtimeapi.csproj" />
-    <ProjectReference Include="..\infrastructure\infrastructure.csproj" />
+    <ProjectReference Include="..\Infrastructure.Scaffold\Infrastructure.Scaffold.csproj" />
+    <ProjectReference Include="..\Infrastructure.Repositories\Infrastructure.Repositories.csproj" />
     <ProjectReference Include="..\core\core.csproj" />
     <ProjectReference Include="..\service\service.csproj" />
     
