@@ -1,4 +1,6 @@
+using System.Text.Json;
 using AsyncApi.Net.Generator.Attributes;
+using core;
 using Fleck;
 using lib;
 using realtimeapi;
@@ -16,11 +18,11 @@ public class ServerSendsEchoDto : BaseDto
 
 [SubscribeOperation<ClientWantsToEchoDto>(nameof(ClientWantsToEcho))]
 [PublishOperation<ServerSendsEchoDto>(nameof(ServerSendsEchoDto))]
-public class ClientWantsToEcho(State state) : BaseEventHandler<ClientWantsToEchoDto>
+public class ClientWantsToEcho(State state, IServiceLogic service) : BaseEventHandler<ClientWantsToEchoDto>
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {
-        socket.SendDto(new ServerSendsEchoDto() { message = dto.message, client = socket.ConnectionInfo.Id});
+        socket.SendDto(new ServerSendsEchoDto() { message = JsonSerializer.Serialize(service.GetDomainModels()), client = socket.ConnectionInfo.Id});
         return Task.CompletedTask;
     }
 }

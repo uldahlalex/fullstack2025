@@ -11,5 +11,9 @@
     <PackageReference Include="AsyncApi.Net.Generator" Version="*" />
     <PackageReference Include="uldahlalex.websocket.boilerplate" Version="1.7" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\..\core\core.csproj" />
+  </ItemGroup>
 
 </Project>

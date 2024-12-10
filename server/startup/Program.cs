@@ -1,5 +1,6 @@
 using realtimeapi;
 using restapi;
+using service;
 
 public static class Program
 {
@@ -7,6 +8,8 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder();
 
+        builder.Services.AddDataSource();
+        builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
         
