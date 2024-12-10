@@ -9,7 +9,7 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder();
 
-        builder.Services.AddDataSource("Host=localhost;Database=testdb;Username=testuser;Password=testpass");
+        // builder.Services.AddDataSource("Host=localhost;Database=testdb;Username=testuser;Password=testpass");
         builder.Services.AddRepositories();
         builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
