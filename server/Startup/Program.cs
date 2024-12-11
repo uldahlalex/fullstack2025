@@ -35,6 +35,6 @@ public static class Program
             scope.ServiceProvider.GetRequiredService<MyDbContext>().Database.EnsureCreated();
         }
 
-        app.Run();
+        app.Run(Environment.GetEnvironmentVariable("PORT")??"8080");
     }
 }
