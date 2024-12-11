@@ -36,7 +36,8 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v1
         with:
-          service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }} 
+          service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }}
+          region: europe-north1
           source: .
           dockerfile: Dockerfile
           env_vars: |-
