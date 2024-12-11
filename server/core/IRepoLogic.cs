@@ -1,7 +1,9 @@
+using infrastructure;
+
 namespace core;
 
 public interface IRepoLogic
 {
-    public IEnumerable<MyDomainModel> GetDomainModels();
+    public IEnumerable<Board> GetDomainModels();
 
 }

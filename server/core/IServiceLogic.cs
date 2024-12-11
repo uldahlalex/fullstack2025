@@ -1,6 +1,8 @@
-﻿namespace core;
+﻿using infrastructure;
+
+namespace core;
 
 public interface IServiceLogic
 {
-    public IEnumerable<MyDomainModel> GetDomainModels();
+    public IEnumerable<Board> GetDomainModels();
 }

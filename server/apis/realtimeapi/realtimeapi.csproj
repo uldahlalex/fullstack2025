@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="AsyncApi.Net.Generator" Version="*" />
+    <PackageReference Include="patrikvalentiny-WebSocketProxy" Version="1.1.0" />
     <PackageReference Include="uldahlalex.websocket.boilerplate" Version="1.7" />
   </ItemGroup>
   

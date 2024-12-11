@@ -1,9 +1,13 @@
 
+using System.Net;
 using System.Text.Json;
 using AsyncApi.Net.Generator;
 using AsyncApi.Net.Generator.AsyncApiSchema.v2;
 using Fleck;
 using lib;
+using WebSocketProxy;
+using Host = WebSocketProxy.Host;
+
 
 
 namespace realtimeapi;
@@ -25,7 +29,7 @@ public static class RealtimeStartupExtensions
             }; 
         });
         builder.Services.AddSingleton<State>();
-        var assembly = typeof(ClientWantsToEcho).Assembly;
+        var assembly = typeof(State).Assembly;
         Services = builder.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
 
         return builder;
@@ -34,6 +38,7 @@ public static class RealtimeStartupExtensions
 
     public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app)
     {
+
         app.MapAsyncApiDocuments();
         app.MapAsyncApiUi();
         app.UseRouting();
@@ -74,4 +79,6 @@ public static class RealtimeStartupExtensions
          
         return app;
     }
+    
+
 }

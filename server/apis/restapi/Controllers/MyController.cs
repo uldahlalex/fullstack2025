@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace restapi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
 public class MyController(IServiceLogic service) : ControllerBase
 {
     

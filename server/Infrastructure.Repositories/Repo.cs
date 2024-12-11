@@ -1,10 +1,12 @@
 ﻿using core;
+using infrastructure;
+
 // using Infrastructure.Data
 
-public class Repo() : IRepoLogic
+public class Repo(MyDbContext ctx) : IRepoLogic
 {
-    public IEnumerable<MyDomainModel> GetDomainModels()
+    public IEnumerable<Board> GetDomainModels()
     {
-        return null;// ctx.YourEntities.ToList();
+        return ctx.Boards.ToList();
     }
 }
