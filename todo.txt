@@ -1,3 +1,2 @@
-- Fix gcloud deploy (URL listen)
 1. vite prod url change
-2. 
+2. AppOptions change option within request

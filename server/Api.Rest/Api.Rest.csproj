@@ -9,6 +9,13 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj"/>
+        
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NSwag.AspNetCore" Version="14.2.0" />
+      <PackageReference Include="Scalar.AspNetCore" Version="1.2.51" />
+        
     </ItemGroup>
 
 </Project>
