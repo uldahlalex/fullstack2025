@@ -1,3 +1,4 @@
+using infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,14 +9,14 @@ public static class Extensions
     {
         var assembly = typeof(Extensions).Assembly;
             
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<MyDbContext>(options =>
             options.UseNpgsql(connStr)
                 
         );
 
             
         using var scope = services.BuildServiceProvider().CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
         context.Database.EnsureCreated();
 
         return services;

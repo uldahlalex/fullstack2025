@@ -6,5 +6,4 @@ dotnet ef dbcontext scaffold \
   --context-dir . \
   --context MyDbContext  \
   --no-onconfiguring \
-  --data-annotations \
   --force
