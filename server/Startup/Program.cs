@@ -21,25 +21,7 @@ public static class Program
 
         var app = builder.Build();
 
-        var proxyConfiguration = new TcpProxyConfiguration
-        {
-            PublicHost = new Host
-            {
-                IpAddress = IPAddress.Parse("0.0.0.0"),
-                Port = 8080
-            },
-            HttpHost = new Host
-            {
-                IpAddress = IPAddress.Loopback,
-                Port = 5000
-            },
-            WebSocketHost = new Host
-            {
-                IpAddress = IPAddress.Loopback,
-                Port = 8181
-            }
-        };
-        new TcpProxyServer(proxyConfiguration).Start();
+       new ProxyConfig().StartProxyServer();
 
 
         app.AddMiddlewareForRestApi();

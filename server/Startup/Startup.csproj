@@ -7,8 +7,8 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\apis\restapi\restapi.csproj" />
-    <ProjectReference Include="..\apis\realtimeapi\realtimeapi.csproj" />
+    <ProjectReference Include="..\Api.Rest\Api.Rest.csproj" />
+    <ProjectReference Include="..\Api.Realtime\Api.Realtime.csproj" />
     <ProjectReference Include="..\Infrastructure.Repositories\Infrastructure.Repositories.csproj" />
     <ProjectReference Include="..\Application\Application.csproj" />
     
