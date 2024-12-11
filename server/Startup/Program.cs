@@ -1,5 +1,7 @@
+using System.Text.Json;
 using Api.Realtime;
 using Api.Rest;
+using infrastructure;
 using Infrastructure.Repositories;
 using service;
 
@@ -10,8 +12,11 @@ public static class Program
     public static void Main()
     {
         var builder = WebApplication.CreateBuilder();
-        builder.Services.AddDataSourceAndRepositories(
-            "Host=localhost;Database=testdb;Username=testuser;Password=testpass");
+
+        var options = builder.AddAppOptions();
+        Console.WriteLine("Starting with options: "+JsonSerializer.Serialize(options));
+
+        builder.Services.AddDataSourceAndRepositories(options.DbConnectionString);
         builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
@@ -24,6 +29,11 @@ public static class Program
 
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            scope.ServiceProvider.GetRequiredService<MyDbContext>().Database.EnsureCreated();
+        }
 
         app.Run();
     }
