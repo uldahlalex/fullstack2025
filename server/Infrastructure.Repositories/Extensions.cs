@@ -19,6 +19,7 @@ public static class Extensions
 
 
         services.AddScoped<IRepoLogic, Repo>();
+        services.AddScoped<Seeder>();
         return services;
     }
 

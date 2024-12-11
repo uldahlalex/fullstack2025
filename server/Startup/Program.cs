@@ -4,6 +4,7 @@ using Api.Rest;
 using infrastructure;
 using Infrastructure.Repositories;
 using service;
+using Startup.Extensions;
 
 namespace Startup;
 
@@ -32,9 +33,13 @@ public static class Program
 
         using (var scope = app.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<MyDbContext>().Database.EnsureCreated();
+            if (options.Seed)
+            {
+                var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
+                seeder.Seed();
+            }
         }
 
-        app.Run(Environment.GetEnvironmentVariable("PORT")??"8080");
+        app.Run();
     }
 }

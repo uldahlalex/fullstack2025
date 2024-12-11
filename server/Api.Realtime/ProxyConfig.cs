@@ -9,14 +9,12 @@ public class ProxyConfig
 {
     public void StartProxyServer()
     {
-        var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-
         var proxyConfiguration = new TcpProxyConfiguration
         {
             PublicHost = new Host
             {
                 IpAddress = IPAddress.Parse("0.0.0.0"),
-                Port = port
+                Port = 8080
             },
             HttpHost = new Host
             {

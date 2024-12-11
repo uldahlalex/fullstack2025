@@ -2,7 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using service.Types;
 
-public static class UniversalExtensions
+namespace Startup.Extensions;
+
+public static class AppOptionsExtensions
 {
     public static AppOptions AddAppOptions(this WebApplicationBuilder builder)
     {
