@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace service.Models;
 
-namespace infrastructure;
-
-public partial class AspNetUser
+public class AspNetUser
 {
     public string Id { get; set; } = null!;
 

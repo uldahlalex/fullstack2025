@@ -1,7 +1,7 @@
-﻿using core;
-using infrastructure;
+﻿using service.Interfaces;
+using service.Models;
 
-namespace service;
+namespace service.Services;
 
 public class ServiceLogic(IRepoLogic repo) : IServiceLogic
 {

@@ -1,8 +1,15 @@
 <Solution>
-  <Project Path="server/Api.Realtime/Api.Realtime.csproj" Type="Classic C#" />
-  <Project Path="server/Api.Rest/Api.Rest.csproj" Type="Classic C#" />
-  <Project Path="server/Infrastructure.Repositories/Infrastructure.Repositories.csproj" Type="Classic C#" />
-  <Project Path="server/Infrastructure.Scaffolding/Infrastructure.Scaffolding.csproj" Type="Classic C#" />
-  <Project Path="server/Startup/Startup.csproj" Type="Classic C#" />
-  <Project Path="server/Application/Application.csproj" Type="Classic C#" />
+    <Folder Name="server">
+        <Project Path="server/Api.Realtime/Api.Realtime.csproj" Type="Classic C#"/>
+        <Project Path="server/Api.Rest/Api.Rest.csproj" Type="Classic C#"/>
+        <Project Path="server/Infrastructure.Repositories/Infrastructure.Repositories.csproj" Type="Classic C#"/>
+        <Project Path="server/Infrastructure.Scaffolding/Infrastructure.Scaffolding.csproj" Type="Classic C#"/>
+        <Project Path="server/Startup/Startup.csproj" Type="Classic C#"/>
+        <Project Path="server/Application/Application.csproj" Type="Classic C#"/>
+        <Project Path="server/Api.Tests/Api.Tests.csproj" Type="Classic C#"/>
+    </Folder>
+    <Folder Name="client">
+
+    </Folder>
+
 </Solution>

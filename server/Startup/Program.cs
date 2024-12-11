@@ -1,11 +1,9 @@
-using System.Net;
+using Api.Realtime;
+using Api.Rest;
 using Infrastructure.Repositories;
-using realtimeapi;
-using restapi;
 using service;
-using WebSocketProxy;
-using Host = WebSocketProxy.Host;
 
+namespace Startup;
 
 public static class Program
 {
@@ -21,7 +19,7 @@ public static class Program
 
         var app = builder.Build();
 
-       new ProxyConfig().StartProxyServer();
+        new ProxyConfig().StartProxyServer();
 
 
         app.AddMiddlewareForRestApi();

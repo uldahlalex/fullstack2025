@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace service.Models;
 
-namespace infrastructure;
-
-public partial class AspNetUserClaim
+public class AspNetUserClaim
 {
     public int Id { get; set; }
 

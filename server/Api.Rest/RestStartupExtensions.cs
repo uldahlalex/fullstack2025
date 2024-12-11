@@ -1,4 +1,4 @@
-namespace restapi;
+namespace Api.Rest;
 
 public static class RestStartupExtensions
 {
@@ -13,5 +13,5 @@ public static class RestStartupExtensions
         app.MapControllers();
         app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;
-    } 
+    }
 }

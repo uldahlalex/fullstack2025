@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Fleck;
 
-namespace realtimeapi;
+namespace Api.Realtime;
 
 public class State
 {

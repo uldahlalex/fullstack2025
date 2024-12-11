@@ -1,5 +1,6 @@
-using core;
 using Microsoft.Extensions.DependencyInjection;
+using service.Interfaces;
+using service.Services;
 
 namespace service;
 

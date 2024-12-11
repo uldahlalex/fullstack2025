@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace service.Models;
 
-namespace infrastructure;
-
-public partial class AspNetUserLogin
+public class AspNetUserLogin
 {
     public string LoginProvider { get; set; } = null!;
 

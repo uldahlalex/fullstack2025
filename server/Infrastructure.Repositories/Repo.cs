@@ -1,7 +1,10 @@
-﻿using core;
-using infrastructure;
+﻿using infrastructure;
+using service.Interfaces;
+using service.Models;
 
 // using Infrastructure.Data
+
+namespace Infrastructure.Repositories;
 
 public class Repo(MyDbContext ctx) : IRepoLogic
 {

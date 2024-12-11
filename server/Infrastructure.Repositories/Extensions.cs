@@ -1,7 +1,7 @@
-﻿using core;
-using infrastructure;
+﻿using infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using service.Interfaces;
 
 namespace Infrastructure.Repositories;
 

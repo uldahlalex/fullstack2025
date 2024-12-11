@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace service.Models;
 
-namespace infrastructure;
-
-public partial class AspNetUserToken
+public class AspNetUserToken
 {
     public string UserId { get; set; } = null!;
 

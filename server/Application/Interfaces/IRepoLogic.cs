@@ -1,9 +1,8 @@
-using infrastructure;
+using service.Models;
 
-namespace core;
+namespace service.Interfaces;
 
 public interface IRepoLogic
 {
     public IEnumerable<Board> GetDomainModels();
-
 }
