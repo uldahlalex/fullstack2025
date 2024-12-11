@@ -2,8 +2,8 @@
   <Project Path="server/apis/realtimeapi/realtimeapi.csproj" Type="Classic C#" />
   <Project Path="server/apis/restapi/restapi.csproj" Type="Classic C#" />
   <Project Path="server/core/core.csproj" Type="Classic C#" />
+  <Project Path="server/Infrastructure.Repositories/Infrastructure.Repositories.csproj" Type="Classic C#" />
+  <Project Path="server/Infrastructure.Scaffolding/Infrastructure.Scaffolding.csproj" Type="Classic C#" />
   <Project Path="server/service/service.csproj" Type="Classic C#" />
   <Project Path="server/startup/startup.csproj" Type="Classic C#" />
-  <Project Path="server/Infrastructure.Scaffold/Infrastructure.Scaffold.csproj" Type="Classic C#" />
-  <Project Path="server/Infrastructure.Repositories/Infrastructure.Repositories.csproj" Type="Classic C#" />
 </Solution>
