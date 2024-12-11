@@ -14,11 +14,7 @@ public static class Extensions
             options.EnableSensitiveDataLogging();
             options.UseNpgsql(connString);
         });
-        using (var scope = services.BuildServiceProvider().CreateScope())
-        {
-            var context = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-            context.Database.EnsureCreated();
-        }
+
 
         services.AddScoped<IRepoLogic, Repo>();
         return services;

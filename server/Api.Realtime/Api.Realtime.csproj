@@ -11,14 +11,8 @@
     <PackageReference Include="AsyncApi.Net.Generator" Version="*" />
     <PackageReference Include="patrikvalentiny-WebSocketProxy" Version="1.1.0" />
     <PackageReference Include="uldahlalex.websocket.boilerplate" Version="1.7" />
+    <ProjectReference Include="..\Application\Application.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\..\core\core.csproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Remove="Properties\launchSettings.json" />
-  </ItemGroup>
+
 
 </Project>
