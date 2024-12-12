@@ -26,6 +26,7 @@ public class ClientWantsToEcho(IServiceLogic service) : BaseEventHandler<ClientW
         var message = JsonSerializer.Serialize(new ServerSendsEchoDto
             { message = JsonSerializer.Serialize(service.GetDomainModels()), client = socket.ConnectionInfo.Id });
 
+        var info = socket.ConnectionInfo.Id;
         service.Broadcast(message, socket.ConnectionInfo.Id);
         return Task.CompletedTask;
     }

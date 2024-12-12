@@ -14,17 +14,12 @@ public class ServiceLogic(IDataRepository repo,
 
     public void Broadcast(string jsonSerializedMessage, params Guid[] connectionIds)
     {
-        timeSeriesPublishing.Publish();
+        broadcaster.Broadcast(jsonSerializedMessage, connectionIds);
     }
 
     public void Publish()
     {
         throw new NotImplementedException();
-    }
-
-    public void Broadcast(List<Guid> connectionIds, string jsonSerializedMessage)
-    {
-        broadcaster.Broadcast(connectionIds, jsonSerializedMessage);
     }
 
   

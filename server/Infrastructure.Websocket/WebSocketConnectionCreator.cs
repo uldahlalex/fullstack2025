@@ -1,4 +1,5 @@
 using Fleck;
+using Infrastructure.Websocket;
 using service;
 
 public class WebSocketConnectionCreator : IConnectionCreator
@@ -7,7 +8,7 @@ public class WebSocketConnectionCreator : IConnectionCreator
     {
         if (nativeConnection is IWebSocketConnection wsConnection)
         {
-            return new WebSocketConnection(wsConnection);
+            return new WebSocketConnectionAdapter(wsConnection);
         }
         
         throw new ArgumentException("Invalid connection type");
