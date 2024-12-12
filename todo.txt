@@ -4,6 +4,9 @@
     - MQTT publish i infra
     - MQTT subscribe i API
     
+- Auth
+    
+- README.md
     
 "Topics" for Websocket to generalize?
     - Is this just a different psuedonum for "rooms / channels"?

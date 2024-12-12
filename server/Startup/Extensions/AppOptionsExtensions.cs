@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Microsoft.Extensions.Options;
 using service;
 
@@ -25,7 +26,9 @@ public static class AppOptionsExtensions
 
                     return isValid;
                 }, $"{nameof(AppOptions)} validation failed");
-        return builder.Configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
+        var options = builder.Configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
                throw new InvalidCastException("Could not parse as AppOptions");
+        Console.WriteLine("AppOptions: " + JsonSerializer.Serialize(options));
+        return options;
     }
 }
