@@ -18,8 +18,9 @@ public static class RestStartupExtensions
         {
             app.UseOpenApi(options =>
             {
-                options.Path = "/openapi";
+                options.Path = "/openapi/myapi.json";
             });
+            //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
             app.MapScalarApiReference();
         }
         app.MapControllers();
