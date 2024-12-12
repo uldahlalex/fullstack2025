@@ -4,12 +4,13 @@ using service.Models;
 
 // using Infrastructure.Data
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Repositories.Postgresql.Data;
 
-public class Repo(MyDbContext ctx) : IRepoLogic
+public class Repo(MyDbContext ctx) : IDataRepository
 {
     public IEnumerable<Board> GetDomainModels()
     {
         return ctx.Boards.ToList();
     }
+    
 }

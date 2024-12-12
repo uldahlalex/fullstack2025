@@ -1,11 +1,12 @@
 ﻿using infrastructure;
+using Infrastructure.Repositories.Postgresql.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Npgsql;
 using PgCtx;
+using service;
 using service.Interfaces;
-using service.Types;
 
 namespace Infrastructure.Repositories;
 
@@ -37,7 +38,7 @@ public static class Extensions
         });
 
 
-        services.AddScoped<IRepoLogic, Repo>();
+        services.AddScoped<IDataRepository, Repo>();
         services.AddScoped<Seeder>();
         return services;
     }

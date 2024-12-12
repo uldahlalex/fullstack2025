@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using service.Interfaces;
 using service.Services;
 
-namespace service;
+namespace service.Extensions;
 
 public static class ServiceExtensions
 {

@@ -4,7 +4,10 @@ using Api.Rest;
 using Api.Rest.Controllers;
 using infrastructure;
 using Infrastructure.Repositories;
+using Infrastructure.Websocket;
+using Microsoft.AspNetCore.WebSockets;
 using service;
+using service.Extensions;
 using Startup.Extensions;
 
 namespace Startup;
@@ -17,8 +20,8 @@ public static class Program
 
         var options = builder.AddAppOptions();
         Console.WriteLine("Starting with options: "+JsonSerializer.Serialize(options));
-
         builder.Services.AddDataSourceAndRepositories();
+        builder.Services.AddWebsocketInfrastructure();
         builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();

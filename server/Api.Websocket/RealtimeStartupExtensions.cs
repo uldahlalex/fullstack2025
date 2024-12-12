@@ -3,6 +3,7 @@ using AsyncApi.Net.Generator;
 using AsyncApi.Net.Generator.AsyncApiSchema.v2;
 using Fleck;
 using lib;
+using service.Interfaces;
 
 namespace Api.Realtime;
 
@@ -21,10 +22,8 @@ public static class RealtimeStartupExtensions
         //         Info = new Info { Title = "My application", Description = "Fullstack 2025" }
         //     };
         // });
-        builder.Services.AddSingleton<State>();
-        var assembly = typeof(State).Assembly;
+        var assembly = typeof(RealtimeStartupExtensions).Assembly;
         Services = builder.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
-
         return builder;
     }
 
@@ -37,13 +36,14 @@ public static class RealtimeStartupExtensions
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         server.Start(ws =>
         {
-            ws.OnOpen = () => { app.Services.GetRequiredService<State>().Connections.TryAdd(Guid.NewGuid(), ws); };
-            ws.OnClose = () =>
+            server.Start(ws =>
             {
-                var state = app.Services.GetRequiredService<State>();
-                var key = state.Connections.FirstOrDefault(x => x.Value == ws).Key;
-                state.Connections.TryRemove(key, out _);
-            };
+                var adapter = new IWebSocketConnectionAdapter(ws);
+                var registry = app.Services.GetRequiredService<IConnectionRegistry>();
+
+                ws.OnOpen = () => registry.RegisterConnection(adapter);
+                ws.OnClose = () => registry.UnregisterConnection(adapter);
+            });
             ws.OnError = ex => { Console.WriteLine(ex.Message); };
             ws.OnMessage = async message =>
             {

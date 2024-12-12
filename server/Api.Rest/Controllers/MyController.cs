@@ -1,9 +1,9 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using service;
 using service.Interfaces;
 using service.Models;
-using service.Types;
 
 namespace Api.Rest.Controllers;
 

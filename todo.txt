@@ -1,1 +1,9 @@
-1. vite prod url change
+- MQTT implementation
+    - Docker broker
+    - WS broadcast i infra
+    - MQTT publish i infra
+    - MQTT subscribe i API
+    
+    
+"Topics" for Websocket to generalize?
+    - Is this just a different psuedonum for "rooms / channels"?

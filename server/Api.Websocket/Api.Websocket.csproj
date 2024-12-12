@@ -5,6 +5,7 @@
         <OutputType>library</OutputType>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Api.Realtime</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

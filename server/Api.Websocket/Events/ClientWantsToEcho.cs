@@ -19,12 +19,14 @@ public class ServerSendsEchoDto : BaseDto
 
 [SubscribeOperation<ClientWantsToEchoDto>(nameof(ClientWantsToEcho))]
 [PublishOperation<ServerSendsEchoDto>(nameof(ServerSendsEchoDto))]
-public class ClientWantsToEcho(State state, IServiceLogic service) : BaseEventHandler<ClientWantsToEchoDto>
+public class ClientWantsToEcho(IServiceLogic service) : BaseEventHandler<ClientWantsToEchoDto>
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {
-        socket.SendDto(new ServerSendsEchoDto
+        var message = JsonSerializer.Serialize(new ServerSendsEchoDto
             { message = JsonSerializer.Serialize(service.GetDomainModels()), client = socket.ConnectionInfo.Id });
+
+        service.Broadcast(message, socket.ConnectionInfo.Id);
         return Task.CompletedTask;
     }
 }
