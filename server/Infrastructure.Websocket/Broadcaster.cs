@@ -3,7 +3,7 @@
 namespace Infrastructure.Websocket;
 
 
-public class Broadcaster(State state) : IBroadcaster
+public class Broadcaster(IState state) : IBroadcaster
 {
     public void Broadcast(List<Guid> connectionIds, string jsonSerializedMessage)
     {

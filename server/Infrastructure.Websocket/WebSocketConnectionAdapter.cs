@@ -1,20 +1,11 @@
 using Fleck;
 using service;
 
-public class WebSocketConnectionAdapter(IWebSocketConnection fleckConnection) : IConnection
+public class WebSocketConnection(IWebSocketConnection connection) : IConnection
 {
-
-    public void Send(string jsonSerialzedMessage)
+    public void Send(string jsonSerializedMessage)
     {
-        fleckConnection.Send(jsonSerialzedMessage);
+        connection.Send(jsonSerializedMessage);
     }
-    public IConnection Create(object nativeConnection)
-    {
-        if (nativeConnection is IWebSocketConnection wsConnection)
-        {
-            return new IWebSocketConnection(wsConnection);
-        }
-        
-        throw new ArgumentException("Invalid connection type");
-    }
+    
 }

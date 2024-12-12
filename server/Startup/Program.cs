@@ -3,6 +3,7 @@ using Api.Realtime;
 using Api.Rest;
 using Api.Rest.Controllers;
 using infrastructure;
+using Infrastructure.Mqtt;
 using Infrastructure.Repositories;
 using Infrastructure.Websocket;
 using Microsoft.AspNetCore.WebSockets;
@@ -19,12 +20,15 @@ public static class Program
         var builder = WebApplication.CreateBuilder();
 
         var options = builder.AddAppOptions();
-        Console.WriteLine("Starting with options: "+JsonSerializer.Serialize(options));
         builder.Services.AddDataSourceAndRepositories();
         builder.Services.AddWebsocketInfrastructure();
+        builder.Services.AddMqttInfrastructure();
+        
         builder.Services.AddApplicationServices();
+        
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
+        
         builder.WebHost.UseUrls("http://*:5000");
 
         var app = builder.Build();
