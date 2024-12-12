@@ -3,7 +3,7 @@ import useCustomWsClient from './useCustomWsClient.ts';
 import ClientWantsToEchoDto from "./models/generated/ClientWantsToEchoDto.ts";
 import {EchoAtom} from "./Atoms.ts";
 import {useAtom} from "jotai";
-
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export  const App = () => {
 
@@ -20,6 +20,9 @@ const [history, setHistory] = useAtom(EchoAtom);
 
     return (
         <div>
+            {
+                API_BASE_URL
+            }
             {
                 history.map((message, index) => {
                     return <div key={index}>{JSON.stringify(message)}</div>

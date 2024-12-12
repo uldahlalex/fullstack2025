@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Api.Realtime;
 using Api.Rest;
+using Api.Rest.Controllers;
 using infrastructure;
 using Infrastructure.Repositories;
 using service;
@@ -17,7 +18,7 @@ public static class Program
         var options = builder.AddAppOptions();
         Console.WriteLine("Starting with options: "+JsonSerializer.Serialize(options));
 
-        builder.Services.AddDataSourceAndRepositories(options.DbConnectionString);
+        builder.Services.AddDataSourceAndRepositories();
         builder.Services.AddApplicationServices();
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
@@ -31,15 +32,13 @@ public static class Program
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
 
-        using (var scope = app.Services.CreateScope())
+        
+        if (options.Seed)
         {
-            if (options.Seed)
-            {
-                var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
-                seeder.Seed();
-            }
+            using var scope = app.Services.CreateScope();
+            var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
+            seeder.Seed();
         }
-
         app.Run();
     }
 }
