@@ -3,7 +3,7 @@ using WebSocketProxy;
 using Host = WebSocketProxy.Host;
 
 
-namespace Api.Realtime;
+namespace Startup;
 
 public class ProxyConfig
 {

@@ -3,10 +3,9 @@ using Infrastructure.Repositories.Postgresql.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Npgsql;
 using PgCtx;
 using service;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.Data;
 
 namespace Infrastructure.Repositories;
 
@@ -14,42 +13,45 @@ public static class Extensions
 {
     public static IServiceCollection AddDataSourceAndRepositories(this IServiceCollection services)
     {
-        
+        var serviceProvider = services.BuildServiceProvider();
+        var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
+        var connectionString = optionsMonitor.CurrentValue.DbConnectionString;
+
+        // Create a DbContextOptionsBuilder and configure it
+        var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();
+        optionsBuilder.EnableSensitiveDataLogging();
+        optionsBuilder.UseNpgsql(connectionString);
+
+        // Try to create a DbContext and open a connection
         try
         {
-            services.AddDbContext<MyDbContext>((serviceProvider, options) =>
+            using (var context = new MyDbContext(optionsBuilder.Options))
             {
-                Console.WriteLine("Connecting to DB at "+ serviceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue.DbConnectionString);
-                var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
-                options.EnableSensitiveDataLogging();
-                options.UseNpgsql(optionsMonitor.CurrentValue.DbConnectionString);
-            });
-            //Test DB connection
-         
-            var result = services.BuildServiceProvider().GetRequiredService<MyDbContext>().Database.ExecuteSql($"Select 'test';");
-            Console.WriteLine(result);
+                context.Database.OpenConnection();
+            }
         }
         catch (Exception e)
         {
             Console.WriteLine("Error connecting to DB: " + e.Message + " " + e.StackTrace);
-            Console.WriteLine("Starting DB in testcontainer instead");
+            Console.WriteLine("Starting DB in test container instead");
+
             var pgCtxSetup = new PgCtxSetup<MyDbContext>();
-            services.AddDbContext<MyDbContext>((serviceProvider, options) =>
-            {
-                var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
-                optionsMonitor.CurrentValue.DbConnectionString = pgCtxSetup._postgres.GetConnectionString();
-                options.EnableSensitiveDataLogging();
-                options.UseNpgsql(optionsMonitor.CurrentValue.DbConnectionString);
-            });
+            connectionString = pgCtxSetup._postgres.GetConnectionString();
+
+            // Reconfigure the optionsBuilder to use the new connection string
+            optionsBuilder.UseNpgsql(connectionString);
         }
 
-
-
+        // Add the DbContext with the configured options to the service collection
+        services.AddDbContext<MyDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+            options.EnableSensitiveDataLogging();
+        });
 
         services.AddScoped<IDataRepository, Repo>();
         services.AddScoped<Seeder>();
-        return services;
-    } 
 
-  
+        return services;
+    }
 }

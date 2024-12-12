@@ -1,10 +1,7 @@
-using Api.Realtime.Events;
-using AsyncApi.Net.Generator;
-using AsyncApi.Net.Generator.AsyncApiSchema.v2;
 using Fleck;
 using lib;
 using service;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.Broadcasting;
 
 namespace Api.Realtime;
 
@@ -14,7 +11,7 @@ public static class WebSocketExtensions
 
     public static WebApplicationBuilder AddDependenciesForRealtimeApi(this WebApplicationBuilder builder)
     {
-             var assembly = typeof(WebSocketExtensions).Assembly;
+        var assembly = typeof(WebSocketExtensions).Assembly;
         Services = builder.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
         return builder;
     }
@@ -22,7 +19,6 @@ public static class WebSocketExtensions
 
     public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app)
     {
- 
         app.UseRouting();
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         server.Start(ws =>

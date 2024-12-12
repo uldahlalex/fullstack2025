@@ -16,13 +16,11 @@ public static class RestStartupExtensions
     {
         if (app.Environment.IsDevelopment())
         {
-            app.UseOpenApi(options =>
-            {
-                options.Path = "/openapi/myapi.json";
-            });
+            app.UseOpenApi(options => { options.Path = "/openapi/myapi.json"; });
             //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
             app.MapScalarApiReference();
         }
+
         app.MapControllers();
         app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;

@@ -1,5 +1,5 @@
 ﻿using infrastructure;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.Data;
 using service.Models;
 
 // using Infrastructure.Data
@@ -12,5 +12,4 @@ public class Repo(MyDbContext ctx) : IDataRepository
     {
         return ctx.Boards.ToList();
     }
-    
 }

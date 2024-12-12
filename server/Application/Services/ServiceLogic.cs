@@ -1,10 +1,14 @@
 ﻿using service.Interfaces;
+using service.Interfaces.Infrastructure.Broadcasting;
+using service.Interfaces.Infrastructure.Data;
+using service.Interfaces.Infrastructure.TimeeSeries;
 using service.Models;
 
 namespace service.Services;
 
-public class ServiceLogic(IDataRepository repo, 
-    ITimeSeriesPublishing timeSeriesPublishing, 
+public class ServiceLogic(
+    IDataRepository repo,
+    ITimeSeriesPublishing timeSeriesPublishing,
     IBroadcaster broadcaster) : IServiceLogic
 {
     public IEnumerable<Board> GetDomainModels()
@@ -21,6 +25,4 @@ public class ServiceLogic(IDataRepository repo,
     {
         throw new NotImplementedException();
     }
-
-  
 }

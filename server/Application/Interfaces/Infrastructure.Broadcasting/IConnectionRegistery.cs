@@ -1,4 +1,4 @@
-namespace service.Interfaces;
+namespace service.Interfaces.Infrastructure.Broadcasting;
 
 public interface IConnectionRegistry
 {

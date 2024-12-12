@@ -1,12 +1,14 @@
 using System.Collections.Concurrent;
 using service;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.Broadcasting;
+
+namespace Infrastructure.Websocket;
 
 public class State : IState
 {
     private readonly ConcurrentDictionary<Guid, IConnection> _connections = new();
-    
-    public ConcurrentDictionary<Guid, IConnection> Connections => 
+
+    public ConcurrentDictionary<Guid, IConnection> Connections =>
         new(_connections);
 
     public bool TryAddConnection(IConnection connection)

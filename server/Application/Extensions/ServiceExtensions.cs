@@ -11,6 +11,4 @@ public static class ServiceExtensions
         services.AddScoped<IServiceLogic, ServiceLogic>();
         return services;
     }
-    
-  
 }

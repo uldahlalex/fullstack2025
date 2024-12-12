@@ -1,6 +1,6 @@
 using service.Models;
 
-namespace service.Interfaces;
+namespace service.Interfaces.Infrastructure.Data;
 
 public interface IDataRepository
 {

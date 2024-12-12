@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.TimeeSeries;
 
 namespace Infrastructure.Mqtt;
 

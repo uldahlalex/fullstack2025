@@ -1,13 +1,8 @@
-using System.Text.Json;
 using Api.Realtime;
 using Api.Rest;
-using Api.Rest.Controllers;
-using infrastructure;
 using Infrastructure.Mqtt;
 using Infrastructure.Repositories;
 using Infrastructure.Websocket;
-using Microsoft.AspNetCore.WebSockets;
-using service;
 using service.Extensions;
 using Startup.Extensions;
 

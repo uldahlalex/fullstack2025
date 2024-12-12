@@ -1,5 +1,7 @@
 using service;
-using service.Interfaces;
+using service.Interfaces.Infrastructure.Broadcasting;
+
+namespace Infrastructure.Websocket;
 
 public class ConnectionRegistry(IState state) : IConnectionRegistry
 {
