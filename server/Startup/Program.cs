@@ -8,7 +8,7 @@ using Startup.Extensions;
 
 namespace Startup;
 
-public static class Program
+public  class Program
 {
     public static void Main()
     {
@@ -25,13 +25,19 @@ public static class Program
         builder.AddDependenciesForRestApi();
         builder.AddDependenciesForRealtimeApi();
 
-        builder.WebHost.UseUrls("http://*:5000");
+        // builder.WebHost.UseUrls("http://*:5000");
 
         var app = builder.Build();
 
         app.Services.GetRequiredService<ProxyConfig>().StartProxyServer();
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
+
+        app.MapGet("Acceptance", () =>
+        {   
+            return "Acceptance";
+
+        });
 
 
         if (options.Seed)

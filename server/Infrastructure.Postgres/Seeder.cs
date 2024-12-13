@@ -4,7 +4,7 @@ namespace Infrastructure.Repositories;
 
 public class Seeder(MyDbContext context)
 {
-    public void Seed()
+    public async Task Seed()
     {
         context.Database.EnsureCreated();
     }

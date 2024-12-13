@@ -7,6 +7,10 @@
 - Auth
     
 - README.md
+
+- Testing
+
+- Exception handling for all API's
     
 "Topics" for Websocket to generalize?
     - Is this just a different psuedonum for "rooms / channels"?
