@@ -14,7 +14,7 @@ public static class RestStartupExtensions
 
     public static WebApplication AddMiddlewareForRestApi(this WebApplication app)
     {
-        if (app.Environment.IsDevelopment())
+        if (!app.Environment.IsProduction())
         {
             app.UseOpenApi(options => { options.Path = "/openapi/myapi.json"; });
             //To open the Scalar page, go to: http://localhost:5000/scalar/myapi

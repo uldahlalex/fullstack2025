@@ -18,9 +18,9 @@ public class ApiTestBase : WebApplicationFactory<Program>
 {
     public ApiTestBase(ITestOutputHelper outputHelper)
     {
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
         _outputHelper = outputHelper;
         PgCtxSetup = new PgCtxSetup<MyDbContext>();
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
         ApplicationServices = base.Services.CreateScope().ServiceProvider;
         ApplicationServices.GetRequiredService<Seeder>().Seed().GetAwaiter().GetResult(); //todo is already being called? how does webhost actually work
         // var tokenService = ApplicationServices.GetRequiredService<ITokenClaimsService>();
@@ -49,8 +49,11 @@ public class ApiTestBase : WebApplicationFactory<Program>
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType ==
                      typeof(DbContextOptions<MyDbContext>));
-
             if (descriptor != null) services.Remove(descriptor);
+
+            var proxy = services.SingleOrDefault(d => d.ServiceType == typeof(ProxyConfig));
+            if (proxy != null) services.Remove(proxy);
+
 
             services.AddDbContext<MyDbContext>(opt =>
             {
