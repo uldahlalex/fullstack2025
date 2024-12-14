@@ -45,7 +45,6 @@ public class ApiTestBase : WebApplicationFactory<Program>
     {
         builder.ConfigureServices(services =>
         {
-            // Remove and replace DbContext
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<MyDbContext>));
             if (descriptor != null) services.Remove(descriptor);
@@ -67,7 +66,12 @@ public class ApiTestBase : WebApplicationFactory<Program>
             logging.ClearProviders();
             logging.AddXUnit(_outputHelper);
         });
+        
+         // base.ConfigureWebHost(builder);
+
     }
+    
+
 
 
     #region properties

@@ -1,3 +1,6 @@
+- Simplify Startup + ApiTestBase
+    - Kan jeg evt få builderen + webapplication til at anvende samme typer som webhost'en?
+
 - MQTT implementation
     - Docker broker
     - WS broadcast i infra

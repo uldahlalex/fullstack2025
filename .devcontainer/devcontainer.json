@@ -14,8 +14,10 @@
     }
   },
 
-  "forwardPorts": [5000, 5001, 8080],
 
   "postCreateCommand": "echo hello world",
-  "runArgs": ["--init"]
+  "runArgs": [
+    "--init",
+    "--network=host"
+  ]
 }
