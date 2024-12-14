@@ -1,5 +1,6 @@
 using Api.Realtime;
 using Api.Rest;
+using Api.Tests;
 using Infrastructure.Mqtt;
 using Infrastructure.Repositories;
 using Infrastructure.Websocket;
@@ -15,7 +16,7 @@ public  class Program
         var builder = WebApplication.CreateBuilder();
 
         var options = builder.AddAppOptions();
-        builder.Services.AddSingleton<ProxyConfig>();
+        builder.Services.AddSingleton<IProxyConfig, ProxyConfig>();
         builder.Services.AddDataSourceAndRepositories();
         builder.Services.AddWebsocketInfrastructure();
         builder.Services.AddMqttInfrastructure();
@@ -29,7 +30,7 @@ public  class Program
 
         var app = builder.Build();
 
-        app.Services.GetRequiredService<ProxyConfig>().StartProxyServer();
+        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer();
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
 
@@ -44,7 +45,7 @@ public  class Program
         {
             using var scope = app.Services.CreateScope();
             var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
-            seeder.Seed();
+            seeder.Seed().Wait();
         }
 
         app.Run();

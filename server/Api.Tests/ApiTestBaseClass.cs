@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using infrastructure;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -41,19 +42,14 @@ public class ApiTestBase : WebApplicationFactory<Program>
 
     public IdentityUser User { get; set; }
 
-
-    protected override IHost CreateHost(IHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
+            // Remove and replace DbContext
             var descriptor = services.SingleOrDefault(
-                d => d.ServiceType ==
-                     typeof(DbContextOptions<MyDbContext>));
+                d => d.ServiceType == typeof(DbContextOptions<MyDbContext>));
             if (descriptor != null) services.Remove(descriptor);
-
-            var proxy = services.SingleOrDefault(d => d.ServiceType == typeof(ProxyConfig));
-            if (proxy != null) services.Remove(proxy);
-
 
             services.AddDbContext<MyDbContext>(opt =>
             {
@@ -61,14 +57,19 @@ public class ApiTestBase : WebApplicationFactory<Program>
                 opt.EnableSensitiveDataLogging(false);
                 opt.LogTo(_ => { });
             });
-        }).ConfigureLogging(logging =>
+            var proxy = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IProxyConfig));
+            if (proxy != null) services.Remove(proxy);
+            services.AddSingleton<IProxyConfig, MockProxyConfig>();
+        });
+
+        builder.ConfigureLogging(logging =>
         {
             logging.ClearProviders();
             logging.AddXUnit(_outputHelper);
         });
-
-        return base.CreateHost(builder);
     }
+
 
     #region properties
 

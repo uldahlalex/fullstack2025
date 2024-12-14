@@ -5,7 +5,12 @@ using Host = WebSocketProxy.Host;
 
 namespace Startup;
 
-public class ProxyConfig
+public interface IProxyConfig
+{
+    void StartProxyServer();
+}
+
+public class ProxyConfig : IProxyConfig
 {
     public void StartProxyServer()
     {
