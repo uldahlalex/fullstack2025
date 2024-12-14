@@ -19,7 +19,6 @@ public class ApiTestBase : WebApplicationFactory<Program>
 {
     public ApiTestBase(ITestOutputHelper outputHelper)
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Testing");
         _outputHelper = outputHelper;
         PgCtxSetup = new PgCtxSetup<MyDbContext>();
         ApplicationServices = base.Services.CreateScope().ServiceProvider;
