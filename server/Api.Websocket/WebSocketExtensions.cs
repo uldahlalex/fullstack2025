@@ -8,15 +8,15 @@ namespace Api.Realtime;
 public static class WebSocketExtensions
 {
 
-    public static HashSet<Type> AddDependenciesForRealtimeApiReturnEventHandlers(this IServiceCollection services)
+    public static IServiceCollection AddDependenciesForRealtimeApi(this IServiceCollection services)
     {
         var assembly = typeof(WebSocketExtensions).Assembly;
-        var types = services.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
-        return types;
+        services.FindAndInjectClientEventHandlers(assembly, ServiceLifetime.Scoped);
+        return services;
     }
 
 
-    public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app, HashSet<Type> clientEventHandlers)
+    public static WebApplication AddMiddlewareForRealtimeApi(this WebApplication app)
     {
         app.UseRouting();
         var server = new WebSocketServer("ws://0.0.0.0:8181");
@@ -32,7 +32,7 @@ public static class WebSocketExtensions
             {
                 try
                 {
-                    await app.InvokeClientEventHandler(clientEventHandlers, ws, message, ServiceLifetime.Scoped);
+                    await app.InvokeClientEventHandler(new HashSet<Type>(), ws, message, ServiceLifetime.Scoped);
                 }
                 catch (Exception ex)
                 {

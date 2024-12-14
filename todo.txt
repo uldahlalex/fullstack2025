@@ -1,5 +1,7 @@
 - Simplify Startup + ApiTestBase
     - Kan jeg evt få builderen + webapplication til at anvende samme typer som webhost'en?
+    - Det med hashset af types giver måske meget lidt mening pga den statiske kontekst: migrer væk og få et mere simpelt startup
+    - Vil gerne helt undgå både configurewebhost + createwebhost men jeg skal lige forstå workflowet helt
 
 - MQTT implementation
     - Docker broker

@@ -20,6 +20,6 @@ public class OpenApiTests(ITestOutputHelper outputHelper) : ApiTestBase(outputHe
     {
         var client = CreateClient();
         var response = await client.GetAsync("/acceptance");
-        Assert.Equal("Acceptance", await response.Content.ReadAsStringAsync());
+        Assert.Equal("Accepted", await response.Content.ReadAsStringAsync());
     }
 }

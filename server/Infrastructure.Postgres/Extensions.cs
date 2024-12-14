@@ -17,12 +17,10 @@ public static class Extensions
         var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
         var connectionString = optionsMonitor.CurrentValue.DbConnectionString;
 
-        // Create a DbContextOptionsBuilder and configure it
         var optionsBuilder = new DbContextOptionsBuilder<MyDbContext>();
         optionsBuilder.EnableSensitiveDataLogging();
         optionsBuilder.UseNpgsql(connectionString);
 
-        // Try to create a DbContext and open a connection
         try
         {
             using (var context = new MyDbContext(optionsBuilder.Options))
@@ -37,12 +35,9 @@ public static class Extensions
 
             var pgCtxSetup = new PgCtxSetup<MyDbContext>();
             connectionString = pgCtxSetup._postgres.GetConnectionString();
-
-            // Reconfigure the optionsBuilder to use the new connection string
+            optionsMonitor.CurrentValue.DbConnectionString = connectionString;
             optionsBuilder.UseNpgsql(connectionString);
         }
-
-        // Add the DbContext with the configured options to the service collection
         services.AddDbContext<MyDbContext>(options =>
         {
             options.UseNpgsql(connectionString);
