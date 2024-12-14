@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using infrastructure;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -43,8 +44,12 @@ public class ApiTestBase : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
+            // First call the Program's ConfigureServices
+            Program.ConfigureServices(services, context.Configuration);
+
+            // Then override what you need
             var descriptor = services.SingleOrDefault(
                 d => d.ServiceType == typeof(DbContextOptions<MyDbContext>));
             if (descriptor != null) services.Remove(descriptor);
@@ -55,6 +60,7 @@ public class ApiTestBase : WebApplicationFactory<Program>
                 opt.EnableSensitiveDataLogging(false);
                 opt.LogTo(_ => { });
             });
+            
             var proxy = services.SingleOrDefault(
                 d => d.ServiceType == typeof(IProxyConfig));
             if (proxy != null) services.Remove(proxy);
@@ -66,11 +72,27 @@ public class ApiTestBase : WebApplicationFactory<Program>
             logging.ClearProviders();
             logging.AddXUnit(_outputHelper);
         });
-        
-         // base.ConfigureWebHost(builder);
 
+        // Add the middleware configuration
+        builder.Configure(app =>
+        {
+            // You might need to cast to WebApplication here
+            // or create a test-specific middleware configuration
+            Program.ConfigureMiddleware((WebApplication)app);
+        });
     }
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        var host = base.CreateHost(builder);
     
+        using (var scope = host.Services.CreateScope())
+        {
+            ApplicationServices = scope.ServiceProvider;
+            // Initialize your other services here
+        }
+    
+        return host;
+    }
 
 
 

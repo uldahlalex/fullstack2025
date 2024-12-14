@@ -1,53 +1,64 @@
 using Api.Realtime;
 using Api.Rest;
-using Api.Tests;
 using Infrastructure.Mqtt;
 using Infrastructure.Repositories;
 using Infrastructure.Websocket;
+using service;
 using service.Extensions;
 using Startup.Extensions;
 
 namespace Startup;
 
-public  class Program
+public class Program
 {
+    private static HashSet<Type> _eventHandlers;
+    private static AppOptions _appOptions;
+
+
     public static void Main()
     {
         var builder = WebApplication.CreateBuilder();
-
-        var options = builder.AddAppOptions();
-        builder.Services.AddSingleton<IProxyConfig, ProxyConfig>();
-        builder.Services.AddDataSourceAndRepositories();
-        builder.Services.AddWebsocketInfrastructure();
-        builder.Services.AddMqttInfrastructure();
-
-        builder.Services.AddApplicationServices();
-
-        builder.AddDependenciesForRestApi();
-        builder.AddDependenciesForRealtimeApi();
-
-        // builder.WebHost.UseUrls("http://*:5000");
-
+        
+        ConfigureServices(builder.Services, builder.Configuration);
+        
         var app = builder.Build();
+        
+        ConfigureMiddleware(app);
+        
+        // var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+        // var url = $"http://0.0.0.0:{port}";
+        app.Run(
+            // url
+            );
+    }
 
-        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer();
-        app.AddMiddlewareForRestApi();
-        app.AddMiddlewareForRealtimeApi();
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    {
+        _appOptions = services.AddAppOptions(configuration);
+        services.AddSingleton<IProxyConfig, ProxyConfig>();
+        services.AddDataSourceAndRepositories();
+        services.AddWebsocketInfrastructure();
+        services.AddMqttInfrastructure();
 
-        app.MapGet("Acceptance", () =>
-        {   
-            return "Acceptance";
+        services.AddApplicationServices();
 
-        });
+        services.AddDependenciesForRestApi();
+        _eventHandlers = services.AddDependenciesForRealtimeApiReturnEventHandlers();
+    }
 
-
-        if (options.Seed)
+    public static void ConfigureMiddleware( WebApplication app)
+    {
+        if (_appOptions.Seed)
         {
             using var scope = app.Services.CreateScope();
             var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
             seeder.Seed().Wait();
         }
 
-        app.Run();
+        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer();
+        app.AddMiddlewareForRestApi();
+        app.AddMiddlewareForRealtimeApi(_eventHandlers);
+
+        app.MapGet("Acceptance", () => "Accepted");
     }
 }

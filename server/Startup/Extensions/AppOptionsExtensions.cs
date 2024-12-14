@@ -7,10 +7,12 @@ namespace Startup.Extensions;
 
 public static class AppOptionsExtensions
 {
-    public static AppOptions AddAppOptions(this WebApplicationBuilder builder)
+    public static AppOptions AddAppOptions(
+        this IServiceCollection services,
+        IConfiguration configuration) 
     {
-        builder.Services.AddOptionsWithValidateOnStart<AppOptions>()
-            .Bind(builder.Configuration.GetSection(nameof(AppOptions)))
+        services.AddOptionsWithValidateOnStart<AppOptions>()
+            .Bind(configuration.GetSection(nameof(AppOptions)))
             .ValidateDataAnnotations()
             .Validate(options =>
                 {
@@ -26,7 +28,8 @@ public static class AppOptionsExtensions
 
                     return isValid;
                 }, $"{nameof(AppOptions)} validation failed");
-        var options = builder.Configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
+
+        var options = configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
                       throw new InvalidCastException("Could not parse as AppOptions");
         Console.WriteLine("AppOptions: " + JsonSerializer.Serialize(options));
         return options;

@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="AsyncApi.Net.Generator" Version="*"/>
-        <PackageReference Include="uldahlalex.websocket.boilerplate" Version="1.7"/>
+        <PackageReference Include="uldahlalex.websocket.boilerplate" Version="1.8"/>
         <ProjectReference Include="..\Application\Application.csproj"/>
     </ItemGroup>
 

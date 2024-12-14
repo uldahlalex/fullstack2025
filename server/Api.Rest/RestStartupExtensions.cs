@@ -4,12 +4,12 @@ namespace Api.Rest;
 
 public static class RestStartupExtensions
 {
-    public static WebApplicationBuilder AddDependenciesForRestApi(this WebApplicationBuilder builder)
+    public static IServiceCollection AddDependenciesForRestApi(this IServiceCollection services)
     {
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddOpenApiDocument();
-        builder.Services.AddControllers();
-        return builder;
+        services.AddEndpointsApiExplorer();
+        services.AddOpenApiDocument();
+        services.AddControllers();
+        return services;
     }
 
     public static WebApplication AddMiddlewareForRestApi(this WebApplication app)
