@@ -32,7 +32,7 @@ public static class WebSocketExtensions
             {
                 try
                 {
-                    await app.InvokeClientEventHandler(new HashSet<Type>(), ws, message, ServiceLifetime.Scoped);
+                    await app.InvokeClientEventHandler(ws, message, ServiceLifetime.Scoped);
                 }
                 catch (Exception ex)
                 {
