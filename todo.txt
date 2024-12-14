@@ -11,6 +11,13 @@
 - Testing
 
 - Exception handling for all API's
+
+- DevContainer
+    - Test in pipeline with all OS's
+    - removal of https certs
+    - EF core CLI
+    - npm?
+    - testcontainer / DIND
     
 "Topics" for Websocket to generalize?
     - Is this just a different psuedonum for "rooms / channels"?

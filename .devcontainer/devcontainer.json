@@ -1,0 +1,21 @@
+{
+  "name": "Fullstack 2025 DevContainer",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
+  "customizations": {
+   
+  },
+  
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    }
+  },
+
+  "forwardPorts": [5000, 5001, 8080],
+
+  "postCreateCommand": "echo hello world",
+  "runArgs": ["--init"]
+}
