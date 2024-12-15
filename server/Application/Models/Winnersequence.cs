@@ -1,6 +1,9 @@
-﻿namespace service.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Winnersequence
+namespace infrastructure;
+
+public partial class Winnersequence
 {
     public Guid Id { get; set; }
 

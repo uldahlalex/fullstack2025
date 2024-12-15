@@ -1,6 +1,9 @@
-﻿namespace service.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Game
+namespace infrastructure;
+
+public partial class Game
 {
     public Guid Id { get; set; }
 

@@ -10,7 +10,6 @@
     <ItemGroup>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.*"/>
         <PackageReference Include="Npgsql" Version="8.*"/>
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.*"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.*">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

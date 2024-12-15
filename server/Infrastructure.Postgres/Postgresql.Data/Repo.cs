@@ -1,6 +1,5 @@
 ﻿using infrastructure;
 using service.Interfaces.Infrastructure.Data;
-using service.Models;
 
 // using Infrastructure.Data
 

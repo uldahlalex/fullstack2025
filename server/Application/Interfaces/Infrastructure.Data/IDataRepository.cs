@@ -1,4 +1,4 @@
-using service.Models;
+using infrastructure;
 
 namespace service.Interfaces.Infrastructure.Data;
 

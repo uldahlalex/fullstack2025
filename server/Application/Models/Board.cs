@@ -1,6 +1,9 @@
-﻿namespace service.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public class Board
+namespace infrastructure;
+
+public partial class Board
 {
     public Guid Id { get; set; }
 

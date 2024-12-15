@@ -1,8 +1,8 @@
+using infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using service;
 using service.Interfaces;
-using service.Models;
 
 namespace Api.Rest.Controllers;
 
