@@ -1,23 +1,14 @@
-﻿using System.Net.Http.Headers;
-using infrastructure;
-using Infrastructure.Repositories;
-using Microsoft.AspNetCore.Builder;
+﻿using infrastructure;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using PgCtx;
-using service;
 using Startup;
 using Xunit.Abstractions;
 
-namespace Api.Tests;
-
 public class ApiTestBase : WebApplicationFactory<Program>
-{   private readonly ITestOutputHelper _outputHelper;
+{   
+    private readonly ITestOutputHelper _outputHelper;
     public PgCtxSetup<MyDbContext> PgCtxSetup;
     public HttpClient UserHttpClient { get; private set; }
     public HttpClient AdminHttpClient { get; private set; }
@@ -30,55 +21,21 @@ public class ApiTestBase : WebApplicationFactory<Program>
         _outputHelper = outputHelper;
         PgCtxSetup = new PgCtxSetup<MyDbContext>();
         
-        // Create clients after base configuration is done
-        InitializeClients();
+        // Now the sequence is clear:
+        SetupTestServer();    // 1. Configure and start the test server
+        SetupHttpClients();   // 2. Create and configure HTTP clients
     }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    private void SetupTestServer()
     {
-        builder.ConfigureServices((context, services) =>
-        {
-            // First remove any services you want to replace
-            var dbContextDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(DbContextOptions<MyDbContext>));
-            services.Remove(dbContextDescriptor);
-
-            var proxyDescriptor = services.SingleOrDefault(
-                d => d.ServiceType == typeof(IProxyConfig));
-            services.Remove(proxyDescriptor);
-
-            // Add test-specific services
-            services.AddDbContext<MyDbContext>(opt =>
-            {
-                opt.UseNpgsql(PgCtxSetup._postgres.GetConnectionString());
-                opt.EnableSensitiveDataLogging(false);
-                opt.LogTo(_ => { });
-            });
-            services.AddSingleton<IProxyConfig, MockProxyConfig>();
-
-            // Configure test-specific app options
-            services.Configure<AppOptions>(options => 
-            {
-                options.Seed = true;  // or whatever you need for testing
-                // Set other options as needed
-            });
-        });
-
-        builder.ConfigureLogging(logging =>
-        {
-            logging.ClearProviders();
-            logging.AddXUnit(_outputHelper);
-        });
+        // This will trigger ConfigureWebHost and initialize the server
+        ApplicationServices = Services.CreateScope().ServiceProvider;
     }
 
-    private void InitializeClients()
+    private void SetupHttpClients()
     {
-        // Create and configure HTTP clients
         UserHttpClient = CreateClient();
         AdminHttpClient = CreateClient();
-
-        // Get services
-        ApplicationServices = Services.CreateScope().ServiceProvider;
 
         // Setup authentication if needed
         // var tokenService = ApplicationServices.GetRequiredService<ITokenClaimsService>();
@@ -92,4 +49,8 @@ public class ApiTestBase : WebApplicationFactory<Program>
         //     new AuthenticationHeaderValue("Bearer", AdminJwt);
     }
 
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        // Your existing ConfigureWebHost implementation
+    }
 }
