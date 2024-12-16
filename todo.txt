@@ -1,4 +1,8 @@
-- Simplify Startup + ApiTestBase
+- Fix gcloud deployment med proxy osv
+    - Start med at fikse det lokalt i docker compose
+- Fix devcontainer startup af pgctx
+    - Fix pgctxsetup DIND
+
 
 - Skrive ny dokumentation til websocket.boilerplate
 
