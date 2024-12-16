@@ -1,4 +1,4 @@
-namespace service.Interfaces.Infrastructure.TimeeSeries;
+namespace Application.Interfaces.Infrastructure.TimeeSeries;
 
 public interface ITimeSeriesPublishing
 {

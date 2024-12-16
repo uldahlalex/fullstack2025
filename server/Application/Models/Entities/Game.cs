@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace infrastructure;
+﻿namespace Application.Models.Entities;
 
 public partial class Game
 {

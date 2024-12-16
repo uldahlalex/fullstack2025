@@ -1,9 +1,9 @@
+using Application;
+using Application.Interfaces.Infrastructure.Broadcasting;
 using Fleck;
 using lib;
-using service;
-using service.Interfaces.Infrastructure.Broadcasting;
 
-namespace Api.Realtime;
+namespace Api.Websocket;
 
 public static class WebSocketExtensions
 {

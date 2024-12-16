@@ -1,6 +1,6 @@
-using infrastructure;
+using Application.Models.Entities;
 
-namespace service.Interfaces.Infrastructure.Data;
+namespace Application.Interfaces.Infrastructure.Data;
 
 public interface IDataRepository
 {

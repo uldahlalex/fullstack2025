@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Api.Realtime;
 using Api.Rest;
+using Api.Websocket;
+using Application;
+using Application.Extensions;
 using Infrastructure.Mqtt;
-using Infrastructure.Repositories;
+using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
-using service;
-using service.Extensions;
 using Startup.Extensions;
 
 namespace Startup;
@@ -23,11 +23,8 @@ public class Program
 
         ConfigureMiddleware(app);
 
-        //var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-        //var url = $"http://0.0.0.0:{port}";
-        app.Run(
-        //    url
-        );
+    
+        app.Run();
     }
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)

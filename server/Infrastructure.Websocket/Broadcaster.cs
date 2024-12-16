@@ -1,4 +1,4 @@
-﻿using service.Interfaces.Infrastructure.Broadcasting;
+﻿using Application.Interfaces.Infrastructure.Broadcasting;
 
 namespace Infrastructure.Websocket;
 

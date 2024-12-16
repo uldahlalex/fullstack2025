@@ -1,5 +1,5 @@
-using service;
-using service.Interfaces.Infrastructure.Broadcasting;
+using Application;
+using Application.Interfaces.Infrastructure.Broadcasting;
 
 namespace Infrastructure.Websocket;
 

@@ -1,9 +1,8 @@
-﻿using infrastructure;
-using service.Interfaces.Infrastructure.Data;
+﻿using Application.Interfaces.Infrastructure.Data;
+using Application.Models.Entities;
+using Infrastructure.Postgres.Scaffolding;
 
-// using Infrastructure.Data
-
-namespace Infrastructure.Repositories.Postgresql.Data;
+namespace Infrastructure.Postgres.Postgresql.Data;
 
 public class Repo(MyDbContext ctx) : IDataRepository
 {

@@ -1,6 +1,4 @@
-using Startup;
-
-namespace Api.Tests;
+namespace Startup;
 
 public class MockProxyConfig : IProxyConfig 
 {

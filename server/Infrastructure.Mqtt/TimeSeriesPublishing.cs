@@ -1,4 +1,4 @@
-using service.Interfaces.Infrastructure.TimeeSeries;
+using Application.Interfaces.Infrastructure.TimeeSeries;
 
 namespace Infrastructure.Mqtt;
 

@@ -1,10 +1,10 @@
 using System.Text.Json;
+using Application.Interfaces;
 using AsyncApi.Net.Generator.Attributes;
 using Fleck;
 using lib;
-using service.Interfaces;
 
-namespace Api.Realtime.Events;
+namespace Api.Websocket.Events;
 
 public class ClientWantsToEchoDto : BaseDto
 {

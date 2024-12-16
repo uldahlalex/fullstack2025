@@ -1,4 +1,4 @@
-namespace service;
+namespace Application;
 
 public class TimeSeries
 {

@@ -1,8 +1,8 @@
+using Application.Interfaces;
+using Application.Services;
 using Microsoft.Extensions.DependencyInjection;
-using service.Interfaces;
-using service.Services;
 
-namespace service.Extensions;
+namespace Application.Extensions;
 
 public static class ServiceExtensions
 {

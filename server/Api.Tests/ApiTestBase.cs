@@ -1,15 +1,15 @@
-﻿using Api.Tests;
-using infrastructure;
-using Infrastructure.Repositories;
+﻿using Infrastructure.Postgres;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PgCtx;
-using service;
 using Startup;
 using Xunit.Abstractions;
+
+namespace Api.Tests;
 
 public class ApiTestBase : WebApplicationFactory<Program>
 {   

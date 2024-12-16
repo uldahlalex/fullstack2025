@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Application;
 using Microsoft.Extensions.Options;
-using service;
 
 namespace Startup.Extensions;
 

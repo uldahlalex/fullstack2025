@@ -1,6 +1,6 @@
-﻿using infrastructure;
+﻿using Application.Models.Entities;
 
-namespace service.Interfaces;
+namespace Application.Interfaces;
 
 public interface IServiceLogic
 {

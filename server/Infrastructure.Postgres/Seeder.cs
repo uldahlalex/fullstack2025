@@ -1,7 +1,7 @@
-using infrastructure;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Postgres;
 
 public class Seeder(MyDbContext context)
 {

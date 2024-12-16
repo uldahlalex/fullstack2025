@@ -1,10 +1,10 @@
-﻿using infrastructure;
-using service.Interfaces;
-using service.Interfaces.Infrastructure.Broadcasting;
-using service.Interfaces.Infrastructure.Data;
-using service.Interfaces.Infrastructure.TimeeSeries;
+﻿using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Broadcasting;
+using Application.Interfaces.Infrastructure.Data;
+using Application.Interfaces.Infrastructure.TimeeSeries;
+using Application.Models.Entities;
 
-namespace service.Services;
+namespace Application.Services;
 
 public class ServiceLogic(
     IDataRepository repo,

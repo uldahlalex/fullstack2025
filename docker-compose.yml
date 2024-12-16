@@ -1,4 +1,18 @@
 services:
+  backend:
+    image: backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '5000:5000'
+    environment:
+      - APPOPTIONS__DbConnectionString=Host=db;Port=5432;Database=testdb;Username=testuser;Password=testpass
+      - APPOPTIONS__JwtSecret=dfKDL0Rq26AEQhdHBcQkOvMNjj9S8/thdKhTVzm3UDWXfJ0gePCuWyf48VK9/hk1ID4VHqZjXpYhinms1r+Khg==
+      - APPOPTIONS__ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+      - db
+      - mqtt-broker
   db:
     image: postgres:16-alpine
     environment:
@@ -19,3 +33,4 @@ services:
       - "9001:9001"
 volumes:
   postgres_data:
+

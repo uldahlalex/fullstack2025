@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace service.Interfaces.Infrastructure.Broadcasting;
+namespace Application.Interfaces.Infrastructure.Broadcasting;
 
 public interface IState
 {

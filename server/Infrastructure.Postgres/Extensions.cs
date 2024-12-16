@@ -1,13 +1,13 @@
-﻿using infrastructure;
-using Infrastructure.Repositories.Postgresql.Data;
+﻿using Application;
+using Application.Interfaces.Infrastructure.Data;
+using Infrastructure.Postgres.Postgresql.Data;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PgCtx;
-using service;
-using service.Interfaces.Infrastructure.Data;
 
-namespace Infrastructure.Repositories;
+namespace Infrastructure.Postgres;
 
 public static class Extensions
 {
