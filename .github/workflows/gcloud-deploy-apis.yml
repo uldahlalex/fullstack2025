@@ -42,6 +42,7 @@ jobs:
           dockerfile: Dockerfile
           env_vars: |-
             APPOPTIONS__DbConnectionString=${{secrets.DB}} 
+            APPOPTIONS__JwtSecret=${{secrets.JWT_SECRET}}
             
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}

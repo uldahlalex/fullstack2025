@@ -9,10 +9,15 @@ public static class AppOptionsExtensions
 {
     public static AppOptions AddAppOptions(
         this IServiceCollection services,
-        IConfiguration configuration) 
+        IConfiguration configuration,
+        IWebHostEnvironment env) 
     {
         services.AddOptionsWithValidateOnStart<AppOptions>()
             .Bind(configuration.GetSection(nameof(AppOptions)))
+            .PostConfigure(options => 
+            {
+                options.ASPNETCORE_ENVIRONMENT = env.EnvironmentName;
+            })
             .ValidateDataAnnotations()
             .Validate(options =>
                 {
@@ -31,6 +36,9 @@ public static class AppOptionsExtensions
 
         var options = configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
                       throw new InvalidCastException("Could not parse as AppOptions");
+        
+        options.ASPNETCORE_ENVIRONMENT = env.EnvironmentName;
+        
         Console.WriteLine("AppOptions: " + JsonSerializer.Serialize(options));
         return options;
     }

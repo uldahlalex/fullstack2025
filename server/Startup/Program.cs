@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Api.Realtime;
 using Api.Rest;
 using Infrastructure.Mqtt;
@@ -16,7 +17,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder();
 
-        ConfigureServices(builder.Services, builder.Configuration);
+        ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
 
         var app = builder.Build();
 
@@ -29,9 +30,9 @@ public class Program
         );
     }
 
-    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
     {
-        services.AddAppOptions(configuration);
+        services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
@@ -48,10 +49,12 @@ public class Program
         using (var scope = app.Services.CreateScope())
         {
             var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
+            Console.WriteLine(JsonSerializer.Serialize(options.CurrentValue));
             if (options.CurrentValue.Seed)
             {
                 var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
-                seeder.Seed().Wait();
+                var delete = options.CurrentValue.ASPNETCORE_ENVIRONMENT.Equals("Development");
+                seeder.Seed(delete).Wait();
             }
         }
         
