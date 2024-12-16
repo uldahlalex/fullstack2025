@@ -17,7 +17,11 @@ CREATE TABLE jerneif.game (
 CREATE TABLE jerneif.player (
     id uuid NOT NULL,
     created_at timestamp with time zone,
-    activated boolean,
+    activated boolean NOT NULL,
+    "Salt" text NOT NULL,
+    "Hash" text NOT NULL,
+    "Email" text NOT NULL,
+    "FullName" text NOT NULL,
     CONSTRAINT "PK_player" PRIMARY KEY (id)
 );
 

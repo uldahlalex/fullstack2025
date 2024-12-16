@@ -1,8 +1,13 @@
-﻿using infrastructure;
+﻿using Api.Tests;
+using infrastructure;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using PgCtx;
+using service;
 using Startup;
 using Xunit.Abstractions;
 
@@ -21,16 +26,38 @@ public class ApiTestBase : WebApplicationFactory<Program>
         _outputHelper = outputHelper;
         PgCtxSetup = new PgCtxSetup<MyDbContext>();
         
-        // Now the sequence is clear:
-        SetupTestServer();    // 1. Configure and start the test server
-        SetupHttpClients();   // 2. Create and configure HTTP clients
+        ApplicationServices = Services.CreateScope().ServiceProvider; //Triggers ConfigureWebHost
+        ApplicationServices.GetRequiredService<Seeder>().Seed().Wait();
+        SetupHttpClients();   
     }
 
-    private void SetupTestServer()
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        // This will trigger ConfigureWebHost and initialize the server
-        ApplicationServices = Services.CreateScope().ServiceProvider;
-    }
+        builder.ConfigureServices((context, services) =>
+        {
+            var dbContextDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(DbContextOptions<MyDbContext>));
+            services.Remove(dbContextDescriptor);
+
+            var proxyDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IProxyConfig));
+            services.Remove(proxyDescriptor);
+
+            services.AddDbContext<MyDbContext>(opt =>
+            {
+                opt.UseNpgsql(PgCtxSetup._postgres.GetConnectionString());
+                opt.EnableSensitiveDataLogging(false);
+                opt.LogTo(_ => { });
+            });
+            services.AddSingleton<IProxyConfig, MockProxyConfig>();
+        });
+
+        builder.ConfigureLogging(logging =>
+        {
+            logging.ClearProviders();
+            logging.AddXUnit(_outputHelper);
+        });    }
 
     private void SetupHttpClients()
     {
@@ -49,8 +76,5 @@ public class ApiTestBase : WebApplicationFactory<Program>
         //     new AuthenticationHeaderValue("Bearer", AdminJwt);
     }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        // Your existing ConfigureWebHost implementation
-    }
+
 }
