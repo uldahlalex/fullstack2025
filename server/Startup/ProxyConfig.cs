@@ -2,7 +2,6 @@ using System.Net;
 using WebSocketProxy;
 using Host = WebSocketProxy.Host;
 
-
 namespace Startup;
 
 public interface IProxyConfig
@@ -14,13 +13,14 @@ public class ProxyConfig : IProxyConfig
 {
     public void StartProxyServer()
     {
-      
+        var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
+        
         var proxyConfiguration = new TcpProxyConfiguration
         {
             PublicHost = new Host
             {
                 IpAddress = IPAddress.Parse("0.0.0.0"),
-                Port = 8080
+                Port = port
             },
             HttpHost = new Host
             {

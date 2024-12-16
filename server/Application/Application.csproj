@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JWT" Version="11.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.*"/>
+        
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Security\" />
-    </ItemGroup>
+
 
 </Project>
