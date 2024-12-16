@@ -1,6 +1,6 @@
 ﻿namespace Application.Models.Entities;
 
-public partial class Player
+public class Player
 {
     public Guid Id { get; set; }
 
@@ -13,4 +13,5 @@ public partial class Player
     public string Hash { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string FullName { get; set; } = null!;
+    public string Role { get; set; } = null!;
 }

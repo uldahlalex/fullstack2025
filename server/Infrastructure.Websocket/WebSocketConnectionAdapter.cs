@@ -1,4 +1,4 @@
-using Application;
+using Application.Interfaces.Infrastructure.Broadcasting;
 using Fleck;
 
 namespace Infrastructure.Websocket;

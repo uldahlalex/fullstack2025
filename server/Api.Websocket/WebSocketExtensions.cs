@@ -1,4 +1,3 @@
-using Application;
 using Application.Interfaces.Infrastructure.Broadcasting;
 using Fleck;
 using lib;
@@ -7,7 +6,6 @@ namespace Api.Websocket;
 
 public static class WebSocketExtensions
 {
-
     public static IServiceCollection AddDependenciesForRealtimeApi(this IServiceCollection services)
     {
         var assembly = typeof(WebSocketExtensions).Assembly;

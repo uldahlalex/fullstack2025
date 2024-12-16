@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Application;
 using Application.Interfaces.Infrastructure.Broadcasting;
 
 namespace Infrastructure.Websocket;

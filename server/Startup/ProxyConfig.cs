@@ -14,7 +14,7 @@ public class ProxyConfig : IProxyConfig
     public void StartProxyServer()
     {
         var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-        
+
         var proxyConfiguration = new TcpProxyConfiguration
         {
             PublicHost = new Host

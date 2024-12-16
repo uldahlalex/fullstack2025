@@ -21,7 +21,7 @@
     <ItemGroup>
         <Using Include="Xunit"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\Startup\Startup.csproj"/>
     </ItemGroup>

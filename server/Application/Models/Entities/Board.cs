@@ -1,8 +1,6 @@
-﻿
+﻿namespace Application.Models.Entities;
 
-namespace Application.Models.Entities;
-
-public partial class Board
+public class Board
 {
     public Guid Id { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace Application.Models.Entities;
 
-public partial class Winnersequence
+public class Winnersequence
 {
     public Guid Id { get; set; }
 

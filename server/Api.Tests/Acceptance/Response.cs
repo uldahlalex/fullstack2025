@@ -1,5 +1,3 @@
-using System.Net;
-using Microsoft.AspNetCore.Http;
 using NSwag;
 using Xunit.Abstractions;
 

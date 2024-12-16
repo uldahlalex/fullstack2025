@@ -1,6 +1,6 @@
 ﻿namespace Application.Models.Entities;
 
-public partial class Game
+public class Game
 {
     public Guid Id { get; set; }
 

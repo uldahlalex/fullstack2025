@@ -5,7 +5,7 @@ namespace Api.Tests;
 
 public static class Extensions
 {
-        public static async Task<HttpResponseWithObject<T>> GetFromJsonAsync<T>(this HttpClient httpClient,
+    public static async Task<HttpResponseWithObject<T>> GetFromJsonAsync<T>(this HttpClient httpClient,
         string requestUri)
     {
         var httpResponse = await httpClient.GetAsync(requestUri);

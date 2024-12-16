@@ -1,4 +1,4 @@
-namespace Application;
+namespace Application.Interfaces.Infrastructure.Broadcasting;
 
 public interface IConnection
 {

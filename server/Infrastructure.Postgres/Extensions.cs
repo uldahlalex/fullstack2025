@@ -1,5 +1,5 @@
-﻿using Application;
-using Application.Interfaces.Infrastructure.Data;
+﻿using Application.Interfaces.Infrastructure.Data;
+using Application.Models;
 using Infrastructure.Postgres.Postgresql.Data;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +38,7 @@ public static class Extensions
             optionsMonitor.CurrentValue.DbConnectionString = connectionString;
             optionsBuilder.UseNpgsql(connectionString);
         }
+
         services.AddDbContext<MyDbContext>(options =>
         {
             options.UseNpgsql(connectionString);

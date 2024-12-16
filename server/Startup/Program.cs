@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Api.Rest;
 using Api.Websocket;
-using Application;
 using Application.Extensions;
+using Application.Models;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
@@ -23,11 +23,12 @@ public class Program
 
         ConfigureMiddleware(app);
 
-    
+
         app.Run();
     }
 
-    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration, IWebHostEnvironment environment)
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
@@ -54,7 +55,7 @@ public class Program
                 seeder.Seed(delete).Wait();
             }
         }
-        
+
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer();
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();

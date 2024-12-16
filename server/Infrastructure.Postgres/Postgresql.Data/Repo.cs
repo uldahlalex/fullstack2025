@@ -10,4 +10,16 @@ public class Repo(MyDbContext ctx) : IDataRepository
     {
         return ctx.Boards.ToList();
     }
+
+    public Player GetUserByUsername(string username)
+    {
+        return ctx.Players.FirstOrDefault(p => p.FullName == username);
+    }
+
+    public Player AddPlayer(Player player)
+    {
+        ctx.Players.Add(player);
+        ctx.SaveChanges();
+        return player;
+    }
 }

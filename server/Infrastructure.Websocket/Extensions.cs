@@ -1,4 +1,3 @@
-using Application;
 using Application.Interfaces.Infrastructure.Broadcasting;
 using Microsoft.Extensions.DependencyInjection;
 

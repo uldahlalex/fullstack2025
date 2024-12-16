@@ -12,24 +12,25 @@ using Xunit.Abstractions;
 namespace Api.Tests;
 
 public class ApiTestBase : WebApplicationFactory<Program>
-{   
+{
     private readonly ITestOutputHelper _outputHelper;
     public PgCtxSetup<MyDbContext> PgCtxSetup;
-    public HttpClient UserHttpClient { get; private set; }
-    public HttpClient AdminHttpClient { get; private set; }
-    public string UserJwt { get; private set; }
-    public string AdminJwt { get; private set; }
-    public IServiceProvider ApplicationServices { get; private set; }
 
     public ApiTestBase(ITestOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
         PgCtxSetup = new PgCtxSetup<MyDbContext>();
-        
+
         ApplicationServices = Services.CreateScope().ServiceProvider; //Triggers ConfigureWebHost
         ApplicationServices.GetRequiredService<Seeder>().Seed().Wait();
-        SetupHttpClients();   
+        SetupHttpClients();
     }
+
+    public HttpClient UserHttpClient { get; private set; }
+    public HttpClient AdminHttpClient { get; private set; }
+    public string UserJwt { get; private set; }
+    public string AdminJwt { get; private set; }
+    public IServiceProvider ApplicationServices { get; }
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -57,7 +58,8 @@ public class ApiTestBase : WebApplicationFactory<Program>
         {
             logging.ClearProviders();
             logging.AddXUnit(_outputHelper);
-        });    }
+        });
+    }
 
     private void SetupHttpClients()
     {
@@ -75,6 +77,4 @@ public class ApiTestBase : WebApplicationFactory<Program>
         // AdminHttpClient.DefaultRequestHeaders.Authorization = 
         //     new AuthenticationHeaderValue("Bearer", AdminJwt);
     }
-
-
 }
