@@ -1,3 +1,4 @@
+using Api.Rest.Controllers;
 using Api.Rest.Middleware;
 using Scalar.AspNetCore;
 
@@ -11,7 +12,9 @@ public static class RestStartupExtensions
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         services.AddOpenApiDocument();
-        services.AddControllers();
+        var controllersAssembly = typeof(MyController).Assembly;
+
+        services.AddControllers().AddApplicationPart(controllersAssembly);
         return services;
     }
 
@@ -23,8 +26,7 @@ public static class RestStartupExtensions
         //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
         app.MapScalarApiReference();
 
-
-        app.MapControllers();
+app.MapControllers();
         app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;
     }

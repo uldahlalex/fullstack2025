@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 namespace Api.Rest.Controllers;
 
 [ApiController]
-[Route("api")]
 public class MyController(IServiceLogic service, IOptionsMonitor<AppOptions> optionsMonitor) : ControllerBase
 {
     public const string DoSomethingRoute = "api/mycontroller/dosomething";
