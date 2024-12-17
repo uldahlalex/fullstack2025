@@ -1,6 +1,5 @@
-- Fix devcontainer startup af pgctx
-    - Fix pgctxsetup DIND
-
+- Fix devcontainer startup
+    - Skal anvende en compose DB og ikke DIND
 
 - Skrive ny dokumentation til websocket.boilerplate
 
@@ -10,9 +9,9 @@
     - MQTT publish i infra
     - MQTT subscribe i API
     
-- Auth
     
 - README.md
+    - grafisk overblik
 
 - Testing
 
@@ -20,10 +19,8 @@
 
 - DevContainer
     - Test in pipeline with all OS's
-    - removal of https certs
     - EF core CLI
     - npm?
-    - testcontainer / DIND
     
 "Topics" for Websocket to generalize?
     - Is this just a different psuedonum for "rooms / channels"?

@@ -1,23 +1,28 @@
 {
   "name": "Fullstack 2025 DevContainer",
-  "image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
-  "customizations": {
-   
-  },
-  
-
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "latest",
-      "moby": true
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
     }
   },
-
-
-  "postCreateCommand": "echo hello world",
+  "postCreateCommand": "apt-get update && apt-get install -y curl wget netcat-traditional iputils-ping && dotnet tool install --global dotnet-ef && dotnet restore",
+  "remoteEnv": {
+    "DOTNET_ENVIRONMENT": "Development",
+    "ConnectionStrings__DefaultConnection": "Host=localhost;Database=defaultdb;Username=postgres;Password=postgres"
+  },
+  "forwardPorts": [
+    5432
+  ],
   "runArgs": [
-    "--init",
-    "--network=host"
+    "--init"
   ]
 }

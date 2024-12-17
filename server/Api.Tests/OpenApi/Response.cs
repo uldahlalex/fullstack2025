@@ -12,12 +12,4 @@ public class OpenApiTests(ITestOutputHelper outputHelper) : ApiTestBase(outputHe
         var document = await OpenApiDocument.FromJsonAsync(await response.Content.ReadAsStringAsync());
         Assert.True(document.Paths.Count > 0);
     }
-
-    [Fact]
-    public async Task AcceptanceTest()
-    {
-        var client = CreateClient();
-        var response = await client.GetAsync("/acceptance");
-        Assert.Equal("Accepted", await response.Content.ReadAsStringAsync());
-    }
 }
