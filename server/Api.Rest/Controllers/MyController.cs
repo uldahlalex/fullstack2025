@@ -11,12 +11,17 @@ namespace Api.Rest.Controllers;
 [Route("api")]
 public class MyController(IServiceLogic service, IOptionsMonitor<AppOptions> optionsMonitor) : ControllerBase
 {
+    public const string DoSomethingRoute = "api/mycontroller/dosomething";
+    [Route(DoSomethingRoute)]
+    [HttpGet]
     public ActionResult<IEnumerable<Board>> DoSomething([FromQuery] string param)
     {
         return Ok(service.GetDomainModels());
     }
 
-    [Route("secured")]
+    public const string SecuredRoute = "api/secured";
+
+    [HttpGet("secured")]  // Combines with base route to make "api/secured"
     [TypeFilter(typeof(VerifyJwt))]
     public ActionResult SecuredEndpoint()
     {

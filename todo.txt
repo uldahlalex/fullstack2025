@@ -1,5 +1,9 @@
+- ApiTestBase må også være forkert opsat
+
 - Fix devcontainer startup
     - Skal anvende en compose DB og ikke DIND
+    
+- Prblemdetails
 
 - Skrive ny dokumentation til websocket.boilerplate
 
