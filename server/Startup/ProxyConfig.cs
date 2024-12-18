@@ -20,7 +20,7 @@ public class ProxyConfig : IProxyConfig
             PublicHost = new Host
             {
                 IpAddress = IPAddress.Parse("0.0.0.0"),
-                Port = 8001
+                Port = port
             },
             HttpHost = new Host
             {
