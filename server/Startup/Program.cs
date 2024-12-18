@@ -32,7 +32,9 @@ public class Program
     {
         services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
+        
         services.AddDataSourceAndRepositories();
+        
         services.AddWebsocketInfrastructure();
         services.AddMqttInfrastructure();
 

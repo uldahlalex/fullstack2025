@@ -3,7 +3,6 @@
 - Fix devcontainer startup
     - Skal anvende en compose DB og ikke DIND
     
-- Prblemdetails
 
 - Skrive ny dokumentation til websocket.boilerplate
 
@@ -20,6 +19,7 @@
 - Testing
 
 - Exception handling for all API's
+    - problemdetails
 
 - DevContainer
     - Test in pipeline with all OS's
