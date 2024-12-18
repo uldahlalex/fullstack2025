@@ -1,5 +1,4 @@
-﻿using Infrastructure.Postgres;
-using Infrastructure.Postgres.Scaffolding;
+﻿using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +8,11 @@ using PgCtx;
 using Startup;
 using Xunit.Abstractions;
 
+namespace Api.Tests;
+
 public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory<Program>
 {
-    
+    private PgCtxSetup<MyDbContext> pgCtxSetup = new();
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(ConfigureTestServices);
@@ -25,7 +26,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
 
         services.AddDbContext<MyDbContext>(opt =>
         {
-            opt.UseNpgsql(new PgCtxSetup<MyDbContext>()._postgres.GetConnectionString());
+            opt.UseNpgsql(pgCtxSetup._postgres.GetConnectionString());
             opt.EnableSensitiveDataLogging();
             opt.LogTo(_ => { });
         });

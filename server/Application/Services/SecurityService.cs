@@ -19,29 +19,30 @@ public interface ISecurityService
     public bool VerifyPassword(string password, string hashedPassword);
     public string GenerateSalt();
     public string GenerateJwt(JwtClaims claims);
-    public string Login(AuthRequestDto dto);
-    public string Register(AuthRequestDto dto);
+    public AuthResponseDto Login(AuthRequestDto dto);
+    public AuthResponseDto Register(AuthRequestDto dto);
     public void VerifyJwt(string jwt);
 }
 
 public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRepository repository) : ISecurityService
 {
-    public string Login(AuthRequestDto dto)
+    public AuthResponseDto Login(AuthRequestDto dto)
     {
         var player = repository.GetUserByUsername(dto.Username) ??
                      throw new Exception("Could not get user by username");
         if (!VerifyPassword(dto.Password + player.Salt, player.Hash)) throw new Exception("Invalid password");
-        return GenerateJwt(new JwtClaims
+        return new AuthResponseDto() {
+            Jwt = GenerateJwt(new JwtClaims
         {
             Id = player.Id.ToString(),
             Username = player.FullName,
             Role = player.Role,
             Email = player.Email,
             Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
-        });
+        })};
     }
 
-    public string Register(AuthRequestDto dto)
+    public AuthResponseDto Register(AuthRequestDto dto)
     {
         var player = repository.GetUserByUsername(dto.Username);
         if (player is not null) throw new Exception("User already exists");
@@ -55,21 +56,24 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
             Salt = salt,
             Hash = hash
         });
-        return GenerateJwt(new JwtClaims
+        return new AuthResponseDto()
         {
-            Id = insertedPlayer.Id.ToString(),
-            Username = insertedPlayer.FullName,
-            Role = insertedPlayer.Role,
-            Email = insertedPlayer.Email,
-            Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
-        });
+            Jwt = GenerateJwt(new JwtClaims
+            {
+                Id = insertedPlayer.Id.ToString(),
+                Username = insertedPlayer.FullName,
+                Role = insertedPlayer.Role,
+                Email = insertedPlayer.Email,
+                Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
+            })
+        };
     }
 
     public string HashPassword(string password)
     {
-        using var sha256 = SHA256.Create();
+        using var sha512 = SHA512.Create();
         var bytes = Encoding.UTF8.GetBytes(password);
-        var hash = sha256.ComputeHash(bytes);
+        var hash = sha512.ComputeHash(bytes);
         return Convert.ToBase64String(hash);
     }
 
