@@ -9,16 +9,17 @@
     },
     "ghcr.io/devcontainers/features/common-utils:2": {
       "upgradePackages": true
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true,
+      "dockerDashComposeVersion": "v2"
     }
   },
   "postCreateCommand": "echo hello world",
   "remoteEnv": {
     "APPOPTIONS__DbConnectionString": "Host=db;Database=testdb;Username=testuser;Password=testpass"
   },
-  "forwardPorts": [
-    5432
-  ],
-  "runArgs": [
-    "--init"
-  ]
+  "forwardPorts": [5432, 8080],
+  "runArgs": ["--init"]
 }

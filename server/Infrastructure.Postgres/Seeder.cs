@@ -22,7 +22,7 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
 {
     public async Task Seed()
     {
-        context.Database.ExecuteSqlRaw($"DROP SCHEMA jerneif CASCADE; CREATE SCHEMA jerneif;");
+        context.Database.ExecuteSqlRaw($"DROP SCHEMA IF EXISTS jerneif CASCADE;");
         context.Database.EnsureCreated();
         File.WriteAllText("current_schema.sql", context.Database.GenerateCreateScript());
     }

@@ -12,20 +12,22 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - default
+      - devnet
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
     networks:
-      - default
+      - devnet
     dns:
       - 8.8.8.8
       - 8.8.4.4
 
+networks:
+  devnet:
+    driver: bridge
+
 volumes:
   postgres-data:
-
-networks:
-  default:
-    driver: bridge
