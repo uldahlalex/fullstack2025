@@ -11,7 +11,6 @@ public static class CustomWebSocketServer
 {
     public static WebApplication StartWsServer(this WebApplication app)
     {
-        //var scopedServices
         var scopedServices = app.Services.CreateScope().ServiceProvider;
         
         var server = new WebSocketServer("ws://0.0.0.0:8181");

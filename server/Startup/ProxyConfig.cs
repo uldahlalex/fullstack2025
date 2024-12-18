@@ -6,33 +6,33 @@ namespace Startup;
 
 public interface IProxyConfig
 {
-    void StartProxyServer();
+    void StartProxyServer(int publicPort, int restPort, int wsPort);
 }
 
 public class ProxyConfig : IProxyConfig
 {
-    public void StartProxyServer()
+    public void StartProxyServer(int publicPort, int restPort, int wsPort)
     {
-        var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-
         var proxyConfiguration = new TcpProxyConfiguration
         {
             PublicHost = new Host
             {
                 IpAddress = IPAddress.Parse("0.0.0.0"),
-                Port = port
+                Port = publicPort
             },
             HttpHost = new Host
             {
                 IpAddress = IPAddress.Loopback,
-                Port = 5000
+                Port = restPort
             },
             WebSocketHost = new Host
             {
                 IpAddress = IPAddress.Loopback,
-                Port = 8181
+                Port = wsPort
             }
         };
         new TcpProxyServer(proxyConfiguration).Start();
     }
+
+   
 }

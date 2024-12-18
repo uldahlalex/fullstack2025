@@ -23,9 +23,6 @@ public class Program
 
         ConfigureMiddleware(app);
 
-        var port = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-        var url = $"http://0.0.0.0/{port}";
-
         app.Run();
     }
 
@@ -34,9 +31,9 @@ public class Program
     {
         services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
-        
+
         services.AddDataSourceAndRepositories();
-        
+
         services.AddWebsocketInfrastructure();
         services.AddMqttInfrastructure();
 
@@ -60,7 +57,17 @@ public class Program
             }
         }
 
-        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer();
+        app.Urls.Clear();
+        const int restPort = 5000;
+        const int wsPort = 8181;
+        var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
+
+        app.Urls.Add($"http://0.0.0.0:{restPort}");  // Note the colon inside the string
+// Remove this line since Fleck handles the WebSocket port
+// app.Urls.Add($"http://0.0.0.0:{wsPort}");  
+
+        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
+
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
         app.MapGet("Acceptance", () => "Accepted");
