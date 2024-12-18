@@ -26,7 +26,7 @@ public static class RestStartupExtensions
         //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
         app.MapScalarApiReference();
 
-app.MapControllers();
+        app.MapControllers();
         app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
         return app;
     }

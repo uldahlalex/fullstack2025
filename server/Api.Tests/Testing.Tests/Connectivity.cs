@@ -12,7 +12,7 @@ public class Connectivity(ITestOutputHelper testOutputHelper) : ApiTestBase(test
     {
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-    
+
         // Log the test context's connection string
         var testConnectionString = ctx.Database.GetConnectionString();
         testOutputHelper.WriteLine($"Test connection string: {testConnectionString}");

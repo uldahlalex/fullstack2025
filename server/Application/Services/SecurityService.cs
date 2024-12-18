@@ -31,15 +31,17 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         var player = repository.GetUserByUsername(dto.Username) ??
                      throw new Exception("Could not get user by username");
         if (!VerifyPassword(dto.Password + player.Salt, player.Hash)) throw new Exception("Invalid password");
-        return new AuthResponseDto() {
-            Jwt = GenerateJwt(new JwtClaims
+        return new AuthResponseDto
         {
-            Id = player.Id.ToString(),
-            Username = player.FullName,
-            Role = player.Role,
-            Email = player.Email,
-            Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
-        })};
+            Jwt = GenerateJwt(new JwtClaims
+            {
+                Id = player.Id.ToString(),
+                Username = player.FullName,
+                Role = player.Role,
+                Email = player.Email,
+                Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
+            })
+        };
     }
 
     public AuthResponseDto Register(AuthRequestDto dto)
@@ -56,7 +58,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
             Salt = salt,
             Hash = hash
         });
-        return new AuthResponseDto()
+        return new AuthResponseDto
         {
             Jwt = GenerateJwt(new JwtClaims
             {

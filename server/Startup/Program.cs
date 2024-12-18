@@ -51,7 +51,7 @@ public class Program
             if (options.CurrentValue.Seed)
             {
                 var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
-                var delete = options.CurrentValue.ASPNETCORE_ENVIRONMENT.Equals("Development");
+                var delete = options.CurrentValue.AspnetcoreEnvironment.Equals("Development");
                 seeder.Seed(delete).Wait();
             }
         }

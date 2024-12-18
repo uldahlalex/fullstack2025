@@ -1,5 +1,5 @@
 namespace Application.Interfaces.Infrastructure.Data;
 
-public interface IUserRepository<IdentityUser>
+public interface IUserRepository<TIdentityUser>
 {
 }

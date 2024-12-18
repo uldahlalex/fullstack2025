@@ -30,7 +30,7 @@ public static class AppOptionsExtensions
 
         services.AddOptionsWithValidateOnStart<AppOptions>()
             .Bind(configuration.GetSection(nameof(AppOptions)))
-            .PostConfigure(options => { options.ASPNETCORE_ENVIRONMENT = environment; })
+            .PostConfigure(options => { options.AspnetcoreEnvironment = environment; })
             .ValidateDataAnnotations()
             .Validate(options =>
                 {
@@ -50,7 +50,7 @@ public static class AppOptionsExtensions
         var options = configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
                       throw new InvalidCastException("Could not parse as AppOptions");
 
-        options.ASPNETCORE_ENVIRONMENT = environment;
+        options.AspnetcoreEnvironment = environment;
 
         Console.WriteLine("Final AppOptions: " + JsonSerializer.Serialize(options));
         return options;

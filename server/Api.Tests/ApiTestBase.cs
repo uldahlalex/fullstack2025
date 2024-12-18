@@ -12,7 +12,8 @@ namespace Api.Tests;
 
 public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory<Program>
 {
-    private PgCtxSetup<MyDbContext> pgCtxSetup = new();
+    private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(ConfigureTestServices);
@@ -26,7 +27,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
 
         services.AddDbContext<MyDbContext>(opt =>
         {
-            opt.UseNpgsql(pgCtxSetup._postgres.GetConnectionString());
+            opt.UseNpgsql(_pgCtxSetup._postgres.GetConnectionString());
             opt.EnableSensitiveDataLogging();
             opt.LogTo(_ => { });
         });
@@ -36,7 +37,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
     private void RemoveExistingService<T>(IServiceCollection services)
     {
         var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(T));
-        if (descriptor != null) 
+        if (descriptor != null)
             services.Remove(descriptor);
     }
 

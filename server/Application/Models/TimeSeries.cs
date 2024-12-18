@@ -2,7 +2,7 @@ namespace Application.Models;
 
 public class TimeSeries
 {
-    public int id { get; set; }
-    public int? datapoint { get; set; }
-    public DateTimeOffset timestamp { get; set; }
+    public int Id { get; set; }
+    public int? Datapoint { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
 }

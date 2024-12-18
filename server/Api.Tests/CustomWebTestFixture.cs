@@ -8,7 +8,6 @@ using Startup;
 public class CustomWebTestFixture : IDisposable
 {
     private readonly TestServer _testServer;
-    private readonly HttpClient _client;
 
     public CustomWebTestFixture()
     {
@@ -23,13 +22,10 @@ public class CustomWebTestFixture : IDisposable
             {
                 // Configure all services in one place
                 Program.ConfigureServices(services, context.Configuration, context.HostingEnvironment);
-                
+
                 // Replace IProxyConfig with mock
                 var proxy = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IProxyConfig));
-                if (proxy != null)
-                {
-                    services.Remove(proxy);
-                }
+                if (proxy != null) services.Remove(proxy);
                 services.AddSingleton<IProxyConfig, MockProxyConfig>();
             })
             .Configure(app =>
@@ -38,20 +34,20 @@ public class CustomWebTestFixture : IDisposable
                 Program.ConfigureMiddleware(webApp);
             }));
 
-        _client = _testServer.CreateClient();
+        Client = _testServer.CreateClient();
     }
 
-    public HttpClient Client => _client;
+    public HttpClient Client { get; }
+
+    public void Dispose()
+    {
+        Client?.Dispose();
+        _testServer?.Dispose();
+    }
 
     public T GetService<T>() where T : class
     {
         return _testServer.Services.GetService<T>();
-    }
-
-    public void Dispose()
-    {
-        _client?.Dispose();
-        _testServer?.Dispose();
     }
 }
 

@@ -22,5 +22,5 @@ public sealed class AppOptions
     [Required] public string DbConnectionString { get; set; }
     public bool RunInTestContainer { get; set; }
     public bool Seed { get; set; }
-    public string ASPNETCORE_ENVIRONMENT { get; set; }
+    public string AspnetcoreEnvironment { get; set; }
 }

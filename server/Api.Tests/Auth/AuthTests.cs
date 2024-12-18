@@ -4,7 +4,6 @@ using Application.Models.Dtos;
 using Application.Models.Entities;
 using Application.Models.Enums;
 using Infrastructure.Postgres.Scaffolding;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
@@ -19,7 +18,7 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
     private const string TestHash =
         "J4SHSN9SKisNBoijKZkNAA5GNWJlO/RNsiXWhoWq2lOpd7hBtmwnqb6bOcxxYP8tEvNRomJunrVkWKNa5W3lXg==";
 
-    
+
     [Fact]
     public async Task RouteWithNoAuth_Can_Be_Accessed()
     {
@@ -41,7 +40,7 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
     {
         var client = CreateClient();
         var response = await client.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
-            new AuthRequestDto()
+            new AuthRequestDto
             {
                 Username = TestUsername,
                 Password = TestPassword
@@ -54,10 +53,9 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
     [Fact]
     public async Task Login_Can_Login_And_Return_Jwt()
     {
-   
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-    
+
         ctx.Players.Add(new Player
         {
             FullName = TestUsername,
@@ -67,12 +65,12 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
             Role = Roles.User.ToString(),
             Salt = TestSalt,
             Hash = TestHash
-               });
+        });
         await ctx.SaveChangesAsync();
 
         var client = CreateClient();
         var response = await client.PostAsJsonAsync<AuthResponseDto>(AuthController.LoginRoute,
-            new AuthRequestDto()
+            new AuthRequestDto
             {
                 Username = TestUsername,
                 Password = TestPassword
