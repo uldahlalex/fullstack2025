@@ -8,16 +8,12 @@
       "version": "lts"
     },
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
-      "configureZshAsDefaultShell": true,
-      "installOhMyZsh": true,
       "upgradePackages": true
     }
   },
-  "postCreateCommand": "apt-get update && apt-get install -y curl wget netcat-traditional iputils-ping && dotnet tool install --global dotnet-ef && dotnet restore",
+  "postCreateCommand": "echo hello world",
   "remoteEnv": {
-    "DOTNET_ENVIRONMENT": "Development",
-    "ConnectionStrings__DefaultConnection": "Host=localhost;Database=defaultdb;Username=postgres;Password=postgres"
+    "APPOPTIONS__DbConnectionString": "Host=db;Database=testdb;Username=testuser;Password=testpass"
   },
   "forwardPorts": [
     5432

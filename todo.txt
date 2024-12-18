@@ -1,7 +1,9 @@
-- ApiTestBase må også være forkert opsat
+
 
 - Fix devcontainer startup
-    - Skal anvende en compose DB og ikke DIND
+    - Kan man verificere dette i pipeline på nogen måde?
+    - persisted changes must be in Dockerfile, no post create commands (run every time)
+    - pt problem: postgres bliver ikke startet
     
 
 - Skrive ny dokumentation til websocket.boilerplate
