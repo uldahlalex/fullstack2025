@@ -9,10 +9,11 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
 {
     public async Task Seed()
     {
-        bool hasDifferences = context.Database.GetPendingMigrations().Any();
-        if(hasDifferences)
+        if (optionsMonitor.CurrentValue.Seed)
+        {
             context.Database.ExecuteSql($"DROP SCHEMA if exists jerneif CASCADE; CREATE SCHEMA jerneif;");
-        
+        }
+
         context.Database.EnsureCreated();
         File.WriteAllText("current_schema.sql", context.Database.GenerateCreateScript());
     }
