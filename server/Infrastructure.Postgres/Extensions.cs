@@ -39,9 +39,10 @@ public static class Extensions
             optionsBuilder.UseNpgsql(connectionString);
         }
 
-        services.AddDbContext<MyDbContext>(options =>
+        services.AddDbContext<MyDbContext>(options => 
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(connectionString,
+                npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "jerneif"));
             options.EnableSensitiveDataLogging();
         });
 

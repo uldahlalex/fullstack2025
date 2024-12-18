@@ -1,4 +1,5 @@
-﻿using Infrastructure.Postgres.Scaffolding;
+﻿using Infrastructure.Postgres;
+using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
     {
         RemoveExistingService<DbContextOptions<MyDbContext>>(services);
         RemoveExistingService<IProxyConfig>(services);
+        RemoveExistingService<ISeeder>(services);
 
         services.AddDbContext<MyDbContext>(opt =>
         {
@@ -32,6 +34,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
             opt.LogTo(_ => { });
         });
         services.AddSingleton<IProxyConfig, MockProxyConfig>();
+        services.AddSingleton<ISeeder, TestSeeder>();
     }
 
     private void RemoveExistingService<T>(IServiceCollection services)

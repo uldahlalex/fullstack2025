@@ -15,7 +15,12 @@
         <ProjectReference Include="..\Application\Application.csproj"/>
         <PackageReference Include="patrikvalentiny-WebSocketProxy" Version="1.1.0"/>
 
-
+<!--        Must be present due to migraitons -->
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.*">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
+    
 
 </Project>
