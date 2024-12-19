@@ -1,6 +1,6 @@
 namespace Application.Interfaces.Infrastructure.Websocket;
 
-public interface IBroadcaster
+public interface IWebsocketClientMessager
 {
     void Broadcast(string jsonSerializedMessage, params Guid[] connectionIds);
 }

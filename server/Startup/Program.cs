@@ -64,9 +64,11 @@ public class Program
         var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
         app.Urls.Add($"http://0.0.0.0:{restPort}");
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
+
         app.ConfigureRestApi();
         app.ConfigureWebsocketApi();
         app.ConfigureMqttApi();
+
         app.MapGet("Acceptance", () => "Accepted");
     }
 }

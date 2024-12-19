@@ -14,32 +14,26 @@ public interface IMqttApi
     Task HandleIncomingMessage(MqttApplicationMessageReceivedEventArgs args);
 }
 
-public class MqttApi : IMqttApi, IHostedService
+/// <summary>
+/// Mqtt API could also have been a websocket implementation subscribing to MQTT
+/// </summary>
+/// <param name="logger"></param>
+public class MqttApi(ILogger<MqttApi> logger) : IMqttApi, IHostedService
 {
-    private readonly IMqttClient _mqttClient;
-    // private readonly IMessageProcessor _processor;
+    private readonly IMqttClient _mqttClient = new MqttFactory().CreateMqttClient();
 
-    public MqttApi(
-        // IMessageProcessor processor
-    )
-    {
-        // Create the client in constructor
-        _mqttClient = new MqttFactory().CreateMqttClient();
-        // _processor = processor;
-    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         try
         {
-            // Set up the handler before connecting
             _mqttClient.ApplicationMessageReceivedAsync += HandleIncomingMessage;
 
             var mqttClientOptions = new MqttClientOptionsBuilder()
                 .WithTcpServer("localhost", 1883)
                 .WithProtocolVersion(MqttProtocolVersion.V500)
-                .WithClientId("MyClientId_" + Guid.NewGuid()) // Add unique client ID
-                .WithCleanSession() // Add this for clean session
+                .WithClientId("MyClientId_" + Guid.NewGuid()) 
+                .WithCleanSession() 
                 .Build();
 
             var response = await _mqttClient.ConnectAsync(mqttClientOptions, cancellationToken);
@@ -95,14 +89,14 @@ public class MqttApi : IMqttApi, IHostedService
             {
                 MessageString = incomingText
             };
-            Console.WriteLine($"Received message: {incomingText}");
+            logger.LogInformation($"Received message: {incomingText}");
 
-            var applicationMessage = new MqttApplicationMessageBuilder()
-                .WithTopic("test2")
-                .WithPayload("Hello from the server")
-                .Build();
+            // var applicationMessage = new MqttApplicationMessageBuilder()
+            //     .WithTopic("test2")
+            //     .WithPayload("Hello from the server")
+            //     .Build();
 
-            await _mqttClient.PublishAsync(applicationMessage);
+            // await _mqttClient.PublishAsync(applicationMessage);
         }
         catch (Exception ex)
         {

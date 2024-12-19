@@ -6,7 +6,7 @@ public static class Extensions
 {
     public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
     {
-        services.AddScoped<ITimeSeriesPublishing, TimeSeriesPublishing>();
+        services.AddScoped<IMqttPublisher, MqttPublisher>();
         return services;
     }
 

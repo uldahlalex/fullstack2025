@@ -1,6 +1,6 @@
 namespace Application.Interfaces.Infrastructure.Mqtt;
 
-public interface ITimeSeriesPublishing
+public interface IMqttPublisher
 {
     public void Publish();
 }

@@ -10,7 +10,7 @@ public static class Extensions
         services.AddSingleton<IState, State>();
         services.AddSingleton<IConnectionRegistry, ConnectionRegistry>();
         services.AddSingleton<IConnectionCreator, WebSocketConnectionCreator>();
-        services.AddScoped<IBroadcaster, Broadcaster>();
+        services.AddScoped<IWebsocketClientMessager, WebsocketClientMessager>();
         return services;
     }
 }

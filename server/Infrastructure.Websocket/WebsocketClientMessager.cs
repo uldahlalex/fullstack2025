@@ -2,7 +2,7 @@
 
 namespace Infrastructure.Websocket;
 
-public class Broadcaster(IState state) : IBroadcaster
+public class WebsocketClientMessager(IState state) : IWebsocketClientMessager
 {
     public void Broadcast(string jsonSerializedMessage, params Guid[] connectionIds)
     {

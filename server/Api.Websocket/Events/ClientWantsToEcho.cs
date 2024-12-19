@@ -14,7 +14,6 @@ public class ClientWantsToEchoDto : BaseDto
 public class ServerSendsEchoDto : BaseDto
 {
     public string Message { get; set; }
-    public Guid Client { get; set; }
 }
 
 [SubscribeOperation<ClientWantsToEchoDto>(nameof(ClientWantsToEcho))]
@@ -23,9 +22,7 @@ public class ClientWantsToEcho(IServiceLogic service) : BaseEventHandler<ClientW
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {
-        var message = JsonSerializer.Serialize(new ServerSendsEchoDto
-            { Message = JsonSerializer.Serialize(service.GetDomainModels()), Client = socket.ConnectionInfo.Id });
-
+        var message = new ServerSendsEchoDto { Message = dto.Message };
         service.Broadcast(message, socket.ConnectionInfo.Id);
         return Task.CompletedTask;
     }
