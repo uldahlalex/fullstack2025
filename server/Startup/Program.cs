@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Api.Mqtt;
 using Api.Rest;
 using Api.Websocket;
 using Application.Extensions;
@@ -41,6 +42,7 @@ public class Program
 
         services.AddDependenciesForRestApi();
         services.AddDependenciesForRealtimeApi();
+        services.AddDependenciesForMqttApi();
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -64,6 +66,7 @@ public class Program
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
         app.AddMiddlewareForRestApi();
         app.AddMiddlewareForRealtimeApi();
+        app.AddMiddlewareForMqttApi();
         app.MapGet("Acceptance", () => "Accepted");
     }
 }

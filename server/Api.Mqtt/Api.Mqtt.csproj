@@ -11,6 +11,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore" >
+        <HintPath>..\..\..\..\dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.11\ref\net8.0\Microsoft.AspNetCore.dll</HintPath>
+      </Reference>
       <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
         <HintPath>..\..\..\..\dotnet\packs\Microsoft.AspNetCore.App.Ref\8.0.11\ref\net8.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
       </Reference>

@@ -1,16 +1,15 @@
+Fix .csproj deps references
+
 Ville det være federe at have et nyt domæneområde? 
 - Måske et indeklima-tamtam projekt?
 
 - Fix devcontainer startup
     - Kan man verificere dette i pipeline på nogen måde?
-    - network utils og andre ting i dockerfile bliver ikke installeret og jeg kan ikke sync IDE
     
 
 - Skrive ny dokumentation til websocket.boilerplate
 
 - MQTT implementation
-    - Docker broker
-    - WS broadcast i infra
     - MQTT publish i infra
     - MQTT subscribe i API
     
