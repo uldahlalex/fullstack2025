@@ -6,7 +6,7 @@ namespace Api.Rest;
 
 public static class RestStartupExtensions
 {
-    public static IServiceCollection AddDependenciesForRestApi(this IServiceCollection services)
+    public static IServiceCollection RegisterRestApiServices(this IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
         services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -18,13 +18,13 @@ public static class RestStartupExtensions
         return services;
     }
 
-    public static WebApplication AddMiddlewareForRestApi(this WebApplication app)
+    public static WebApplication ConfigureRestApi(this WebApplication app)
     {
         app.UseExceptionHandler();
 
         app.UseOpenApi(options => { options.Path = "/openapi/myapi.json"; });
-        //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
-        app.MapScalarApiReference();
+
+        app.MapScalarApiReference(); //To open the Scalar page, go to: http://localhost:5000/scalar/myapi
 
         app.MapControllers();
         app.UseCors(opts => opts.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());

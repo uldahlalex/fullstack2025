@@ -1,3 +1,5 @@
+namespace Application.Interfaces.Api.Mqtt;
+
 public interface IMessageProcessor
 {
     Task ProcessAsync(Message message);

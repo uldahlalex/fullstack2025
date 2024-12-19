@@ -49,7 +49,7 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
     {
         var client = CreateClient();
         var response = await client.PostAsJsonAsync<ProblemDetails>(
-            AuthController.RegisterRoute, new AuthRequestDto()
+            AuthController.RegisterRoute, new AuthRequestDto
             {
                 Username = "bob@bob.dk",
                 Password = "a"
@@ -108,7 +108,7 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
         var player = MockObjects.GetPlayer();
         ctx.Players.Add(player);
         await ctx.SaveChangesAsync();
-        
+
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.RegisterRoute,
             MockObjects.GetAuthRequestDto());
         Assert.Equal(HttpStatusCode.BadRequest, response.HttpResponseMessage.StatusCode);

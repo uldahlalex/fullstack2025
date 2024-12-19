@@ -16,6 +16,6 @@
         <ProjectReference Include="..\Application\Application.csproj"/>
         <PackageReference Include="patrikvalentiny-WebSocketProxy" Version="1.1.0"/>
     </ItemGroup>
-    
+
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Application.Interfaces.Infrastructure.TimeeSeries;
+namespace Application.Interfaces.Infrastructure.Mqtt;
 
 public interface ITimeSeriesPublishing
 {

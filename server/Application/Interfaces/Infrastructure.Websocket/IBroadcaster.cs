@@ -1,4 +1,4 @@
-namespace Application.Interfaces.Infrastructure.Broadcasting;
+namespace Application.Interfaces.Infrastructure.Websocket;
 
 public interface IBroadcaster
 {

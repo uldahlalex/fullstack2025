@@ -2,7 +2,7 @@ using System.Text.Json;
 using Api.Mqtt;
 using Api.Rest;
 using Api.Websocket;
-using Application.Extensions;
+using Application;
 using Application.Models;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
@@ -36,13 +36,13 @@ public class Program
         services.AddDataSourceAndRepositories();
 
         services.AddWebsocketInfrastructure();
-        services.AddMqttInfrastructure();
+        services.RegisterMqttInfrastructure();
 
-        services.AddApplicationServices();
+        services.RegisterApplicationServices();
 
-        services.AddDependenciesForRestApi();
-        services.AddDependenciesForRealtimeApi();
-        services.AddDependenciesForMqttApi();
+        services.RegisterRestApiServices();
+        services.RegisterWebsocketApiServices();
+        services.RegisterMqttApiServices();
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -62,11 +62,11 @@ public class Program
         const int restPort = 5000;
         const int wsPort = 8181;
         var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-        app.Urls.Add($"http://0.0.0.0:{restPort}"); 
+        app.Urls.Add($"http://0.0.0.0:{restPort}");
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
-        app.AddMiddlewareForRestApi();
-        app.AddMiddlewareForRealtimeApi();
-        app.AddMiddlewareForMqttApi();
+        app.ConfigureRestApi();
+        app.ConfigureWebsocketApi();
+        app.ConfigureMqttApi();
         app.MapGet("Acceptance", () => "Accepted");
     }
 }

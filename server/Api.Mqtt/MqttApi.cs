@@ -1,10 +1,12 @@
-using Microsoft.Extensions.Hosting;
+using Application.Interfaces.Api.Mqtt;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Formatter;
 using MQTTnet.Packets;
 
-public interface IMqttListener
+namespace Api.Mqtt;
+
+public interface IMqttApi
 {
     Task StartAsync(CancellationToken cancellationToken);
     Task SubscribeToTopics();
@@ -12,23 +14,23 @@ public interface IMqttListener
     Task HandleIncomingMessage(MqttApplicationMessageReceivedEventArgs args);
 }
 
-public class MqttListener : IMqttListener, IHostedService
+public class MqttApi : IMqttApi, IHostedService
 {
     private readonly IMqttClient _mqttClient;
     // private readonly IMessageProcessor _processor;
-    
-    public MqttListener(
+
+    public MqttApi(
         // IMessageProcessor processor
-        )
+    )
     {
         // Create the client in constructor
         _mqttClient = new MqttFactory().CreateMqttClient();
         // _processor = processor;
     }
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        try 
+        try
         {
             // Set up the handler before connecting
             _mqttClient.ApplicationMessageReceivedAsync += HandleIncomingMessage;
@@ -41,11 +43,9 @@ public class MqttListener : IMqttListener, IHostedService
                 .Build();
 
             var response = await _mqttClient.ConnectAsync(mqttClientOptions, cancellationToken);
-            
+
             if (response.ResultCode != MqttClientConnectResultCode.Success)
-            {
                 throw new Exception($"Failed to connect: {response.ResultCode}");
-            }
 
             await SubscribeToTopics();
             Console.WriteLine("MQTT connection started");
@@ -59,17 +59,14 @@ public class MqttListener : IMqttListener, IHostedService
 
     public async Task SubscribeToTopics()
     {
-        try 
+        try
         {
-            if (!_mqttClient.IsConnected)
-            {
-                throw new Exception("Client not connected");
-            }
+            if (!_mqttClient.IsConnected) throw new Exception("Client not connected");
 
             var topicFilter = new MqttTopicFilterBuilder()
                 .WithTopic("test")
                 .Build();
-                
+
             var result = await _mqttClient.SubscribeAsync(new MqttClientSubscribeOptions
             {
                 TopicFilters = new List<MqttTopicFilter> { topicFilter }
@@ -86,15 +83,12 @@ public class MqttListener : IMqttListener, IHostedService
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        if (_mqttClient.IsConnected)
-        {
-            await _mqttClient.DisconnectAsync();
-        }
+        if (_mqttClient.IsConnected) await _mqttClient.DisconnectAsync();
     }
 
     public async Task HandleIncomingMessage(MqttApplicationMessageReceivedEventArgs args)
     {
-        try 
+        try
         {
             var incomingText = args.ApplicationMessage.ConvertPayloadToString();
             var message = new Message
@@ -116,4 +110,3 @@ public class MqttListener : IMqttListener, IHostedService
         }
     }
 }
-

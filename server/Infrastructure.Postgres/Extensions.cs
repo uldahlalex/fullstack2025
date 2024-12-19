@@ -1,9 +1,8 @@
-﻿using Application.Interfaces.Infrastructure.Data;
+﻿using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models;
 using Infrastructure.Postgres.Postgresql.Data;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PgCtx;
 
@@ -39,7 +38,7 @@ public static class Extensions
             optionsBuilder.UseNpgsql(connectionString);
         }
 
-        services.AddDbContext<MyDbContext>(options => 
+        services.AddDbContext<MyDbContext>(options =>
         {
             options.UseNpgsql(connectionString,
                 npgsqlOptions => npgsqlOptions.MigrationsHistoryTable("__EFMigrationsHistory", "jerneif"));

@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Infrastructure.Broadcasting;
-using Application.Interfaces.Infrastructure.Data;
-using Application.Interfaces.Infrastructure.TimeeSeries;
+using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Interfaces.Infrastructure.Postgres;
+using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Entities;
 
 namespace Application.Services;

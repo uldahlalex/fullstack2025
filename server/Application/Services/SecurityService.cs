@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
-using Application.Interfaces.Infrastructure.Data;
+using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models;
 using Application.Models.Dtos;
 using Application.Models.Entities;
@@ -32,7 +32,8 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     {
         var player = repository.GetUserByUsername(dto.Username) ??
                      throw new AuthenticationException("Could not get user by username");
-        if (!VerifyPassword(dto.Password + player.Salt, player.Hash)) throw new AuthenticationException("Invalid password");
+        if (!VerifyPassword(dto.Password + player.Salt, player.Hash))
+            throw new AuthenticationException("Invalid password");
         return new AuthResponseDto
         {
             Jwt = GenerateJwt(new JwtClaims

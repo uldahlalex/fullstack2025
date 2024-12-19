@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Application.Interfaces.Infrastructure.Broadcasting;
+namespace Application.Interfaces.Infrastructure.Websocket;
 
 public interface IState
 {

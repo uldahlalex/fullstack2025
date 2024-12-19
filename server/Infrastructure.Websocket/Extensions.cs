@@ -1,5 +1,4 @@
-using Application;
-using Application.Interfaces.Infrastructure.Broadcasting;
+using Application.Interfaces.Infrastructure.Websocket;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Websocket;

@@ -1,7 +1,6 @@
 using Application.Models.Dtos;
 using Application.Models.Entities;
 using Application.Models.Enums;
-using Npgsql.Replication.PgOutput.Messages;
 
 namespace Api.Tests;
 
@@ -13,16 +12,16 @@ public class MockObjects
 
     public const string TestHash =
         "J4SHSN9SKisNBoijKZkNAA5GNWJlO/RNsiXWhoWq2lOpd7hBtmwnqb6bOcxxYP8tEvNRomJunrVkWKNa5W3lXg==";
-    
+
     public static Player GetPlayer(
-        string? username = TestUsername, 
+        string? username = TestUsername,
         string? role = null,
         bool activated = true,
         DateTime? createdAt = null,
         string? email = TestUsername,
         string? salt = TestSalt,
         string? hash = TestHash
-        )
+    )
     {
         return new Player
         {
@@ -38,7 +37,7 @@ public class MockObjects
 
     public static AuthRequestDto GetAuthRequestDto(string? username = TestUsername, string? password = TestPassword)
     {
-        return new AuthRequestDto()
+        return new AuthRequestDto
         {
             Username = username,
             Password = password

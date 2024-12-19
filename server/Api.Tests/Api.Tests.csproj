@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="GameTests\" />
+        <Folder Include="GameTests\"/>
     </ItemGroup>
 
 </Project>

@@ -33,6 +33,4 @@ public class ProxyConfig : IProxyConfig
         };
         new TcpProxyServer(proxyConfiguration).Start();
     }
-
-   
 }
