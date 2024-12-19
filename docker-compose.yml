@@ -24,11 +24,14 @@ services:
       - postgres_data:/var/lib/postgresql/data
   mqtt-broker:
     image: eclipse-mosquitto
-    hostname: mosquitto
-    container_name: mosquitto
     ports:
       - "1883:1883"
       - "9001:9001"
+    command: |
+      sh -c '
+      echo "listener 1883 0.0.0.0
+      allow_anonymous true" > /mosquitto/config/mosquitto.conf && 
+      mosquitto -c /mosquitto/config/mosquitto.conf'
 volumes:
   postgres_data:
 
