@@ -12,7 +12,7 @@ namespace Application.Services;
 
 public class ServiceLogic(
     IDataRepository repo,
-    IMqttPublisher mqttPublisher,
+    IMessagePublisher messagePublisher,
     IWebsocketClientMessager websocketClientMessager) : IServiceLogic
 {
     public IEnumerable<Board> GetDomainModels()
@@ -36,6 +36,7 @@ public class ServiceLogic(
         //Persist new changes to DB
         //Broadcast new preferences to IoT devices in 
         //Broadcast new preferences to web clients
+        messagePublisher.PublishAsync("preferences", dto);
         throw new NotImplementedException();
     }
 }

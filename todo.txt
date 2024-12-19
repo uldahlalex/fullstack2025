@@ -1,17 +1,16 @@
-Fix .csproj deps references
+- Subscription handlers for mqtt (when devices send traffic like health, temp, etc)
 
-Ville det være federe at have et nyt domæneområde? 
-- Måske et indeklima-tamtam projekt?
+- Preferences feature
+    - persist DB
+    - publish change to mqtt clients
+    - broadcast ws to dashboard(s)
+    
 
 - Fix devcontainer startup
     - Kan man verificere dette i pipeline på nogen måde?
     
 
 - Skrive ny dokumentation til websocket.boilerplate
-
-- MQTT implementation
-    - MQTT publish i infra
-    - MQTT subscribe i API
     
     
 - README.md

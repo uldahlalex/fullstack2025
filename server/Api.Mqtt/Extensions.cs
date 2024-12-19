@@ -4,14 +4,14 @@ public static class Extensions
 {
     public static IServiceCollection RegisterMqttApiServices(this IServiceCollection services)
     {
-        services.AddHostedService<MqttApi>(); // Change to AddHostedService
+
+        services.AddHostedService<MqttApi>();        
         return services;
     }
 
     public static WebApplication ConfigureMqttApi(this WebApplication app)
     {
-        // var mqttListener = app.Services.GetRequiredService<IMqttListener>();
-        // mqttListener.StartAsync(CancellationToken.None);
+        //Due to hosted service nature, we don't need to start the mqtt api explicitly
         return app;
     }
 }

@@ -1,16 +1,16 @@
-namespace Application.Interfaces.Api.Mqtt;
-
-public interface IMessageProcessor
+public interface IMqttClientConnection
 {
-    Task ProcessAsync(Message message);
+    bool IsConnected { get; }
+    Task ConnectAsync(CancellationToken cancellationToken);
+    Task DisconnectAsync(CancellationToken cancellationToken);
+    Task SubscribeAsync(string topic);
+    Task UnsubscribeAsync(string topic);
+    event Func<MqttMessage, Task> OnMessageReceived;
 }
 
-public interface IMessageDispatcher
+public class MqttMessage
 {
-    Task DispatchAsync(Message message, string topic);
-}
-
-public class Message
-{
-    public string MessageString { get; set; }
+    public string Topic { get; set; }
+    public string Payload { get; set; }
+    public DateTime Timestamp { get; set; }
 }

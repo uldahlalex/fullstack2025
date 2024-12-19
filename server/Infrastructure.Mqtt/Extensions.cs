@@ -1,4 +1,6 @@
 using Application.Interfaces.Infrastructure.Mqtt;
+using MQTTnet;
+using MQTTnet.Client;
 
 namespace Infrastructure.Mqtt;
 
@@ -6,12 +8,9 @@ public static class Extensions
 {
     public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
     {
-        services.AddScoped<IMqttPublisher, MqttPublisher>();
+        services.AddSingleton<IMqttClientConnection, MqttConnectionProvider>();
+
         return services;
     }
 
-    // public static WebApplication AddMiddlewareForMqttInfrastructure(this WebApplication app)
-    // {
-    //     return app;
-    // }
 }
