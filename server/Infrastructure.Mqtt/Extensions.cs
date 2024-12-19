@@ -10,4 +10,9 @@ public static class Extensions
         services.AddScoped<ITimeSeriesPublishing, TimeSeriesPublishing>();
         return services;
     }
+
+    public static WebApplication AddMiddlewareForMqttInfrastructure(this WebApplication app)
+    {
+        
+    }
 }
