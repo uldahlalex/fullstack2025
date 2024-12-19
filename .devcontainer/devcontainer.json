@@ -3,6 +3,7 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
   "workspaceFolder": "/workspace",
+  "remoteUser": "root",
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
       "version": "lts"

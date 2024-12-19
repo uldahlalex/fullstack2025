@@ -2,8 +2,7 @@
 
 - Fix devcontainer startup
     - Kan man verificere dette i pipeline på nogen måde?
-    - persisted changes must be in Dockerfile, no post create commands (run every time)
-    - pt problem: postgres bliver ikke startet
+    - network utils og andre ting i dockerfile bliver ikke installeret og jeg kan ikke sync IDE
     
 
 - Skrive ny dokumentation til websocket.boilerplate
@@ -20,13 +19,6 @@
 
 - Testing
 
-- Exception handling for all API's
-    - problemdetails
 
-- DevContainer
-    - Test in pipeline with all OS's
-    - EF core CLI
-    - npm?
-    
 "Topics" for Websocket to generalize?
     - Is this just a different psuedonum for "rooms / channels"?
