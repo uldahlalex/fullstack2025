@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
@@ -5,6 +6,7 @@ using Application.Interfaces.Infrastructure.Data;
 using Application.Models;
 using Application.Models.Dtos;
 using Application.Models.Entities;
+using Application.Models.Enums;
 using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
@@ -29,8 +31,8 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     public AuthResponseDto Login(AuthRequestDto dto)
     {
         var player = repository.GetUserByUsername(dto.Username) ??
-                     throw new Exception("Could not get user by username");
-        if (!VerifyPassword(dto.Password + player.Salt, player.Hash)) throw new Exception("Invalid password");
+                     throw new AuthenticationException("Could not get user by username");
+        if (!VerifyPassword(dto.Password + player.Salt, player.Hash)) throw new AuthenticationException("Invalid password");
         return new AuthResponseDto
         {
             Jwt = GenerateJwt(new JwtClaims
@@ -47,14 +49,14 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     public AuthResponseDto Register(AuthRequestDto dto)
     {
         var player = repository.GetUserByUsername(dto.Username);
-        if (player is not null) throw new Exception("User already exists");
+        if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);
         var insertedPlayer = repository.AddPlayer(new Player
         {
             FullName = dto.Username,
             Email = dto.Username,
-            Role = "user",
+            Role = Roles.User.ToString(),
             Salt = salt,
             Hash = hash
         });

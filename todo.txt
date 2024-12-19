@@ -1,4 +1,5 @@
-
+Ville det være federe at have et nyt domæneområde? 
+- Måske et indeklima-tamtam projekt?
 
 - Fix devcontainer startup
     - Kan man verificere dette i pipeline på nogen måde?
