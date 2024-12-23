@@ -2,10 +2,6 @@ name: Update README
 
 on:
   push:
-  #    paths:
-  #      - '**.sh'
-  #      - '**.cs'
-  #      - '**.sql'
   workflow_dispatch:
 
 jobs:
@@ -37,7 +33,7 @@ jobs:
           fi
           
           echo "\nSearching for markers in README.md:"
-          grep -o "<!-- BEGIN_FILE_SNIPPET:.*" README.md || echo "No markers found"
+          grep -o "<!-- BEGIN_FILE_SNIPPET:.* -->" README.md || echo "No markers found"
           
           # Read the original README
           content=$(cat README.md)
@@ -61,21 +57,12 @@ jobs:
           
                 echo "Updating content with awk..."
                 content=$(echo "$content" | awk -v path="$filepath" -v r="$file_content" -v ext="$ext" '
+                  BEGIN{RS="<!-- END_FILE_SNIPPET:" path " -->";ORS=RS}
                   $0 ~ "<!-- BEGIN_FILE_SNIPPET:" path " -->"{
-                    p=1
-                    print
-                    print "```" ext
-                    print r
-                    print "```"
+                    print $1 "```" ext "\n" r "\n```"
                     next
                   }
-                  $0 ~ "<!-- END_FILE_SNIPPET:" path " -->"{
-                    p=1
-                    print
-                    next
-                  }
-                  !p{print}
-                  {p=0}
+                  {print}
                 ')
                 echo "Content updated for $filepath"
               else
@@ -86,7 +73,7 @@ jobs:
             else
               echo "Marker format not recognized"
             fi
-          done < <(grep -o "<!-- BEGIN_FILE_SNIPPET:.*" README.md)
+          done < <(grep -o "<!-- BEGIN_FILE_SNIPPET:.* -->" README.md)
           
           echo "\nWriting updated content back to README.md"
           echo "$content" > README.md
