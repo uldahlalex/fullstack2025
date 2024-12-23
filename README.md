@@ -18,7 +18,7 @@ Mount via devcontainer.json:
 
 #### Scaffolding:
 
-<!-- BEGIN_FILE_SNIPPET:Infrastructure.Postgres.Scaffold/scaffold.sh -->
+<!-- BEGIN_FILE_SNIPPET:server/Infrastructure.Postgres.Scaffold/scaffold.sh -->
 ```
 
 
