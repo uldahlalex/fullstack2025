@@ -1,7 +1,11 @@
 text
 
 
-[//]: # (FILE: ./server/Infrastructure.Postgres.Scaffolding/scaffold.sh)
+```
+
+```
+
+
 ```
 #!/bin/bash
 
@@ -16,6 +20,7 @@ dotnet ef dbcontext scaffold \
   --context-namespace  Infrastructure.Postgres.Scaffolding \
   --force
   ```
+[//]: # (FILE: ./server/Infrastructure.Postgres.Scaffolding/scaffold.sh)
 ```
 #!/bin/bash
 
