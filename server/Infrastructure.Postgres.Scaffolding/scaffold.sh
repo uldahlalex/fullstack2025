@@ -9,3 +9,4 @@ dotnet ef dbcontext scaffold \
   --namespace Application.Models.Entities \
   --context-namespace  Infrastructure.Postgres.Scaffolding \
   --force
+  
