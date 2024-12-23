@@ -1,0 +1,63 @@
+name: Update README
+
+on:
+  push:
+    paths:
+      - '**.sh'
+      - '**.cs'
+      - '**.sql'
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update README.md with file snippets
+        run: |
+          # Read the original README
+          content=$(cat README.md)
+          
+          # Find all snippet markers and update them
+          while IFS= read -r marker; do
+            if [[ $marker =~ BEGIN_FILE_SNIPPET:(.+) ]]; then
+              filepath="${BASH_REMATCH[1]}"
+              if [ -f "$filepath" ]; then
+                file_content=$(cat "$filepath")
+                # Determine language for markdown based on file extension
+                ext="${filepath##*.}"
+          
+                # Update content between markers for this file
+                content=$(echo "$content" | awk -v path="$filepath" -v r="$file_content" -v ext="$ext" '
+                  $0 ~ "<!-- BEGIN_FILE_SNIPPET:" path " -->"{
+                    p=1
+                    print
+                    print "```" ext
+                    print r
+                    print "```"
+                    next
+                  }
+                  $0 ~ "<!-- END_FILE_SNIPPET:" path " -->"{
+                    p=1
+                    print
+                    next
+                  }
+                  !p{print}
+                  {p=0}
+                ')
+              fi
+            fi
+          done < <(grep -o "<!-- BEGIN_FILE_SNIPPET:.*" README.md)
+          
+          # Write updated content back to README
+          echo "$content" > README.md
+
+      - name: Commit and push if changed
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: Update code snippets in README [skip ci]" && git push)

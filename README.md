@@ -12,4 +12,14 @@ Mount via devcontainer.json:
 
 ## Deploying
 
-### A: To
+### A: 
+
+### Common actions:
+
+#### Scaffolding:
+
+<!-- BEGIN_FILE_SNIPPET:Infrastructure.Postgres.Scaffold/scaffold.sh -->
+```
+
+
+```
