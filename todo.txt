@@ -1,5 +1,6 @@
-- IMessagePublisher implementation
-- Subscription handlers for mqtt (when devices send traffic like health, temp, etc)
+
+- Subscription handlers for mqtt (when devices send traffic like health, temp, etc) og videre med mqtt implemetation:
+    - https://poe.com/chat/2z2z0qf6de2ohlldzwp
 
 - Preferences feature
     - persist DB
