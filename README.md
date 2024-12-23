@@ -17,8 +17,8 @@ Mount via devcontainer.json:
 ### Common actions:
 
 #### Scaffolding:
-<!-- BEGIN_FILE_SNIPPET:server/Infrastructure.Postgres.Scaffolding/scaffold.sh -->
+<!-- BEGIN_FILE_SNIPPET:./server/Infrastructure.Postgres.Scaffolding/scaffold.sh -->
 ```bash
 
 ```
-<!-- END_FILE_SNIPPET:server/Infrastructure.Postgres.Scaffolding/scaffold.sh -->
+<!-- END_FILE_SNIPPET:./server/Infrastructure.Postgres.Scaffolding/scaffold.sh -->
