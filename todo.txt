@@ -1,3 +1,4 @@
+- IMessagePublisher implementation
 - Subscription handlers for mqtt (when devices send traffic like health, temp, etc)
 
 - Preferences feature

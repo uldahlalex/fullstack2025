@@ -2,10 +2,10 @@ name: Update README
 
 on:
   push:
-    paths:
-      - '**.sh'
-      - '**.cs'
-      - '**.sql'
+#    paths:
+#      - '**.sh'
+#      - '**.cs'
+#      - '**.sql'
   workflow_dispatch:
 
 jobs:
