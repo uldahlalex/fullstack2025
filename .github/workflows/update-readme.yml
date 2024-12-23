@@ -2,10 +2,10 @@ name: Update README
 
 on:
   push:
-#    paths:
-#      - '**.sh'
-#      - '**.cs'
-#      - '**.sql'
+  #    paths:
+  #      - '**.sh'
+  #      - '**.cs'
+  #      - '**.sql'
   workflow_dispatch:
 
 jobs:
@@ -21,19 +21,45 @@ jobs:
 
       - name: Update README.md with file snippets
         run: |
+          echo "Current working directory:"
+          pwd
+          
+          echo "\nRepository contents:"
+          ls -R
+          
+          echo "\nChecking if README.md exists:"
+          if [ -f "README.md" ]; then
+            echo "README.md found"
+            echo "\nContent of README.md:"
+            cat README.md
+          else
+            echo "README.md not found!"
+          fi
+          
+          echo "\nSearching for markers in README.md:"
+          grep -o "<!-- BEGIN_FILE_SNIPPET:.*" README.md || echo "No markers found"
+          
           # Read the original README
           content=$(cat README.md)
           
           # Find all snippet markers and update them
           while IFS= read -r marker; do
+            echo "\nProcessing marker: $marker"
+          
             if [[ $marker =~ BEGIN_FILE_SNIPPET:(.+) ]]; then
               filepath="${BASH_REMATCH[1]}"
-              if [ -f "$filepath" ]; then
-                file_content=$(cat "$filepath")
-                # Determine language for markdown based on file extension
-                ext="${filepath##*.}"
+              echo "Extracted filepath: $filepath"
           
-                # Update content between markers for this file
+              if [ -f "$filepath" ]; then
+                echo "File exists: $filepath"
+                echo "File contents:"
+                cat "$filepath"
+          
+                file_content=$(cat "$filepath")
+                ext="${filepath##*.}"
+                echo "File extension: $ext"
+          
+                echo "Updating content with awk..."
                 content=$(echo "$content" | awk -v path="$filepath" -v r="$file_content" -v ext="$ext" '
                   $0 ~ "<!-- BEGIN_FILE_SNIPPET:" path " -->"{
                     p=1
@@ -51,21 +77,41 @@ jobs:
                   !p{print}
                   {p=0}
                 ')
+                echo "Content updated for $filepath"
+              else
+                echo "File not found: $filepath"
+                echo "Available files in current directory:"
+                find . -type f
               fi
+            else
+              echo "Marker format not recognized"
             fi
           done < <(grep -o "<!-- BEGIN_FILE_SNIPPET:.*" README.md)
           
-          # Write updated content back to README
+          echo "\nWriting updated content back to README.md"
           echo "$content" > README.md
+          
+          echo "\nFinal README.md content:"
+          cat README.md
 
       - name: Commit and push if changed
         run: |
+          echo "Configuring git..."
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+          echo "\nChecking git status:"
+          git status
+          
+          echo "\nAdding README.md..."
           git add README.md
+          
+          echo "\nChecking for changes..."
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
+            echo "Changes detected, committing..."
             git commit -m "docs: Update code snippets in README [skip ci]"
+            echo "Pushing changes..."
             git push
           fi
