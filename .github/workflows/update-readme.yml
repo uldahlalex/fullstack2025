@@ -19,38 +19,45 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Debug directory contents
+      - name: Debug repository state
         run: |
           pwd
           ls -la
+          echo "Content of README.md before update:"
           cat README.md
+          echo "Content of ./server/Startup/Program.cs:"
+          cat ./server/Startup/Program.cs || echo "File not found"
 
       - name: Make script executable
-        run: |
-          chmod +x ./update-readme-snippets.sh
-          ls -la ./update-readme-snippets.sh
+        run: chmod +x ./update-readme-snippets.sh
 
-      - name: Update README
+      - name: Run update script with debug
         run: |
-          ./update-readme-snippets.sh
-          echo "Content after update:"
+          bash -x ./update-readme-snippets.sh
+          echo "Content of README.md after update:"
           cat README.md
 
-      - name: Check git status
+      - name: Check for changes
+        id: git-check
         run: |
-          git status
-          git diff README.md
+          if git diff --quiet README.md; then
+            echo "No changes detected in README.md"
+          else
+            echo "Changes detected in README.md"
+            git diff README.md
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push changes
+        if: steps.git-check.outputs.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git diff --cached --quiet || (git commit -m "Update README.md with latest file snippets" && git push)
+          git commit -m "Update README.md with latest file snippets"
+          git push
 
-      - name: Final verification
+      - name: Final status
         run: |
-          echo "Final README.md content:"
-          cat README.md
-          echo "Git status after push:"
+          echo "Final git status:"
           git status
