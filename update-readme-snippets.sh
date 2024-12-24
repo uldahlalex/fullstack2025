@@ -1,43 +1,71 @@
 #!/bin/bash
 
-# Get list of file paths from README.md comments
-files=$(grep -oP '(?<=FILE: ).*(?=\))' README.md)
-
-# Function to replace the content of a file into the README.md
-replace_file_contents() {
+# Function to process a single file reference and its code block
+process_file_reference() {
     local filename="$1"
-    local marker="[//]: # (FILE: $filename)"
     local temp_file=$(mktemp)
+    local in_target_block=0
+    local marker="[//]: # (FILE: $filename)"
+    local skip_next_block=0
+    local current_marker=""
+    
+    # Check if file exists
+    if [ ! -f "$filename" ]; then
+        echo "Warning: File $filename does not exist!"
+        return 1
+    fi
 
-    # Print everything before the marker
-    awk -v marker="$marker" '$0 ~ marker {exit} {print}' README.md > "$temp_file"
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Check if this is any file marker
+        if [[ "$line" =~ \[//\]:\ \#\ \(FILE:* ]]; then
+            current_marker="$line"
+            if [ "$line" = "$marker" ]; then
+                # Found our target marker - output it and the new code block
+                echo "$line" >> "$temp_file"
+                echo '```' >> "$temp_file"
+                cat "$filename" >> "$temp_file"
+                echo '```' >> "$temp_file"
+                in_target_block=1
+                skip_next_block=1
+                continue
+            else
+                # This is a different marker - output it
+                echo "$line" >> "$temp_file"
+                in_target_block=0
+                skip_next_block=0
+            fi
+            continue
+        fi
 
-    # Print the marker
-    echo "$marker" >> "$temp_file"
+        if [ $in_target_block -eq 1 ]; then
+            if [ "$line" = '```' ]; then
+                in_target_block=0
+            fi
+            continue
+        fi
 
-    # Print the file contents
-    echo '```' >> "$temp_file"
-    cat "$filename" >> "$temp_file"
-    echo '```' >> "$temp_file"
+        if [ "$skip_next_block" = "1" ] && [ "$line" = '```' ]; then
+            skip_next_block=0
+            continue
+        fi
 
-    # Print everything after the marker and the following code block
-    awk -v marker="$marker" 'BEGIN {print_block=1} $0 ~ marker {getline; getline; getline; print_block=2} print_block == 2' README.md >> "$temp_file"
+        if [ "$skip_next_block" = "0" ]; then
+            echo "$line" >> "$temp_file"
+        fi
+    done < "README.md"
 
-    # Replace the README.md with the temp file
-    mv "$temp_file" README.md
+    mv "$temp_file" "README.md"
 }
 
-# Remove existing marker comments from README.md
-for filename in $files; do
-    escaped_filename=$(printf '%s\n' "$filename" | sed -e 's/[\/&]/\\&/g')
-    sed -i "/(FILE: $escaped_filename)/d" README.md
-done
+# Main script
+if [ ! -f "README.md" ]; then
+    echo "Error: README.md not found!"
+    exit 1
+fi
 
-# Replace the existing code block in the README.md with the contents of each file
-for filename in $files; do
-    if [ -f "$filename" ]; then
-        replace_file_contents "$filename"
-    else
-        echo "File $filename does not exist!"
-    fi
+# Extract all file references and process each one
+grep -o '\[//\]: # (FILE: [^)]*)' README.md | while read -r marker; do
+    # Extract filename from marker
+    filename=$(echo "$marker" | sed 's/\[\/\/\]: # (FILE: \(.*\))/\1/')
+    process_file_reference "$filename"
 done
