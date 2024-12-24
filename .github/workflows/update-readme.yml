@@ -7,6 +7,20 @@ on:
 jobs:
   auto-update-readme:
     runs-on: ubuntu-latest
+    
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - uses: actions/setup-node@v4
-      - run: npx embedme README.md
+        with:
+          node-version: 'lts/*'
+          
+      - run: npx embedme ./README.md
+        
+      - run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update README with embedme" && git push)
