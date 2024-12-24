@@ -17,47 +17,27 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Debug repository state
+      - name: Set up Git
         run: |
-          pwd
-          ls -la
-          echo "Content of README.md before update:"
-          cat README.md
-          echo "Content of ./server/Startup/Program.cs:"
-          cat ./server/Startup/Program.cs || echo "File not found"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Make script executable
         run: chmod +x ./update-readme-snippets.sh
 
-      - name: Run update script with debug
+      - name: Run update script
         run: |
-          bash -x ./update-readme-snippets.sh
-          echo "Content of README.md after update:"
-          cat README.md
+          ./update-readme-snippets.sh
 
       - name: Check for changes
-        id: git-check
+        id: check
         run: |
           if git diff --quiet README.md; then
-            echo "No changes detected in README.md"
+            echo "No changes detected"
           else
-            echo "Changes detected in README.md"
-            git diff README.md
-            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Changes detected"
+            git add README.md
+            git commit -m "Update README.md with latest file snippets"
+            git push
           fi
-
-      - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add README.md
-          git commit -m "Update README.md with latest file snippets"
-          git push
-
-      - name: Final status
-        run: |
-          echo "Final git status:"
-          git status
