@@ -19,45 +19,38 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Debug repository state
+      - name: Debug directory contents
         run: |
           pwd
           ls -la
-          echo "Content of README.md before update:"
           cat README.md
-          echo "Content of ./server/Startup/Program.cs:"
-          cat ./server/Startup/Program.cs || echo "File not found"
 
       - name: Make script executable
-        run: chmod +x ./update-readme-snippets.sh
-
-      - name: Run update script with debug
         run: |
-          bash -x ./update-readme-snippets.sh
-          echo "Content of README.md after update:"
+          chmod +x ./update-readme-snippets.sh
+          ls -la ./update-readme-snippets.sh
+
+      - name: Update README
+        run: |
+          ./update-readme-snippets.sh
+          echo "Content after update:"
           cat README.md
 
-      - name: Check for changes
-        id: git-check
+      - name: Check git status
         run: |
-          if git diff --quiet README.md; then
-            echo "No changes detected in README.md"
-          else
-            echo "Changes detected in README.md"
-            git diff README.md
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+          git status
+          git diff README.md
 
       - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update README.md with latest file snippets"
-          git push
+          git diff --cached --quiet || (git commit -m "Update README.md with latest file snippets" && git push)
 
-      - name: Final status
+      - name: Final verification
         run: |
-          echo "Final git status:"
+          echo "Final README.md content:"
+          cat README.md
+          echo "Git status after push:"
           git status
