@@ -1,18 +1,5 @@
 text
 
-[//]: # (FILE: ./server/Infrastructure.Postgres.Scaffolding/scaffold.sh)
-```bash
-#!/bin/bash
+<!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./server/Infrastructure.Postgres.Scaffolding/scaffold.sh) -->
 
-dotnet ef dbcontext scaffold \
-  "Server=localhost;Database=testdb;User Id=testuser;Password=testpass;" \
-  Npgsql.EntityFrameworkCore.PostgreSQL \
-  --output-dir ../Application/Models/Entities  \
-  --context-dir . \
-  --context MyDbContext  \
-  --no-onconfiguring \
-  --namespace Application.Models.Entities \
-  --context-namespace  Infrastructure.Postgres.Scaffolding \
-  --force
-  ```
-[//]: # (FILE: ./server/Startup/Program.cs)
+<!-- MARKDOWN-AUTO-DOCS:END -->
