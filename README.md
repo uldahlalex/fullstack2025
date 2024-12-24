@@ -3,7 +3,7 @@
 ### program startup:
 
 ```cs
-// ./server/Startup/Progam.cs
+// ./server/Startup/Program.cs
 
 using System.Text.Json;
 using Api.Mqtt;
