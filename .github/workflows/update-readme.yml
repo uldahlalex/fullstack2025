@@ -2,27 +2,29 @@ name: Update README
 
 on:
   push:
-    branches:
-      - master
   workflow_dispatch:
 
+
+permissions:
+  contents: write
+
 jobs:
-  update-readme:
+  auto-update-readme:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Update README
-        run: bash ./update-readme-snippets.sh
-
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "github-actions@github.com"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          
+      - run: npx embedme ./README.md
+        
+      - run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
           git add README.md
-          git commit -m "Update README.md" || exit 0
-          git push
+          git diff --quiet && git diff --staged --quiet || (git commit -m "docs: update README with embedme" && git push)
