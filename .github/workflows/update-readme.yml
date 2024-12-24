@@ -4,6 +4,10 @@ on:
   push:
   workflow_dispatch:
 
+
+permissions:
+  contents: write
+
 jobs:
   auto-update-readme:
     runs-on: ubuntu-latest
