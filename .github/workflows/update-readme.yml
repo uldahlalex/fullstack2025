@@ -19,27 +19,38 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Debug directory contents
+        run: |
+          pwd
+          ls -la
+          cat README.md
+
       - name: Make script executable
-        run: chmod +x ./update-readme-snippets.sh
+        run: |
+          chmod +x ./update-readme-snippets.sh
+          ls -la ./update-readme-snippets.sh
 
       - name: Update README
         run: |
-          if [ ! -f "./update-readme-snippets.sh" ]; then
-            echo "Error: update-readme-snippets.sh not found"
-            exit 1
-          fi
           ./update-readme-snippets.sh
+          echo "Content after update:"
+          cat README.md
 
-      - name: Check for changes
-        id: git-check
+      - name: Check git status
         run: |
-          git diff --quiet README.md || echo "changed=true" >> $GITHUB_OUTPUT
+          git status
+          git diff README.md
 
       - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update README.md with latest file snippets"
-          git push origin HEAD:master
+          git diff --cached --quiet || (git commit -m "Update README.md with latest file snippets" && git push)
+
+      - name: Final verification
+        run: |
+          echo "Final README.md content:"
+          cat README.md
+          echo "Git status after push:"
+          git status
