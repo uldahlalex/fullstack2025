@@ -1,17 +1,37 @@
+name: Update README
 
-- name: Update README
-  run: bash ./update-readme-snippets.sh
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
-- name: Check for changes
-  id: git-check
-  run: |
-    git diff --quiet README.md || echo "changed=true" >> $GITHUB_OUTPUT
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
 
-- name: Commit and push changes
-  if: steps.git-check.outputs.changed == 'true'
-  run: |
-    git config --global user.name "github-actions[bot]"
-    git config --global user.email "github-actions[bot]@users.noreply.github.com"
-    git add README.md
-    git commit -m "Update README.md with latest file snippets"
-    git push
+
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+
+
+
+      - name: Update README
+        run: bash ./update-readme-snippets.sh
+
+
+
+
+
+
+      - name: Commit and push changes
+
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
+          git add README.md
+          git commit -m "Update README.md" || exit 0
+          git push
