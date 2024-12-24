@@ -2,9 +2,7 @@ name: API tests with .NET + TestContainers
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
+
 
 jobs:
   local_development:

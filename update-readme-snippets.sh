@@ -54,10 +54,9 @@ get_language() {
 process_file_reference() {
     local filename="$1"
     local temp_file=$(mktemp)
-    local in_target_block=0
+    local in_code_block=0
     local marker="[//]: # (FILE: $filename)"
     local skip_next_block=0
-    local current_marker=""
     local language=$(get_language "$filename")
     
     # Check if file exists
@@ -67,36 +66,25 @@ process_file_reference() {
     fi
 
     while IFS= read -r line || [ -n "$line" ]; do
-        # Check if this is any file marker
-        if [[ "$line" =~ \[//\]:\ \#\ \(FILE:* ]]; then
-            current_marker="$line"
-            if [ "$line" = "$marker" ]; then
-                # Found our target marker - output it and the new code block
-                echo "$line" >> "$temp_file"
-                if [ -n "$language" ]; then
-                    echo "\`\`\`$language" >> "$temp_file"
-                else
-                    echo "\`\`\`" >> "$temp_file"
-                fi
-                cat "$filename" >> "$temp_file"
-                echo "" >> "$temp_file"  # Add newline before closing backticks
-                echo "\`\`\`" >> "$temp_file"
-                echo "" >> "$temp_file"  # Add newline after code block
-                in_target_block=1
-                skip_next_block=1
-                continue
+        if [ "$line" = "$marker" ]; then
+            echo "$line" >> "$temp_file"
+            if [ -n "$language" ]; then
+                echo "\`\`\`$language" >> "$temp_file"
             else
-                # This is a different marker - output it
-                echo "$line" >> "$temp_file"
-                in_target_block=0
-                skip_next_block=0
+                echo "\`\`\`" >> "$temp_file"
             fi
+            cat "$filename" >> "$temp_file"
+            echo "" >> "$temp_file"
+            echo "\`\`\`" >> "$temp_file"
+            echo "" >> "$temp_file"
+            in_code_block=1
+            skip_next_block=1
             continue
         fi
 
-        if [ $in_target_block -eq 1 ]; then
+        if [ $in_code_block -eq 1 ]; then
             if [ "$line" = '```' ]; then
-                in_target_block=0
+                in_code_block=0
             fi
             continue
         fi
@@ -122,7 +110,6 @@ fi
 
 # Extract all file references and process each one
 grep -o '\[//\]: # (FILE: [^)]*)' README.md | while read -r marker; do
-    # Extract filename from marker
     filename=$(echo "$marker" | sed 's/\[\/\/\]: # (FILE: \(.*\))/\1/')
     process_file_reference "$filename"
 done
