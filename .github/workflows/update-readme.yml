@@ -9,29 +9,20 @@ on:
 jobs:
   update-readme:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update README
         run: bash ./update-readme-snippets.sh
 
-      - name: Check for changes
-        id: git-check
-        run: |
-          git diff --quiet README.md || echo "changed=true" >> $GITHUB_OUTPUT
-
       - name: Commit and push changes
-        if: steps.git-check.outputs.changed == 'true'
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "github-actions@github.com"
           git add README.md
-          git commit -m "Update README.md with latest file snippets"
+          git commit -m "Update README.md" || exit 0
           git push
