@@ -6,63 +6,78 @@ set -x
 # Function to get language based on file extension
 get_language() {
     local filename="$1"
-    case "${filename##*.}" in
-        sh) echo "bash" ;;
-        js) echo "javascript" ;;
-        py) echo "python" ;;
-        cpp|cc|cxx) echo "cpp" ;;
-        c) echo "c" ;;
-        cs) echo "csharp" ;;
-        java) echo "java" ;;
-        *) echo "" ;;
+    local extension="${filename##*.}"
+    case "$extension" in
+        "sh")
+            echo "bash"
+            ;;
+        "js")
+            echo "javascript"
+            ;;
+        "py")
+            echo "python"
+            ;;
+        "cpp"|"cc"|"cxx")
+            echo "cpp"
+            ;;
+        "c")
+            echo "c"
+            ;;
+        "cs")
+            echo "csharp"
+            ;;
+        "java")
+            echo "java"
+            ;;
+        *)
+            echo ""
+            ;;
     esac
 }
 
-# Function to process a file reference
+# Function to process a single file reference and its code block
 process_file_reference() {
     local filename="$1"
     local temp_file=$(mktemp)
     local marker="[//]: # (FILE: $filename)"
     local language=$(get_language "$filename")
-    local in_code_block=false
     
     echo "Processing file: $filename"
+    echo "Language detected: $language"
     
     if [ ! -f "$filename" ]; then
         echo "Warning: File $filename does not exist!"
         return 1
     fi
 
+    # Read file line by line
     while IFS= read -r line || [ -n "$line" ]; do
-        # If we find our marker, insert the new content
-        if [[ "$line" == "$marker" ]]; then
-            echo "Found marker for $filename"
+        if [ "$line" = "$marker" ]; then
+            # Found our marker, write it and the new content
             echo "$line" >> "$temp_file"
             if [ -n "$language" ]; then
-                echo "\`\`\`$language" >> "$temp_file"
+                echo ""\`\`\`$language"" >> "$temp_file"
             else
-                echo "\`\`\`" >> "$temp_file"
+                echo ""\`\`\`"" >> "$temp_file"
             fi
             cat "$filename" >> "$temp_file"
-            echo "\`\`\`" >> "$temp_file"
             echo "" >> "$temp_file"
-            in_code_block=true
-            continue
+            echo ""\`\`\`"" >> "$temp_file"
+            echo "" >> "$temp_file"
+            
+            # Skip lines until we find the next marker or end of file
+            while IFS= read -r skip_line; do
+                if [[ "$skip_line" =~ ^\[\/\/\]:\ \#\ \(FILE: ]]; then
+                    echo "$skip_line" >> "$temp_file"
+                    break
+                fi
+            done
+        else
+            echo "$line" >> "$temp_file"
         fi
-        
-        # If we're in a code block from our marker, skip lines until we find another marker
-        if $in_code_block; then
-            if [[ "$line" =~ ^\[\/\/\]:\ \#\ \(FILE: ]]; then
-                in_code_block=false
-                echo "$line" >> "$temp_file"
-            fi
-            continue
-        fi
-        
-        # Otherwise, copy the line as-is
-        echo "$line" >> "$temp_file"
     done < "README.md"
 
+    # Replace the original file with our new version
     mv "$temp_file" "README.md"
 }
 
@@ -77,7 +92,7 @@ fi
 echo "Initial README.md contents:"
 cat "README.md"
 
-# Process all file references
+# Find all file references and process them
 echo "Finding file references..."
 grep -o '\[//]: # (FILE: [^)]*)' README.md | while read -r marker; do
     filename=$(echo "$marker" | sed 's/\[\/\/\]: # (FILE: \(.*\))/\1/')

@@ -16,38 +16,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Debug repository state
+      - name: Set up Git
         run: |
-          pwd
-          ls -la
-          echo "Current git status:"
-          git status
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Setup script
-        run: |
-          chmod +x ./update-readme-snippets.sh
-          echo "Script contents:"
-          cat ./update-readme-snippets.sh
+      - name: Make script executable
+        run: chmod +x ./update-readme-snippets.sh
 
       - name: Run update script
         run: |
           ./update-readme-snippets.sh
-          echo "Git status after script:"
-          git status
-          echo "README.md contents:"
-          cat README.md
 
-      - name: Commit changes if any
+      - name: Check for changes
+        id: check
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          if ! git diff --quiet README.md; then
-            echo "Changes detected in README.md"
+          if git diff --quiet README.md; then
+            echo "No changes detected"
+          else
+            echo "Changes detected"
             git add README.md
             git commit -m "Update README.md with latest file snippets"
             git push
-          else
-            echo "No changes to commit"
           fi
