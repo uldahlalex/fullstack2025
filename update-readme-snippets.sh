@@ -1,5 +1,55 @@
 #!/bin/bash
 
+# Function to get language based on file extension
+get_language() {
+    local filename="$1"
+    local extension="${filename##*.}"
+    case "$extension" in
+        "sh")
+            echo "bash"
+            ;;
+        "js")
+            echo "javascript"
+            ;;
+        "py")
+            echo "python"
+            ;;
+        "cpp"|"cc"|"cxx")
+            echo "cpp"
+            ;;
+        "c")
+            echo "c"
+            ;;
+        "cs")
+            echo "csharp"
+            ;;
+        "java")
+            echo "java"
+            ;;
+        "sql")
+            echo "sql"
+            ;;
+        "rb")
+            echo "ruby"
+            ;;
+        "php")
+            echo "php"
+            ;;
+        "go")
+            echo "go"
+            ;;
+        "rs")
+            echo "rust"
+            ;;
+        "ts")
+            echo "typescript"
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
 # Function to process a single file reference and its code block
 process_file_reference() {
     local filename="$1"
@@ -8,6 +58,7 @@ process_file_reference() {
     local marker="[//]: # (FILE: $filename)"
     local skip_next_block=0
     local current_marker=""
+    local language=$(get_language "$filename")
     
     # Check if file exists
     if [ ! -f "$filename" ]; then
@@ -22,9 +73,15 @@ process_file_reference() {
             if [ "$line" = "$marker" ]; then
                 # Found our target marker - output it and the new code block
                 echo "$line" >> "$temp_file"
-                echo '```' >> "$temp_file"
+                if [ -n "$language" ]; then
+                    echo "\`\`\`$language" >> "$temp_file"
+                else
+                    echo "\`\`\`" >> "$temp_file"
+                fi
                 cat "$filename" >> "$temp_file"
-                echo '```' >> "$temp_file"
+                echo "" >> "$temp_file"  # Add newline before closing backticks
+                echo "\`\`\`" >> "$temp_file"
+                echo "" >> "$temp_file"  # Add newline after code block
                 in_target_block=1
                 skip_next_block=1
                 continue
