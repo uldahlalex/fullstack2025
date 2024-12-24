@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Enable debugging
-set -x
-
 # Function to get language based on file extension
 get_language() {
     local filename="$1"
@@ -62,66 +59,37 @@ process_file_reference() {
     local skip_next_block=0
     local language=$(get_language "$filename")
     
-    echo "Processing file: $filename"
-    echo "Language detected: $language"
-    
     # Check if file exists
     if [ ! -f "$filename" ]; then
         echo "Warning: File $filename does not exist!"
-        echo "Current directory: $(pwd)"
-        echo "Directory contents:"
-        ls -la
         return 1
     fi
 
-    echo "File content to be inserted:"
-    cat "$filename"
-    
-    local processing_marker=0
     while IFS= read -r line || [ -n "$line" ]; do
-        # Debug output
-        echo "Processing line: $line"
-        echo "in_code_block: $in_code_block"
-        echo "skip_next_block: $skip_next_block"
-        echo "processing_marker: $processing_marker"
-
-        if [[ "$line" == "[//]: # (FILE:"* ]]; then
-            if [[ "$line" == "$marker" ]]; then
-                echo "Found target marker: $line"
-                echo "$line" >> "$temp_file"
-                if [ -n "$language" ]; then
-                    echo "\`\`\`$language" >> "$temp_file"
-                else
-                    echo "\`\`\`" >> "$temp_file"
-                fi
-                cat "$filename" >> "$temp_file"
-                echo "" >> "$temp_file"
-                echo "\`\`\`" >> "$temp_file"
-                echo "" >> "$temp_file"
-                in_code_block=1
-                skip_next_block=1
-                processing_marker=1
-                continue
+        if [ "$line" = "$marker" ]; then
+            echo "$line" >> "$temp_file"
+            if [ -n "$language" ]; then
+                echo "\`\`\`$language" >> "$temp_file"
             else
-                echo "Found different marker: $line"
-                processing_marker=0
-                in_code_block=0
-                skip_next_block=0
-                echo "$line" >> "$temp_file"
+                echo "\`\`\`" >> "$temp_file"
             fi
+            cat "$filename" >> "$temp_file"
+            echo "" >> "$temp_file"
+            echo "\`\`\`" >> "$temp_file"
+            echo "" >> "$temp_file"
+            in_code_block=1
+            skip_next_block=1
             continue
         fi
 
         if [ $in_code_block -eq 1 ]; then
-            if [[ "$line" == "\`\`\`"* ]]; then
-                echo "End of code block found"
+            if [ "$line" = '```' ]; then
                 in_code_block=0
             fi
             continue
         fi
 
-        if [ "$skip_next_block" = "1" ] && [[ "$line" == "\`\`\`"* ]]; then
-            echo "Skipping existing code block"
+        if [ "$skip_next_block" = "1" ] && [ "$line" = '```' ]; then
             skip_next_block=0
             continue
         fi
@@ -131,36 +99,17 @@ process_file_reference() {
         fi
     done < "README.md"
 
-    echo "Temporary file contents:"
-    cat "$temp_file"
-    
     mv "$temp_file" "README.md"
-    echo "Updated README.md contents:"
-    cat "README.md"
 }
 
 # Main script
-echo "Script starting..."
-echo "Current directory: $(pwd)"
-echo "Directory contents:"
-ls -la
-
 if [ ! -f "README.md" ]; then
     echo "Error: README.md not found!"
     exit 1
 fi
 
-echo "Initial README.md contents:"
-cat "README.md"
-
-echo "Finding file references..."
+# Extract all file references and process each one
 grep -o '\[//\]: # (FILE: [^)]*)' README.md | while read -r marker; do
-    echo "Found marker: $marker"
     filename=$(echo "$marker" | sed 's/\[\/\/\]: # (FILE: \(.*\))/\1/')
-    echo "Extracted filename: $filename"
     process_file_reference "$filename"
 done
-
-echo "Script completed"
-echo "Final README.md contents:"
-cat "README.md"
