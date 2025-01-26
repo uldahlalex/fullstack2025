@@ -29,7 +29,9 @@ public static class Extensions
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error connecting to DB: " + e.Message + " " + e.StackTrace);
+            Console.WriteLine("Error connecting to DB: " + e.Message);
+            Console.WriteLine(e.InnerException);
+            Console.WriteLine(e.StackTrace);
             Console.WriteLine("Starting DB in test container instead");
 
             var pgCtxSetup = new PgCtxSetup<MyDbContext>();
