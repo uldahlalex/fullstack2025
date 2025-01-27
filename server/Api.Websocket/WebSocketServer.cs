@@ -2,8 +2,8 @@ using System.Text.Json;
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
-using lib;
 using Microsoft.AspNetCore.Mvc;
+using WebSocketBoilerplate;
 
 namespace Api.Websocket;
 
@@ -34,7 +34,7 @@ public static class CustomWebSocketServer
             {
                 try
                 {
-                    await app.InvokeClientEventHandler(ws, message, ServiceLifetime.Scoped);
+                    await app.CallEventHandler(ws, message);
                 }
                 catch (Exception ex)
                 {

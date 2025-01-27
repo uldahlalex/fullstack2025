@@ -1,7 +1,7 @@
 using Application.Interfaces;
 using Application.Models.Dtos.Websocket;
 using Fleck;
-using lib;
+using WebSocketBoilerplate;
 
 namespace Api.Websocket.Events;
 

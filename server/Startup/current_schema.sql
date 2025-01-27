@@ -1,56 +1,50 @@
-DO
-$EF$
+DO $EF$
 BEGIN
-    IF
-NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'jerneif') THEN
-CREATE SCHEMA jerneif;
-END IF;
+    IF NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'jerneif') THEN
+        CREATE SCHEMA jerneif;
+    END IF;
 END $EF$;
 
 
-CREATE TABLE jerneif.game
-(
-    id         uuid    NOT NULL,
+CREATE TABLE jerneif.game (
+    id uuid NOT NULL,
     weeknumber integer NOT NULL,
     yearnumber integer NOT NULL,
     CONSTRAINT "PK_game" PRIMARY KEY (id)
 );
 
 
-CREATE TABLE jerneif.player
-(
-    id         uuid    NOT NULL,
+CREATE TABLE jerneif.player (
+    id uuid NOT NULL,
     created_at timestamp with time zone,
-    activated  boolean NOT NULL,
-    "Salt"     text    NOT NULL,
-    "Hash"     text    NOT NULL,
-    "Email"    text    NOT NULL,
-    "FullName" text    NOT NULL,
-    "Role"     text    NOT NULL,
+    activated boolean NOT NULL,
+    "Salt" text NOT NULL,
+    "Hash" text NOT NULL,
+    "Email" text NOT NULL,
+    "FullName" text NOT NULL,
+    "Role" text NOT NULL,
     CONSTRAINT "PK_player" PRIMARY KEY (id)
 );
 
 
-CREATE TABLE jerneif.winnersequence
-(
-    id         uuid NOT NULL,
-    gameid     uuid NOT NULL,
+CREATE TABLE jerneif.winnersequence (
+    id uuid NOT NULL,
+    gameid uuid NOT NULL,
     created_at timestamp with time zone,
-    sequence   integer[] NOT NULL,
+    sequence integer[] NOT NULL,
     CONSTRAINT "PK_winnersequence" PRIMARY KEY (id),
     CONSTRAINT "FK_winnersequence_game_gameid" FOREIGN KEY (gameid) REFERENCES jerneif.game (id) ON DELETE CASCADE
 );
 
 
-CREATE TABLE jerneif.board
-(
-    id            uuid                     NOT NULL,
-    userid        uuid                     NOT NULL,
-    gameid        uuid                     NOT NULL,
-    created_at    timestamp with time zone NOT NULL,
+CREATE TABLE jerneif.board (
+    id uuid NOT NULL,
+    userid uuid NOT NULL,
+    gameid uuid NOT NULL,
+    created_at timestamp with time zone NOT NULL,
     sortednumbers integer[] NOT NULL,
-    afviklet      boolean                  NOT NULL,
-    won           boolean                  NOT NULL,
+    afviklet boolean NOT NULL,
+    won boolean NOT NULL,
     CONSTRAINT "PK_board" PRIMARY KEY (id),
     CONSTRAINT "FK_board_game_gameid" FOREIGN KEY (gameid) REFERENCES jerneif.game (id) ON DELETE CASCADE,
     CONSTRAINT "FK_board_player_userid" FOREIGN KEY (userid) REFERENCES jerneif.player (id) ON DELETE CASCADE

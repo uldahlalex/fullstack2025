@@ -1,6 +1,5 @@
 using Application.Interfaces.Infrastructure.Mqtt;
 using MQTTnet;
-using MQTTnet.Client;
 
 namespace Infrastructure.Mqtt;
 

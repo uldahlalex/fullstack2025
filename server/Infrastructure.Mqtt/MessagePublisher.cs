@@ -1,6 +1,7 @@
 using MQTTnet;
-using MQTTnet.Client;
+using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Formatter;
+using MQTTnet.Implementations;
 using MQTTnet.Protocol;
 
 public class MqttConnectionProvider : IMqttClientConnection
@@ -13,7 +14,7 @@ public class MqttConnectionProvider : IMqttClientConnection
 
     public MqttConnectionProvider(ILogger<MqttConnectionProvider> logger)
     {
-        _client = new MqttFactory().CreateMqttClient();
+        _client = new MqttClient(new MqttClientAdapterFactory(), new MqttNetEventLogger());
         _logger = logger;
         _options = new MqttClientOptionsBuilder()
             .WithTcpServer("localhost", 1883)

@@ -36,13 +36,13 @@ public class Program
         services.AddDataSourceAndRepositories();
 
         services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure();
+        //services.RegisterMqttInfrastructure();
 
         services.RegisterApplicationServices();
 
         services.RegisterRestApiServices();
         services.RegisterWebsocketApiServices();
-        services.RegisterMqttApiServices();
+        //services.RegisterMqttApiServices();
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -67,7 +67,7 @@ public class Program
 
         app.ConfigureRestApi();
         app.ConfigureWebsocketApi();
-        app.ConfigureMqttApi();
+        //app.ConfigureMqttApi();
 
         app.MapGet("Acceptance", () => "Accepted");
     }

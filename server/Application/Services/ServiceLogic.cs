@@ -11,9 +11,10 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 namespace Application.Services;
 
 public class ServiceLogic(
-    IDataRepository repo,
-    IMessagePublisher messagePublisher,
-    IWebsocketClientMessager websocketClientMessager) : IServiceLogic
+    IDataRepository repo
+    //IMessagePublisher messagePublisher,
+    //IWebsocketClientMessager websocketClientMessager
+    ) : IServiceLogic
 {
     public IEnumerable<Board> GetDomainModels()
     {
@@ -23,7 +24,7 @@ public class ServiceLogic(
     public void Broadcast(object message, params Guid[] connectionIds)
     {
         var serializedMessage = JsonSerializer.Serialize(message);
-        websocketClientMessager.Broadcast(serializedMessage, connectionIds);
+        //websocketClientMessager.Broadcast(serializedMessage, connectionIds);
     }
 
     public void Publish()
@@ -36,7 +37,7 @@ public class ServiceLogic(
         //Persist new changes to DB
         //Broadcast new preferences to IoT devices in 
         //Broadcast new preferences to web clients
-        messagePublisher.PublishAsync("preferences", dto);
+        //messagePublisher.PublishAsync("preferences", dto);
         throw new NotImplementedException();
     }
 }

@@ -34,6 +34,8 @@ public static class Extensions
             Console.WriteLine(e.StackTrace);
             Console.WriteLine("Starting DB in test container instead");
 
+            if (true || optionsMonitor.CurrentValue.AspnetcoreEnvironment.Equals("Production"))
+                throw;
             var pgCtxSetup = new PgCtxSetup<MyDbContext>();
             connectionString = pgCtxSetup._postgres.GetConnectionString();
             optionsMonitor.CurrentValue.DbConnectionString = connectionString;
