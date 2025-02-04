@@ -25,4 +25,9 @@ public class WebSocketService : IWebSocketService<IWebSocketConnection>
     {
         throw new NotImplementedException();
     }
+
+    public IWebSocketConnection OnClose(IWebSocketConnection ws)
+    {
+        throw new NotImplementedException();
+    }
 }

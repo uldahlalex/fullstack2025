@@ -6,10 +6,10 @@ namespace Application;
 
 public static class Extensions
 {
-    public static IServiceCollection RegisterApplicationServices(this IServiceCollection services)
+    public static IServiceCollection RegisterApplicationServices<T>(this IServiceCollection services)
     {
         services.AddScoped<ISecurityService, SecurityService>();
-        services.AddScoped<IServiceLogic, ServiceLogic>();
+        services.AddScoped<IServiceLogic, ServiceLogic<T>>();
         return services;
     }
 }

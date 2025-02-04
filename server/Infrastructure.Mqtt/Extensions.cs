@@ -1,5 +1,3 @@
-using Application.Interfaces.Infrastructure.Mqtt;
-using MQTTnet;
 
 namespace Infrastructure.Mqtt;
 

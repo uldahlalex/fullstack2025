@@ -16,39 +16,41 @@ public static class CustomWebSocketServer
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         Action<IWebSocketConnection> config = ws =>
         {
-           // var connection = scopedServices.GetRequiredService<IConnectionCreator>().Create(ws);
-            ws.OnOpen = () => scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
+            ws.OnOpen = () =>
+                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
             ws.OnClose = () =>
-                scopedServices.GetRequiredService<IConnectionRegistry>().UnregisterConnection(connection);
+                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
             ws.OnError = ex =>
             {
-                var problemDetails = new ProblemDetails
+                var problemDetails = new ServerSendsErrorMessage()
                 {
-                    Title = ex.Message,
-                    Detail = ex.InnerException?.Message
+                    Error = ex.Message
                 };
-                scopedServices.GetRequiredService<IServiceLogic>()
-                    .Broadcast(JsonSerializer.Serialize(problemDetails), ws.ConnectionInfo.Id);
+                ws.Send(JsonSerializer.Serialize(problemDetails));
             };
-            ws.OnMessage = async message =>
+            ws.OnMessage = message =>
             {
-                try
+                Task.Run(async () =>
                 {
-                    await app.CallEventHandler(ws, message);
-                }
-                catch (Exception ex)
-                {
-                    var problemDetails = new ProblemDetails
+                    try
                     {
-                        Title = ex.Message,
-                        Detail = ex.InnerException?.Message
-                    };
-                    scopedServices.GetRequiredService<IServiceLogic>()
-                        .Broadcast(JsonSerializer.Serialize(problemDetails), ws.ConnectionInfo.Id);
-                }
+                        await app.CallEventHandler(ws, message);
+                    }
+                    catch (Exception e)
+                    {
+                        var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
+                        ws.SendDto(new ServerSendsErrorMessage() { Error = e.Message, RequestId = baseDto.requestId });
+                    }
+                });
             };
         };
         server.Start(config);
         return app;
     }
+}
+
+public class ServerSendsErrorMessage : BaseDto
+{
+    public string Error { get; set; }
+    public string RequestId { get; set; }
 }

@@ -3,6 +3,7 @@ using Api.Rest;
 using Api.Websocket;
 using Application;
 using Application.Models;
+using Fleck;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
@@ -38,7 +39,7 @@ public class Program
 
         services.AddWebsocketInfrastructure();
 
-        services.RegisterApplicationServices();
+        services.RegisterApplicationServices<IWebSocketConnection>();
         
         services.RegisterMqttInfrastructure();
 
