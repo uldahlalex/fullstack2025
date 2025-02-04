@@ -6,15 +6,15 @@ using MQTTnet.Formatter;
 using MQTTnet.Implementations;
 using MQTTnet.Protocol;
 
-public class MqttConnectionProvider : IMqttClientConnection
+public class MqttClientService : IMqttClientService
 {
     private readonly IMqttClient _client;
-    private readonly ILogger<MqttConnectionProvider> _logger;
+    private readonly ILogger<MqttClientService> _logger;
     private readonly MqttClientOptions _options;
 
     public event Func<MqttMessage, Task> OnMessageReceived;
 
-    public MqttConnectionProvider(ILogger<MqttConnectionProvider> logger, IOptionsMonitor<AppOptions> optionsMonitor)
+    public MqttClientService(ILogger<MqttClientService> logger, IOptionsMonitor<AppOptions> optionsMonitor)
     {
         _client = new MqttClient(new MqttClientAdapterFactory(), new MqttNetEventLogger());
         _logger = logger;

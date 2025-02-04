@@ -6,7 +6,7 @@ namespace Application.Interfaces;
 public interface IServiceLogic
 {
     public IEnumerable<Board> GetDomainModels();
-    public void Broadcast(object message, params Guid[] connectionIds);
+    public void Broadcast(object message, params string[] topics);
 
     public void Publish();
     object ChangePreferences(IClientWantsToChangePreferences dto);

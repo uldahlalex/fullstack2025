@@ -1,4 +1,4 @@
-public interface IMqttClientConnection
+public interface IMqttClientService
 {
     bool IsConnected { get; }
     Task ConnectAsync();

@@ -16,8 +16,8 @@ public static class CustomWebSocketServer
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         Action<IWebSocketConnection> config = ws =>
         {
-            var connection = scopedServices.GetRequiredService<IConnectionCreator>().Create(ws);
-            ws.OnOpen = () => scopedServices.GetRequiredService<IConnectionRegistry>().RegisterConnection(connection);
+           // var connection = scopedServices.GetRequiredService<IConnectionCreator>().Create(ws);
+            ws.OnOpen = () => scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
             ws.OnClose = () =>
                 scopedServices.GetRequiredService<IConnectionRegistry>().UnregisterConnection(connection);
             ws.OnError = ex =>
