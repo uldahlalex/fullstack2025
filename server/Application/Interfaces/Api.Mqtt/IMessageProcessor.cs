@@ -1,8 +1,8 @@
 public interface IMqttClientConnection
 {
     bool IsConnected { get; }
-    Task ConnectAsync(CancellationToken cancellationToken);
-    Task DisconnectAsync(CancellationToken cancellationToken);
+    Task ConnectAsync();
+    Task DisconnectAsync();
     Task SubscribeAsync(string topic);
     Task UnsubscribeAsync(string topic);
     event Func<MqttMessage, Task> OnMessageReceived;

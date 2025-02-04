@@ -9,7 +9,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Api.Rest\Api.Rest.csproj"/>
         <ProjectReference Include="..\Api.Websocket\Api.Websocket.csproj"/>
-        <ProjectReference Include="..\Api.Mqtt\Api.Mqtt.csproj"/>
         <ProjectReference Include="..\Infrastructure.Mqtt\Infrastructure.Mqtt.csproj"/>
         <ProjectReference Include="..\Infrastructure.Websocket\Infrastructure.Websocket.csproj"/>
         <ProjectReference Include="..\Infrastructure.Postgres\Infrastructure.Postgres.csproj"/>

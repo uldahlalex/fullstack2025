@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Api.Mqtt;
 using Api.Rest;
 using Api.Websocket;
 using Application;
@@ -33,16 +32,19 @@ public class Program
         services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
 
+        //appropriate onion ordering??
+        
         services.AddDataSourceAndRepositories();
 
         services.AddWebsocketInfrastructure();
-        //services.RegisterMqttInfrastructure();
 
         services.RegisterApplicationServices();
+        
+        services.RegisterMqttInfrastructure();
+
 
         services.RegisterRestApiServices();
         services.RegisterWebsocketApiServices();
-        //services.RegisterMqttApiServices();
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -67,7 +69,7 @@ public class Program
 
         app.ConfigureRestApi();
         app.ConfigureWebsocketApi();
-        //app.ConfigureMqttApi();
+        app.ConfigureMqtt();
 
         app.MapGet("Acceptance", () => "Accepted");
     }

@@ -1,7 +1,6 @@
 <Solution>
     <Folder Name="client"/>
     <Folder Name="server">
-        <Project Path="server/Api.Mqtt/Api.Mqtt.csproj" Type="Classic C#"/>
         <Project Path="server/Api.Rest/Api.Rest.csproj" Type="Classic C#"/>
         <Project Path="server/Api.Tests/Api.Tests.csproj" Type="Classic C#"/>
         <Project Path="server/Application/Application.csproj" Type="Classic C#"/>

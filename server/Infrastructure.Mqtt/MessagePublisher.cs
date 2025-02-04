@@ -1,3 +1,5 @@
+using Application.Models;
+using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Formatter;
@@ -12,27 +14,36 @@ public class MqttConnectionProvider : IMqttClientConnection
 
     public event Func<MqttMessage, Task> OnMessageReceived;
 
-    public MqttConnectionProvider(ILogger<MqttConnectionProvider> logger)
+    public MqttConnectionProvider(ILogger<MqttConnectionProvider> logger, IOptionsMonitor<AppOptions> optionsMonitor)
     {
         _client = new MqttClient(new MqttClientAdapterFactory(), new MqttNetEventLogger());
         _logger = logger;
+        var tlsOptions = new MqttClientTlsOptions
+        {
+            UseTls = true,
+            AllowUntrustedCertificates = true, // Only during development!
+            IgnoreCertificateChainErrors = true, // Only during development!
+            IgnoreCertificateRevocationErrors = true, // Only during development!
+        };
+
         _options = new MqttClientOptionsBuilder()
-            .WithTcpServer("localhost", 1883)
+            .WithTcpServer(optionsMonitor.CurrentValue.MQTT_BROKER_HOST, 8883)
+            .WithCredentials(optionsMonitor.CurrentValue.MQTT_USERNAME, optionsMonitor.CurrentValue.MQTT_PASSWORD)
             .WithProtocolVersion(MqttProtocolVersion.V500)
             .WithClientId($"MyClientId_{Guid.NewGuid()}")
             .WithCleanSession()
+            .WithTlsOptions(tlsOptions)
             .Build();
-
         _client.ApplicationMessageReceivedAsync += HandleMessage;
     }
 
     public bool IsConnected => _client.IsConnected;
 
-    public async Task ConnectAsync(CancellationToken cancellationToken)
+    public async Task ConnectAsync()
     {
         try
         {
-            var response = await _client.ConnectAsync(_options, cancellationToken);
+            var response = await _client.ConnectAsync(_options);
             if (response.ResultCode != MqttClientConnectResultCode.Success)
             {
                 throw new Exception($"Failed to connect: {response.ResultCode}");
@@ -46,7 +57,7 @@ public class MqttConnectionProvider : IMqttClientConnection
         }
     }
 
-    public async Task DisconnectAsync(CancellationToken cancellationToken)
+    public async Task DisconnectAsync()
     {
         try
         {
@@ -57,7 +68,7 @@ public class MqttConnectionProvider : IMqttClientConnection
                     Reason = (MqttClientDisconnectOptionsReason)MqttClientDisconnectReason.NormalDisconnection,
                     ReasonString = "Normal disconnection"
                 };
-                await _client.DisconnectAsync(disconnectOptions, cancellationToken);
+                await _client.DisconnectAsync(disconnectOptions);
                 _logger.LogInformation("Successfully disconnected from MQTT broker");
             }
         }
