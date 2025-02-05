@@ -1,8 +1,6 @@
 using System.Text.Json;
-using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
-using Microsoft.AspNetCore.Mvc;
 using WebSocketBoilerplate;
 
 namespace Api.Websocket;
@@ -22,7 +20,7 @@ public static class CustomWebSocketServer
                 scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
             ws.OnError = ex =>
             {
-                var problemDetails = new ServerSendsErrorMessage()
+                var problemDetails = new ServerSendsErrorMessage
                 {
                     Error = ex.Message
                 };
@@ -39,7 +37,7 @@ public static class CustomWebSocketServer
                     catch (Exception e)
                     {
                         var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
-                        ws.SendDto(new ServerSendsErrorMessage() { Error = e.Message, RequestId = baseDto.requestId });
+                        ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto.requestId });
                     }
                 });
             };

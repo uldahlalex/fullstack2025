@@ -1,4 +1,3 @@
-
 using WebSocketBoilerplate;
 
 namespace Api.Websocket;

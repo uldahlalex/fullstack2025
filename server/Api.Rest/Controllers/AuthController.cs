@@ -1,6 +1,6 @@
 using Api.Rest.Extensions;
+using Application.Interfaces;
 using Application.Models.Dtos;
-using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Rest.Controllers;

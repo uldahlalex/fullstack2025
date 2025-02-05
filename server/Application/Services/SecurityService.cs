@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models;
 using Application.Models.Dtos;
@@ -14,17 +15,6 @@ using JWT.Serializers;
 using Microsoft.Extensions.Options;
 
 namespace Application.Services;
-
-public interface ISecurityService
-{
-    public string HashPassword(string password);
-    public void VerifyPasswordOrThrow(string password, string hashedPassword);
-    public string GenerateSalt();
-    public string GenerateJwt(JwtClaims claims);
-    public AuthResponseDto Login(AuthRequestDto dto);
-    public AuthResponseDto Register(AuthRequestDto dto);
-    public JwtClaims VerifyJwtOrThrow(string jwt);
-}
 
 public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRepository repository) : ISecurityService
 {
@@ -84,7 +74,6 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     {
         if (HashPassword(password) != hashedPassword)
             throw new AuthenticationException("Invalid login");
-
     }
 
     public string GenerateSalt()
@@ -110,8 +99,8 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         var token = new JwtBuilder()
             .WithAlgorithm(new HMACSHA512Algorithm())
             .WithSecret(optionsMonitor.CurrentValue.JwtSecret)
-            .WithUrlEncoder(new JwtBase64UrlEncoder()) 
-            .WithJsonSerializer(new JsonNetSerializer()) 
+            .WithUrlEncoder(new JwtBase64UrlEncoder())
+            .WithJsonSerializer(new JsonNetSerializer())
             .MustVerifySignature()
             .Decode<JwtClaims>(jwt);
 

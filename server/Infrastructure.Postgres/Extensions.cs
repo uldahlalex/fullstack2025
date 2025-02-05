@@ -4,7 +4,6 @@ using Infrastructure.Postgres.Postgresql.Data;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using PgCtx;
 
 namespace Infrastructure.Postgres;
 
@@ -15,8 +14,9 @@ public static class Extensions
         services.AddDbContext<MyDbContext>(options =>
         {
             var provider = services.BuildServiceProvider();
-            options.UseNpgsql(provider.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue.DbConnectionString);
-                options.EnableSensitiveDataLogging();
+            options.UseNpgsql(
+                provider.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue.DbConnectionString);
+            options.EnableSensitiveDataLogging();
         });
 
         services.AddScoped<IDataRepository, Repo>();

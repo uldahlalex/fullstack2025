@@ -1,6 +1,4 @@
-using System.Text.Json;
 using Application.Interfaces;
-using Application.Services;
 using Fleck;
 using WebSocketBoilerplate;
 
@@ -17,7 +15,8 @@ public class ServerSendsEchoDto : BaseDto
     public string Message { get; set; }
 }
 
-public class ClientWantsToEcho(IServiceLogic service, ISecurityService securityService) : BaseEventHandler<ClientWantsToEchoDto>
+public class ClientWantsToEcho(IServiceLogic service, ISecurityService securityService)
+    : BaseEventHandler<ClientWantsToEchoDto>
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {

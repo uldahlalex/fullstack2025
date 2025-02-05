@@ -1,3 +1,4 @@
+using Application.Interfaces.Infrastructure.Mqtt;
 
 namespace Infrastructure.Mqtt;
 
@@ -10,13 +11,12 @@ public static class Extensions
 
         return services;
     }
-    
+
     public static WebApplication ConfigureMqtt(this WebApplication app)
     {
-       var mqttClientConnection = app.Services.GetRequiredService<IMqttClientService>();
-       mqttClientConnection.ConnectAsync().Wait();
-       mqttClientConnection.SubscribeAsync("messages").Wait();
+        var mqttClientConnection = app.Services.GetRequiredService<IMqttClientService>();
+        mqttClientConnection.ConnectAsync().Wait();
+        mqttClientConnection.SubscribeAsync("messages").Wait();
         return app;
     }
-
 }
