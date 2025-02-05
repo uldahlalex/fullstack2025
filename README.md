@@ -41,13 +41,13 @@ public class Program
         services.AddSingleton<IProxyConfig, ProxyConfig>();
 
         //appropriate onion ordering??
-        
+
         services.AddDataSourceAndRepositories();
 
         services.AddWebsocketInfrastructure();
 
         services.RegisterApplicationServices<IWebSocketConnection>();
-        
+
         services.RegisterMqttInfrastructure();
 
 
