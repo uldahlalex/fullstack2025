@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
+using Application.Models;
 using Application.Models.Dtos.Websocket;
 using Application.Models.Entities;
 
@@ -13,7 +14,7 @@ public class ServiceLogic<T>(
     IMqttClientService mqtt,
     IWebSocketService<T> ws) : IServiceLogic
 {
-    public IEnumerable<Board> GetDomainModels()
+    public IEnumerable<Board> GetDomainModels(JwtClaims claims)
     {
         return repo.GetDomainModels();
     }

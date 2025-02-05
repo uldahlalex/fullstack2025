@@ -23,7 +23,7 @@ public interface ISecurityService
     public string GenerateJwt(JwtClaims claims);
     public AuthResponseDto Login(AuthRequestDto dto);
     public AuthResponseDto Register(AuthRequestDto dto);
-    public void VerifyJwtOrThrow(string jwt);
+    public JwtClaims VerifyJwtOrThrow(string jwt);
 }
 
 public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRepository repository) : ISecurityService
@@ -105,7 +105,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         return tokenBuilder.Encode();
     }
 
-    public void VerifyJwtOrThrow(string jwt)
+    public JwtClaims VerifyJwtOrThrow(string jwt)
     {
         var token = new JwtBuilder()
             .WithAlgorithm(new HMACSHA512Algorithm())
@@ -117,5 +117,6 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
 
         if (DateTimeOffset.FromUnixTimeSeconds(long.Parse(token.Exp)) < DateTimeOffset.UtcNow)
             throw new AuthenticationException("Token expired");
+        return token;
     }
 }

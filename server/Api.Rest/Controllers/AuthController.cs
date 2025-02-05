@@ -1,4 +1,4 @@
-using Api.Rest.ActionFilters;
+using Api.Rest.Extensions;
 using Application.Models.Dtos;
 using Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -34,10 +34,10 @@ public class AuthController(ISecurityService securityService) : ControllerBase
     }
 
     [HttpGet]
-    [TypeFilter(typeof(VerifyJwt))]
     [Route(SecuredRoute)]
     public ActionResult Secured()
     {
+        securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
         return Ok("You are authorized to see this message");
     }
 }
