@@ -17,7 +17,7 @@ public class VerifyJwt : IActionFilter
     {
         var token = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
         if (token is null) throw new AuthenticationException("No token provided");
-        _securityService.VerifyJwt(token);
+        _securityService.VerifyJwtOrThrow(token);
     }
 
     public void OnActionExecuted(ActionExecutedContext context)

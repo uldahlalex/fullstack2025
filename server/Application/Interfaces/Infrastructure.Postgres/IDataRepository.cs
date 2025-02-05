@@ -5,6 +5,6 @@ namespace Application.Interfaces.Infrastructure.Postgres;
 public interface IDataRepository
 {
     public IEnumerable<Board> GetDomainModels();
-    Player? GetUserByUsername(string username);
+    Player GetUserByUsernameOrThrow(string username);
     Player AddPlayer(Player player);
 }

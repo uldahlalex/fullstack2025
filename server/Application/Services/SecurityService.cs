@@ -18,22 +18,20 @@ namespace Application.Services;
 public interface ISecurityService
 {
     public string HashPassword(string password);
-    public bool VerifyPassword(string password, string hashedPassword);
+    public void VerifyPasswordOrThrow(string password, string hashedPassword);
     public string GenerateSalt();
     public string GenerateJwt(JwtClaims claims);
     public AuthResponseDto Login(AuthRequestDto dto);
     public AuthResponseDto Register(AuthRequestDto dto);
-    public void VerifyJwt(string jwt);
+    public void VerifyJwtOrThrow(string jwt);
 }
 
 public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRepository repository) : ISecurityService
 {
     public AuthResponseDto Login(AuthRequestDto dto)
     {
-        var player = repository.GetUserByUsername(dto.Username) ??
-                     throw new AuthenticationException("Could not get user by username");
-        if (!VerifyPassword(dto.Password + player.Salt, player.Hash))
-            throw new AuthenticationException("Invalid password");
+        var player = repository.GetUserByUsernameOrThrow(dto.Username);
+        VerifyPasswordOrThrow(dto.Password + player.Salt, player.Hash);
         return new AuthResponseDto
         {
             Jwt = GenerateJwt(new JwtClaims
@@ -49,7 +47,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
 
     public AuthResponseDto Register(AuthRequestDto dto)
     {
-        var player = repository.GetUserByUsername(dto.Username);
+        var player = repository.GetUserByUsernameOrThrow(dto.Username);
         if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);
@@ -82,9 +80,11 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         return Convert.ToBase64String(hash);
     }
 
-    public bool VerifyPassword(string password, string hashedPassword)
+    public void VerifyPasswordOrThrow(string password, string hashedPassword)
     {
-        return HashPassword(password) == hashedPassword;
+        if (HashPassword(password) != hashedPassword)
+            throw new AuthenticationException("Invalid login");
+
     }
 
     public string GenerateSalt()
@@ -105,13 +105,13 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         return tokenBuilder.Encode();
     }
 
-    public void VerifyJwt(string jwt)
+    public void VerifyJwtOrThrow(string jwt)
     {
         var token = new JwtBuilder()
-            .WithAlgorithm(new HMACSHA256Algorithm()) // Add this
+            .WithAlgorithm(new HMACSHA512Algorithm())
             .WithSecret(optionsMonitor.CurrentValue.JwtSecret)
-            .WithUrlEncoder(new JwtBase64UrlEncoder()) // Add this
-            .WithJsonSerializer(new JsonNetSerializer()) // Add this
+            .WithUrlEncoder(new JwtBase64UrlEncoder()) 
+            .WithJsonSerializer(new JsonNetSerializer()) 
             .MustVerifySignature()
             .Decode<JwtClaims>(jwt);
 

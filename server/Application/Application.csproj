@@ -13,9 +13,5 @@
 
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Interfaces\Infrastructure.Mqtt\" />
-    </ItemGroup>
-
 
 </Project>
