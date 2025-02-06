@@ -1,16 +1,28 @@
 using System.Text.Json;
 using Api.Rest;
-using Api.Websocket;
-using Application;
+using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
-using Fleck;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
-using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
 using Startup.Extensions;
 
 namespace Startup;
+
+public class D;
+
+public class Mock : IWebSocketService<D>
+{
+    public D RegisterConnection(D connection)
+    {
+        return connection;
+    }
+
+    public D OnClose(D ws)
+    {
+        return ws;
+    }
+}
 
 public class Program
 {
@@ -37,15 +49,16 @@ public class Program
 
         services.AddDataSourceAndRepositories();
 
-        services.AddWebsocketInfrastructure();
-
-        services.RegisterApplicationServices<IWebSocketConnection>();
+        //services.AddWebsocketInfrastructure();
+        //services.AddScoped<D>();
+        //services.AddScoped<Mock>();
+        //services.RegisterApplicationServices<Mock>();
 
         services.RegisterMqttInfrastructure();
 
 
         services.RegisterRestApiServices();
-        services.RegisterWebsocketApiServices();
+        // services.RegisterWebsocketApiServices();
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -68,8 +81,8 @@ public class Program
         app.Urls.Add($"http://0.0.0.0:{restPort}");
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
 
-        app.ConfigureRestApi();
-        app.ConfigureWebsocketApi();
+        //app.ConfigureRestApi();
+        // app.ConfigureWebsocketApi();
         app.ConfigureMqtt();
 
         app.MapGet("Acceptance", () => "Accepted");

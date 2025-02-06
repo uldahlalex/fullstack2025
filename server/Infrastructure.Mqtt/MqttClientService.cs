@@ -1,26 +1,27 @@
-using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using Microsoft.Extensions.Options;
 using MQTTnet;
-using MQTTnet.Diagnostics.Logger;
-using MQTTnet.Formatter;
-using MQTTnet.Implementations;
 using MQTTnet.Protocol;
 
-namespace Infrastructure.Mqtt;
-
-public class MqttClientService : IMqttClientService
+public class MqttClientService : IMqttClientService, IDisposable
 {
     private readonly IMqttClient _client;
+    private readonly IEventDispatcher _eventDispatcher;
     private readonly ILogger<MqttClientService> _logger;
     private readonly MqttClientOptions _options;
+    private readonly HashSet<string> _subscriptions;
+    private bool _isDisposed;
 
-    //  public event Func<MqttMessage, Task> OnMessageReceived;
-
-    public MqttClientService(ILogger<MqttClientService> logger, IOptionsMonitor<AppOptions> optionsMonitor)
+    public MqttClientService(
+        IOptionsMonitor<AppOptions> optionsMonitor,
+        ILogger<MqttClientService> logger,
+        IEventDispatcher eventDispatcher,
+        IConfiguration configuration)
     {
-        _client = new MqttClient(new MqttClientAdapterFactory(), new MqttNetEventLogger());
         _logger = logger;
+        _eventDispatcher = eventDispatcher;
+        _subscriptions = new HashSet<string>();
+
         var tlsOptions = new MqttClientTlsOptions
         {
             UseTls = true,
@@ -28,28 +29,40 @@ public class MqttClientService : IMqttClientService
             IgnoreCertificateChainErrors = true, // Only during development!
             IgnoreCertificateRevocationErrors = true // Only during development!
         };
-
+        _client = new MqttClientFactory().CreateMqttClient();
         _options = new MqttClientOptionsBuilder()
             .WithTcpServer(optionsMonitor.CurrentValue.MQTT_BROKER_HOST, 8883)
             .WithCredentials(optionsMonitor.CurrentValue.MQTT_USERNAME, optionsMonitor.CurrentValue.MQTT_PASSWORD)
-            .WithProtocolVersion(MqttProtocolVersion.V500)
-            .WithClientId($"MyClientId_{Guid.NewGuid()}")
-            .WithCleanSession()
             .WithTlsOptions(tlsOptions)
+            .WithCleanSession()
             .Build();
+
+        _client.DisconnectedAsync += HandleDisconnection;
         _client.ApplicationMessageReceivedAsync += HandleMessage;
     }
 
-    public bool IsConnected => _client.IsConnected;
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    public bool IsConnected => _client?.IsConnected ?? false;
 
     public async Task ConnectAsync()
     {
         try
         {
-            var response = await _client.ConnectAsync(_options);
-            if (response.ResultCode != MqttClientConnectResultCode.Success)
-                throw new Exception($"Failed to connect: {response.ResultCode}");
+            if (IsConnected) return;
+
+            var result = await _client.ConnectAsync(_options);
+            if (result.ResultCode != MqttClientConnectResultCode.Success)
+                throw new Exception($"Failed to connect to MQTT broker. Result: {result.ResultCode}");
+
             _logger.LogInformation("Successfully connected to MQTT broker");
+
+            // Resubscribe to all topics if we have any
+            await ResubscribeToTopics();
         }
         catch (Exception ex)
         {
@@ -64,18 +77,14 @@ public class MqttClientService : IMqttClientService
         {
             if (_client.IsConnected)
             {
-                var disconnectOptions = new MqttClientDisconnectOptions
-                {
-                    Reason = (MqttClientDisconnectOptionsReason)MqttClientDisconnectReason.NormalDisconnection,
-                    ReasonString = "Normal disconnection"
-                };
+                var disconnectOptions = new MqttClientDisconnectOptionsBuilder().Build();
                 await _client.DisconnectAsync(disconnectOptions);
-                _logger.LogInformation("Successfully disconnected from MQTT broker");
+                _logger.LogInformation("Disconnected from MQTT broker");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during MQTT disconnect");
+            _logger.LogError(ex, "Error disconnecting from MQTT broker");
             throw;
         }
     }
@@ -84,26 +93,20 @@ public class MqttClientService : IMqttClientService
     {
         try
         {
-            if (!_client.IsConnected)
-                throw new InvalidOperationException("Cannot subscribe: MQTT client is not connected");
-
-            var topicFilter = new MqttTopicFilterBuilder()
-                .WithTopic(topic)
-                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.AtLeastOnce)
-                .Build();
+            if (!IsConnected) throw new InvalidOperationException("Cannot subscribe: MQTT client is not connected");
 
             var subscribeOptions = new MqttClientSubscribeOptionsBuilder()
-                .WithTopicFilter(topicFilter)
+                .WithTopicFilter(topic, MqttQualityOfServiceLevel.AtLeastOnce)
                 .Build();
 
             var result = await _client.SubscribeAsync(subscribeOptions);
 
             var firstResult = result.Items.FirstOrDefault();
             if (firstResult?.ResultCode != MqttClientSubscribeResultCode.GrantedQoS1 &&
-                firstResult?.ResultCode != MqttClientSubscribeResultCode.GrantedQoS0 &&
-                firstResult?.ResultCode != MqttClientSubscribeResultCode.GrantedQoS2)
+                firstResult?.ResultCode != MqttClientSubscribeResultCode.GrantedQoS0)
                 throw new Exception($"Failed to subscribe to topic {topic}. Result: {firstResult?.ResultCode}");
 
+            _subscriptions.Add(topic);
             _logger.LogInformation("Successfully subscribed to topic: {Topic}", topic);
         }
         catch (Exception ex)
@@ -117,8 +120,7 @@ public class MqttClientService : IMqttClientService
     {
         try
         {
-            if (!_client.IsConnected)
-                throw new InvalidOperationException("Cannot unsubscribe: MQTT client is not connected");
+            if (!IsConnected) throw new InvalidOperationException("Cannot unsubscribe: MQTT client is not connected");
 
             var unsubscribeOptions = new MqttClientUnsubscribeOptionsBuilder()
                 .WithTopicFilter(topic)
@@ -130,6 +132,7 @@ public class MqttClientService : IMqttClientService
             if (firstResult?.ResultCode != MqttClientUnsubscribeResultCode.Success)
                 throw new Exception($"Failed to unsubscribe from topic {topic}. Result: {firstResult?.ResultCode}");
 
+            _subscriptions.Remove(topic);
             _logger.LogInformation("Successfully unsubscribed from topic: {Topic}", topic);
         }
         catch (Exception ex)
@@ -139,25 +142,86 @@ public class MqttClientService : IMqttClientService
         }
     }
 
+    public IReadOnlyCollection<string> GetSubscribedTopics()
+    {
+        return _subscriptions.ToList().AsReadOnly();
+    }
+
+    private async Task HandleDisconnection(MqttClientDisconnectedEventArgs args)
+    {
+        _logger.LogWarning("Disconnected from MQTT broker: {Reason}", args.Reason);
+
+        try
+        {
+            // Wait 5 seconds before reconnecting
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            await ConnectAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to reconnect to MQTT broker");
+        }
+    }
+
     private async Task HandleMessage(MqttApplicationMessageReceivedEventArgs args)
     {
         try
         {
-            // if (OnMessageReceived != null)
-            // {
-            //     var message = new MqttMessage
-            //     {
-            //         Topic = args.ApplicationMessage.Topic,
-            //         Payload = args.ApplicationMessage.ConvertPayloadToString(),
-            //         Timestamp = DateTime.UtcNow
-            //     };
-            //
-            //     await OnMessageReceived(message);
-            // }
+            var topic = args.ApplicationMessage.Topic;
+            var payload = args.ApplicationMessage.ConvertPayloadToString();
+
+            _logger.LogDebug("Received message on topic {Topic}: {Payload}", topic, payload);
+
+            await _eventDispatcher.DispatchAsync(topic, payload);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error handling MQTT message");
+            _logger.LogError(ex, "Error handling MQTT message on topic: {Topic}",
+                args.ApplicationMessage.Topic);
         }
     }
+
+    private async Task ResubscribeToTopics()
+    {
+        if (_subscriptions.Count == 0) return;
+
+        try
+        {
+            var subscribeOptions = new MqttClientSubscribeOptionsBuilder();
+            foreach (var topic in _subscriptions)
+                subscribeOptions.WithTopicFilter(
+                    topic,
+                    MqttQualityOfServiceLevel.AtLeastOnce
+                );
+
+            await _client.SubscribeAsync(subscribeOptions.Build());
+            _logger.LogInformation("Resubscribed to {Count} topics", _subscriptions.Count);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to resubscribe to topics");
+        }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_isDisposed) return;
+
+        if (disposing)
+            if (_client != null)
+            {
+                if (_client.IsConnected) _client.DisconnectAsync().GetAwaiter().GetResult();
+                _client.Dispose();
+            }
+
+        _isDisposed = true;
+    }
+}
+
+public class MqttConfig
+{
+    public string Host { get; set; }
+    public int Port { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
 }

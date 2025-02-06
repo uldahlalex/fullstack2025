@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using Application.Models;
 using Microsoft.Extensions.Options;
 
@@ -12,25 +11,8 @@ public static class AppOptionsExtensions
         IConfiguration configuration,
         IWebHostEnvironment env)
     {
-        // First try to get from AppOptions configuration
-        var configEnvironment = configuration.GetValue<string>($"{nameof(AppOptions)}:ASPNETCORE_ENVIRONMENT");
-        Console.WriteLine($"Environment from config: {configEnvironment}");
-
-        var environment = configEnvironment // First priority: AppOptions configuration
-                          ?? Environment.GetEnvironmentVariable(
-                              "ASPNETCORE_ENVIRONMENT") // Second priority: Environment variable
-                          ?? env.EnvironmentName // Third priority: WebHostEnvironment
-                          ?? "Development"; // Last resort fallback
-
-        Console.WriteLine($"Selected environment: {environment}");
-
-        // Force all environment indicators to match
-        env.EnvironmentName = environment;
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", environment);
-
         services.AddOptionsWithValidateOnStart<AppOptions>()
             .Bind(configuration.GetSection(nameof(AppOptions)))
-            .PostConfigure(options => { options.ASPNETCORE_ENVIRONMENT = environment; })
             .ValidateDataAnnotations()
             .Validate(options =>
                 {
@@ -47,12 +29,7 @@ public static class AppOptionsExtensions
                     return isValid;
                 }, $"{nameof(AppOptions)} validation failed");
 
-        var options = configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
-                      throw new InvalidCastException("Could not parse as AppOptions");
-
-        options.ASPNETCORE_ENVIRONMENT = environment;
-
-        Console.WriteLine("Final AppOptions: " + JsonSerializer.Serialize(options));
-        return options;
+        return configuration.GetSection(nameof(AppOptions)).Get<AppOptions>() ??
+               throw new InvalidCastException("Could not parse as AppOptions");
     }
 }

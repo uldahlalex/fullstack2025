@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
@@ -8,10 +7,10 @@ using Application.Models.Entities;
 
 namespace Application.Services;
 
-public class ServiceLogic<T>(
+public class ServiceLogic<W>(
     IDataRepository repo,
     IMqttClientService mqtt,
-    IWebSocketService<T> ws) : IServiceLogic
+    IWebSocketService<W> ws) : IServiceLogic
 {
     public IEnumerable<Board> GetDomainModels(JwtClaims claims)
     {
