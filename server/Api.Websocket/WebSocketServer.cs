@@ -14,10 +14,10 @@ public static class CustomWebSocketServer
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         Action<IWebSocketConnection> config = ws =>
         {
-            ws.OnOpen = () =>
-                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
-            ws.OnClose = () =>
-                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
+            ws.OnOpen = () => 
+               scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
+               ws.OnClose = () => { };
+              //  scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
             ws.OnError = ex =>
             {
                 var problemDetails = new ServerSendsErrorMessage
@@ -36,6 +36,9 @@ public static class CustomWebSocketServer
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.InnerException);
+                        Console.WriteLine(e.StackTrace);
                         var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
                         ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto.requestId });
                     }

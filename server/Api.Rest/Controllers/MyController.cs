@@ -12,6 +12,7 @@ public class MyController(
     ISecurityService securityService,
     IOptionsMonitor<AppOptions> optionsMonitor) : ControllerBase
 {
+    [Route("/do")]
     public ActionResult Do()
     {
         var claims = securityService.VerifyJwtOrThrow(HttpContext.GetJwt());

@@ -13,12 +13,21 @@ public class WebSocketService : IWebSocketService<IWebSocketConnection>
 
     public IWebSocketConnection RegisterConnection(IWebSocketConnection connection)
     {
-        throw new NotImplementedException();
+        _connections.TryAdd(connection.ConnectionInfo.Id, connection);
+        return connection;
     }
 
     public IWebSocketConnection OnClose(IWebSocketConnection ws)
     {
         throw new NotImplementedException();
+    }
+
+    public void Brodcast(string message)
+    {
+        foreach (var connection in _connections.Values)
+        {
+            connection.Send(message);
+        }
     }
 
     public bool TryAddConnection(IWebSocketConnection connection)

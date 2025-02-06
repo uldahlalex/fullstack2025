@@ -40,6 +40,38 @@ public class MqttClientService : IMqttClientService, IDisposable
         _client.DisconnectedAsync += HandleDisconnection;
         _client.ApplicationMessageReceivedAsync += HandleMessage;
     }
+    
+    public async Task PublishAsync(string topic, string payload, bool retain = false, int qos = 1)
+    {
+        try
+        {
+            if (!IsConnected)
+            {
+                await ConnectAsync();
+            }
+
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic(topic)
+                .WithPayload(payload)
+                .WithQualityOfServiceLevel((MqttQualityOfServiceLevel)qos)
+                .WithRetainFlag(retain)
+                .Build();
+
+            var result = await _client.PublishAsync(message);
+        
+            if (result.ReasonCode != MqttClientPublishReasonCode.Success)
+            {
+                throw new Exception($"Failed to publish message. Result: {result.ReasonCode}");
+            }
+
+            _logger.LogDebug("Published message to topic {Topic}: {Payload}", topic, payload);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error publishing message to topic {Topic}", topic);
+            throw;
+        }
+    }
 
     public void Dispose()
     {

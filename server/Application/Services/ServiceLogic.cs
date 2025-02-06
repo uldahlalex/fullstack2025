@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Text.Json;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
@@ -17,14 +18,24 @@ public class ServiceLogic<W>(
         return repo.GetDomainModels();
     }
 
-    public void Broadcast(object message, params string[] topics)
+    public async void Broadcast(object message, params string[] topics)
     {
-        //ws.broadcast
+            var payload = JsonSerializer.Serialize(new
+            {
+                SensorId = "001",
+                Temperature = 25.5,
+                Timestamp = DateTime.UtcNow
+            });
+            ws.Brodcast(payload);
+
+
+            await mqtt.PublishAsync($"sensors/001/temperature", payload);
+        
     }
 
     public void Publish()
     {
-        //mqtt.publish
+       
     }
 
     public object ChangePreferences(IClientWantsToChangePreferences dto)
