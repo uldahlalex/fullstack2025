@@ -8,6 +8,7 @@
 using System.Text.Json;
 using Api.Rest;
 using Api.Websocket;
+using Api.Websocket.Documentation;
 using Application;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
@@ -16,6 +17,7 @@ using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
 using Startup.Extensions;
 
 namespace Startup;
@@ -56,7 +58,6 @@ public class Program
         services.AddAppOptions(configuration, environment);
         services.AddSingleton<IProxyConfig, ProxyConfig>();
 
-        //appropriate onion ordering??
         services.RegisterApplicationServices<IWebSocketConnection>();
 
         services.AddDataSourceAndRepositories();
@@ -65,6 +66,12 @@ public class Program
         services.RegisterWebsocketApiServices();
 
         services.RegisterRestApiServices();
+        
+        services.AddOpenApiDocument(conf =>
+        {
+            conf.DocumentProcessors.Add(new AddAllDerivedTypesProcessor());
+            conf.DocumentProcessors.Add(new AddStringConstantsProcessor());
+        });
     }
 
     public static void ConfigureMiddleware(WebApplication app)
@@ -90,8 +97,13 @@ public class Program
         app.ConfigureRestApi();
          app.ConfigureWebsocketApi();
         app.ConfigureMqtt();
+        
+        
 
         app.MapGet("Acceptance", () => "Accepted");
+        
+        app.UseOpenApi();
+        app.MapScalarApiReference();
     }
 }
 ```
