@@ -1,4 +1,7 @@
 using Application.Interfaces;
+using Infrastructure.Mqtt.Interfaces;
+
+namespace Infrastructure.Mqtt.Events;
 
 public class TemperatureEventHandler(ILogger<TemperatureEventHandler> logger, IServiceLogic service) : IMqttEventHandler<TemperatureEvent>
 {

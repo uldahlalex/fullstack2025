@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Application.Interfaces;
+using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;

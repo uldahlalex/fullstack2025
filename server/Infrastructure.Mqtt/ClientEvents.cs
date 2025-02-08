@@ -1,3 +1,7 @@
+using Infrastructure.Mqtt.Interfaces;
+
+namespace Infrastructure.Mqtt;
+
 public record TemperatureEvent : IMqttEvent
 {
     public double Temperature { get; init; }

@@ -1,7 +1,10 @@
+using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Protocol;
+
+namespace Infrastructure.Mqtt;
 
 public class MqttClientService : IMqttClientService, IDisposable
 {

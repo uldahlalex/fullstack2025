@@ -1,3 +1,7 @@
+using Application.Interfaces.Infrastructure.Mqtt;
+using Infrastructure.Mqtt.Events;
+using Infrastructure.Mqtt.Interfaces;
+
 namespace Infrastructure.Mqtt;
 
 public static class Extensions
@@ -23,7 +27,7 @@ public static class Extensions
 
             await mqttService.ConnectAsync();
 
-            await mqttService.SubscribeAsync("sensors/+/temperature");
+            await mqttService.SubscribeAsync("sensors/+/temperature"); //todo single source of truth for sensors in dictionary and here
             await mqttService.SubscribeAsync("sensors/+/humidity");
         });
 

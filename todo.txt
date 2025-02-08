@@ -1,17 +1,17 @@
-- Kig videre på testability
+in extensions:
+            await mqttService.SubscribeAsync("sensors/+/temperature"); //todo single source of truth for sensors in dictionary and here
+in dispatcher:
+    private readonly Dictionary<string, Type> _topicMappings = new()
+    {
+        { "sensors/+/temperature", typeof(TemperatureEvent) },
+        { "sensors/+/humidity", typeof(HumidityEvent) }
+    };
+
 
 - Fix devcontainer startup
-    - Kan man verificere dette i pipeline på nogen måde?
-    
-
-- Skrive ny dokumentation til websocket.boilerplate
-    
+    - Kan man verificere dette i pipeline på nogen måde?    
     
 - README.md
     - grafisk overblik
 
 - Testing
-
-
-"Topics" for Websocket to generalize?
-    - Is this just a different psuedonum for "rooms / channels"?

@@ -22,8 +22,8 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
 {
     public async Task Seed()
     {
-        context.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS jerneif CASCADE;");
-        context.Database.EnsureCreated();
-        File.WriteAllText("current_schema.sql", context.Database.GenerateCreateScript());
+        await context.Database.ExecuteSqlRawAsync("DROP SCHEMA IF EXISTS jerneif CASCADE;");
+        await context.Database.EnsureCreatedAsync();
+        await File.WriteAllTextAsync("current_schema.sql", context.Database.GenerateCreateScript());
     }
 }

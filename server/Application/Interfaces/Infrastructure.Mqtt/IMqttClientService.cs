@@ -1,3 +1,5 @@
+namespace Application.Interfaces.Infrastructure.Mqtt;
+
 public interface IMqttClientService
 {
     bool IsConnected { get; }

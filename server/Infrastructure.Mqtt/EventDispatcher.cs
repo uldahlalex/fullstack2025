@@ -1,4 +1,7 @@
 using System.Text.Json;
+using Infrastructure.Mqtt.Interfaces;
+
+namespace Infrastructure.Mqtt;
 
 public class EventDispatcher(
     ILogger<EventDispatcher> logger,
@@ -15,39 +18,26 @@ public class EventDispatcher(
     public async Task DispatchAsync(string topic, string payload)
     {
         var eventType = GetEventTypeForTopic(topic);
-        if (eventType == null)
-        {
-            logger.LogWarning("No event type mapping found for topic: {Topic}", topic);
-            return;
-        }
 
         try
         {
-            var mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) as IMqttEvent;
+            IMqttEvent mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
+                                   {
+                                       PropertyNameCaseInsensitive = true
+                                   }) as IMqttEvent ??
+                                   throw new Exception("Could not pass object as IMqttEvent " + payload +
+                                                       " with event type " + eventType);
+            
 
-            if (mqttEvent == null)
-            {
-                logger.LogError("Failed to deserialize payload for topic: {Topic}", topic);
-                return;
-            }
-
-            // Get the handler type for this event
             var handlerType = typeof(IMqttEventHandler<>).MakeGenericType(eventType);
 
             using var scope = serviceProvider.CreateScope();
-            var handler = scope.ServiceProvider.GetService(handlerType);
+            var handler = scope.ServiceProvider.GetService(handlerType) ??
+                          throw new Exception("Could not find handler with name " + handlerType);
 
-            if (handler == null)
-            {
-                logger.LogWarning("No handler registered for event type: {EventType}", eventType.Name);
-                return;
-            }
-
-            var method = handler.GetType().GetMethod("HandleAsync");
-            await (Task)method.Invoke(handler, new[] { mqttEvent });
+            var method = handler.GetType().GetMethod(nameof(IMqttEventHandler<MockMqttObject>.HandleAsync)) ??
+                         throw new Exception("Could not find " + nameof(IMqttEventHandler<MockMqttObject>.HandleAsync));
+            await (Task)method.Invoke(handler, [mqttEvent])!;
         }
         catch (Exception ex)
         {
@@ -58,8 +48,9 @@ public class EventDispatcher(
     private Type GetEventTypeForTopic(string topic)
     {
         var matchingPattern = _topicMappings.Keys
-            .FirstOrDefault(pattern => IsTopicMatch(topic, pattern));
-        return matchingPattern != null ? _topicMappings[matchingPattern] : null;
+                                  .FirstOrDefault(pattern => IsTopicMatch(topic, pattern)) ??
+                              throw new Exception("Topic not found using: " + topic);
+        return _topicMappings[matchingPattern];
     }
 
     private bool IsTopicMatch(string actualTopic, string pattern)
