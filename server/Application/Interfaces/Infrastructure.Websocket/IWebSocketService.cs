@@ -4,5 +4,5 @@ public interface IWebSocketService<T>
 {
     public T RegisterConnection(T connection);
     T OnClose(T ws);
-    void Brodcast(string message);
+    void Broadcast(string message);
 }

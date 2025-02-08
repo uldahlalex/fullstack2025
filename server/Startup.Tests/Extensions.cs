@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace Api.Tests;
+namespace Startup.Tests;
 
 public static class Extensions
 {

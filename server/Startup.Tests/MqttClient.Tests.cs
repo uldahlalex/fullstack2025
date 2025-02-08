@@ -1,4 +1,4 @@
-namespace Api.Tests;
+namespace Startup.Tests;
 
 public class MqttClient_Tests
 {

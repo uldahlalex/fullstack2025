@@ -2,7 +2,7 @@ using Application.Models.Dtos;
 using Application.Models.Entities;
 using Application.Models.Enums;
 
-namespace Api.Tests;
+namespace Startup.Tests;
 
 public class MockObjects
 {

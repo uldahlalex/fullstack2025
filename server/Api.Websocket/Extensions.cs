@@ -1,3 +1,4 @@
+using Api.Websocket.Documentation;
 using WebSocketBoilerplate;
 
 namespace Api.Websocket;
@@ -6,7 +7,15 @@ public static class Extensions
 {
     public static IServiceCollection RegisterWebsocketApiServices(this IServiceCollection services)
     {
-        var assembly = typeof(Extensions).Assembly;
+        services.AddEndpointsApiExplorer();
+        services.AddOpenApiDocument(config =>
+        {
+            Console.WriteLine("Adding OpenApiDocument");
+            config.DocumentProcessors.Add(new AddAllDerivedTypesProcessor());
+            config.DocumentProcessors.Add(new AddStringConstantsProcessor());
+
+    
+        });        var assembly = typeof(Extensions).Assembly;
         services.InjectEventHandlers(assembly);
         return services;
     }

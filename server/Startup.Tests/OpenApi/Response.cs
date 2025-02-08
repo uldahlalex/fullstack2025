@@ -1,7 +1,7 @@
 using NSwag;
 using Xunit.Abstractions;
 
-namespace Api.Tests.OpenApi;
+namespace Startup.Tests.OpenApi;
 
 public class OpenApiTests(ITestOutputHelper outputHelper) : ApiTestBase(outputHelper)
 {

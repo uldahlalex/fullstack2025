@@ -22,7 +22,7 @@ public class WebSocketService : IWebSocketService<IWebSocketConnection>
         throw new NotImplementedException();
     }
 
-    public void Brodcast(string message)
+    public void Broadcast(string message)
     {
         foreach (var connection in _connections.Values)
         {

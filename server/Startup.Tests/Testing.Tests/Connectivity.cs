@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
-namespace Api.Tests.Testing.Tests;
+namespace Startup.Tests.Testing.Tests;
 
 public class Connectivity(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper)
 {

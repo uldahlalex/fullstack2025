@@ -26,7 +26,7 @@ public class ServiceLogic<W>(
                 Temperature = 25.5,
                 Timestamp = DateTime.UtcNow
             });
-            ws.Brodcast(payload);
+            ws.Broadcast(payload);
 
 
             await mqtt.PublishAsync($"sensors/001/temperature", payload);

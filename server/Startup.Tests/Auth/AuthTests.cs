@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit.Abstractions;
 
-namespace Api.Tests.Auth;
+namespace Startup.Tests.Auth;
 
 public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper)
 {

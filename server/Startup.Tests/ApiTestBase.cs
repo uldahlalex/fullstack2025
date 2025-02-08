@@ -9,7 +9,7 @@ using PgCtx;
 using Startup;
 using Xunit.Abstractions;
 
-namespace Api.Tests;
+namespace Startup.Tests;
 
 public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory<Program>
 {
