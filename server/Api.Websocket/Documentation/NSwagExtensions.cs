@@ -1,7 +1,10 @@
 
 using System.Text.Json;
+using Api.Websocket.Events;
 using Namotion.Reflection;
 using NJsonSchema;
+using NSwag;
+using NSwag.AspNetCore;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using WebSocketBoilerplate;
@@ -42,12 +45,13 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
     }
 }
 
+
 public sealed class AddStringConstantsProcessor : IDocumentProcessor
 {
     public void Process(DocumentProcessorContext context)
     {
-        var assemblies = (ICollection<object?>)AppDomain.CurrentDomain.GetAssemblies();
-        IEnumerable<object?> derivedTypes = assemblies
+        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        var derivedTypeNames = assemblies
             .SelectMany(a =>
             {
                 try
@@ -59,19 +63,27 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
                     return Array.Empty<Type>();
                 }
             })
-            .Where(t =>
-                t != typeof(BaseDto) && // Exclude BaseDto itself
-                !t.IsAbstract && // Exclude abstract classes
-                typeof(BaseDto).IsAssignableFrom(t)).ToList().Select(t => t.Name)
-            .ToList();
-        
+            .Where(t => 
+                t != typeof(BaseDto) && 
+                !t.IsAbstract && 
+                typeof(BaseDto).IsAssignableFrom(t))
+            .Select(t => t.Name)
+            .ToArray();
+
         var schema = new JsonSchema
         {
             Type = JsonObjectType.String,
-            Enumeration = derivedTypes,
             Description = "Available eventType constants"
         };
+
+        // Add each type name to the Enumeration collection
+        foreach (var typeName in derivedTypeNames)
+        {
+            schema.Enumeration.Add(typeName);
+        }
 
         context.Document.Definitions["StringConstants"] = schema;
     }
 }
+
+
