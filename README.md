@@ -104,6 +104,7 @@ public class Program
         
         app.UseOpenApi();
         app.MapScalarApiReference();
+         app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();
     }
 }
 ```
