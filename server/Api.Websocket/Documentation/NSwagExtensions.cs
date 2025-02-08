@@ -46,10 +46,8 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
 {
     public void Process(DocumentProcessorContext context)
     {
-        var logger = new LoggerFactory().CreateLogger<AddStringConstantsProcessor>();
-        var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-        var derivedTypes = assemblies
+        var assemblies = (ICollection<object?>)AppDomain.CurrentDomain.GetAssemblies();
+        IEnumerable<object?> derivedTypes = assemblies
             .SelectMany(a =>
             {
                 try
@@ -64,20 +62,16 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
             .Where(t =>
                 t != typeof(BaseDto) && // Exclude BaseDto itself
                 !t.IsAbstract && // Exclude abstract classes
-                typeof(BaseDto).IsAssignableFrom(t)).ToList().Select(t => t.Name);
+                typeof(BaseDto).IsAssignableFrom(t)).ToList().Select(t => t.Name)
+            .ToList();
         
         var schema = new JsonSchema
         {
             Type = JsonObjectType.String,
-            Enumeration =
-            {
-           
-            },
+            Enumeration = derivedTypes,
             Description = "Available eventType constants"
         };
 
         context.Document.Definitions["StringConstants"] = schema;
-        logger.LogCritical("hey");
-        Console.WriteLine(JsonSerializer.Serialize(derivedTypes));
     }
 }
