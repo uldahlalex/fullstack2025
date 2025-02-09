@@ -19,16 +19,16 @@ public static class Extensions
 
     public static WebApplication ConfigureMqtt(this WebApplication app)
     {
-        // Create a background task to handle MQTT setup
         _ = Task.Run(async () =>
         {
             using var scope = app.Services.CreateScope();
             var mqttService = scope.ServiceProvider.GetRequiredService<IMqttClientService>();
 
             await mqttService.ConnectAsync();
-
-            await mqttService.SubscribeAsync("sensors/+/temperature"); //todo single source of truth for sensors in dictionary and here
-            await mqttService.SubscribeAsync("sensors/+/humidity");
+            EventDispatcher.TopicMappings.Keys.ToList().ForEach(async void (topicStrings) =>
+            {
+                await mqttService.SubscribeAsync(topicStrings);
+            });
         });
 
         return app;

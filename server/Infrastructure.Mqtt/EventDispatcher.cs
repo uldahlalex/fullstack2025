@@ -8,7 +8,7 @@ public class EventDispatcher(
     IServiceProvider serviceProvider)
     : IEventDispatcher
 {
-    private readonly Dictionary<string, Type> _topicMappings = new()
+    public static readonly Dictionary<string, Type> TopicMappings = new()
     {
         { "sensors/+/temperature", typeof(TemperatureEvent) },
         { "sensors/+/humidity", typeof(HumidityEvent) }
@@ -47,10 +47,10 @@ public class EventDispatcher(
 
     private Type GetEventTypeForTopic(string topic)
     {
-        var matchingPattern = _topicMappings.Keys
+        var matchingPattern = TopicMappings.Keys
                                   .FirstOrDefault(pattern => IsTopicMatch(topic, pattern)) ??
                               throw new Exception("Topic not found using: " + topic);
-        return _topicMappings[matchingPattern];
+        return TopicMappings[matchingPattern];
     }
 
     private bool IsTopicMatch(string actualTopic, string pattern)
