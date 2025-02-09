@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-22.04
     
     env:
-      APPOPTIONS__DbConnectionString: ${{secrets.DB}}
+      APPOPTIONS__DbConnectionString: ${{secrets.DbConnectionString}}
       APPOPTIONS__REDIS_HOST: ${{secrets.REDIS_HOST}}
       APPOPTIONS__REDIS_USERNAME: ${{secrets.REDIS_USERNAME}}
       APPOPTIONS__REDIS_PASSWORD: ${{secrets.REDIS_PASSWORD}}

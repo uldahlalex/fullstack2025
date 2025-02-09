@@ -39,7 +39,7 @@ jobs:
           region: europe-north1
           source: .
           env_vars: |-
-            APPOPTIONS__DbConnectionString=${{secrets.DB}} 
+            APPOPTIONS__DbConnectionString=${{secrets.DbConnectionString}} 
             APPOPTIONS__JwtSecret=${{secrets.JWT_SECRET}}
             APPOPTIONS__ASPNETCORE_ENVIRONMENT=Production
             APPOPTIONS__Seed=false
