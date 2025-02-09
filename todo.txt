@@ -1,4 +1,3 @@
-evt nswag ts gen i program.cs efter openapi eller swagger-typescript-api? 
 
 in extensions:
             await mqttService.SubscribeAsync("sensors/+/temperature"); //todo single source of truth for sensors in dictionary and here

@@ -28,7 +28,8 @@ public static class GenerateTypescriptClient
         var code = generator.GenerateFile();
 
         // Define the output path - adjust as needed
-        string outputPath = Path.Combine(Directory.GetCurrentDirectory(), "generated-client.ts");
+        
+        string outputPath = Path.Combine(Directory.GetCurrentDirectory()+"/../../client/src/generated-client.ts");
         
         // Ensure directory exists
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
