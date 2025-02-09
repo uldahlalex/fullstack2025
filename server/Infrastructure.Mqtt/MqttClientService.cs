@@ -43,15 +43,18 @@ public class MqttClientService : IMqttClientService, IDisposable
         _client.DisconnectedAsync += HandleDisconnection;
         _client.ApplicationMessageReceivedAsync += HandleMessage;
     }
-    
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public async Task PublishAsync(string topic, string payload, bool retain = false, int qos = 1)
     {
         try
         {
-            if (!IsConnected)
-            {
-                await ConnectAsync();
-            }
+            if (!IsConnected) await ConnectAsync();
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic(topic)
@@ -61,11 +64,9 @@ public class MqttClientService : IMqttClientService, IDisposable
                 .Build();
 
             var result = await _client.PublishAsync(message);
-        
+
             if (result.ReasonCode != MqttClientPublishReasonCode.Success)
-            {
                 throw new Exception($"Failed to publish message. Result: {result.ReasonCode}");
-            }
 
             _logger.LogDebug("Published message to topic {Topic}: {Payload}", topic, payload);
         }
@@ -74,12 +75,6 @@ public class MqttClientService : IMqttClientService, IDisposable
             _logger.LogError(ex, "Error publishing message to topic {Topic}", topic);
             throw;
         }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     public bool IsConnected => _client?.IsConnected ?? false;

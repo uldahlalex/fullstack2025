@@ -20,10 +20,10 @@ public class ClientWantsToEcho(IServiceLogic service, ISecurityService securityS
 {
     public override Task Handle(ClientWantsToEchoDto dto, IWebSocketConnection socket)
     {
-      //  var claims = securityService.VerifyJwtOrThrow(dto.Jwt);
-        var message = new ServerSendsEchoDto { Message = dto.Message, requestId = dto.requestId};
-      //  service.Broadcast(message, "");
-       // service.GetDomainModels(claims);
+        //  var claims = securityService.VerifyJwtOrThrow(dto.Jwt);
+        var message = new ServerSendsEchoDto { Message = dto.Message, requestId = dto.requestId };
+        //  service.Broadcast(message, "");
+        // service.GetDomainModels(claims);
         //service.Publish();
         socket.SendDto(message);
         return Task.CompletedTask;

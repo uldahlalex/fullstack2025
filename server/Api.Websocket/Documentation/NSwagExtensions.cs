@@ -1,10 +1,5 @@
-
-using System.Text.Json;
-using Api.Websocket.Events;
 using Namotion.Reflection;
 using NJsonSchema;
-using NSwag;
-using NSwag.AspNetCore;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
 using WebSocketBoilerplate;
@@ -39,12 +34,9 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
 
         // Generate schema for each derived type
         foreach (var type in derivedTypes)
-        {
             context.SchemaGenerator.Generate(type.ToContextualType(), context.SchemaResolver);
-        }
     }
 }
-
 
 public sealed class AddStringConstantsProcessor : IDocumentProcessor
 {
@@ -63,9 +55,9 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
                     return Array.Empty<Type>();
                 }
             })
-            .Where(t => 
-                t != typeof(BaseDto) && 
-                !t.IsAbstract && 
+            .Where(t =>
+                t != typeof(BaseDto) &&
+                !t.IsAbstract &&
                 typeof(BaseDto).IsAssignableFrom(t))
             .Select(t => t.Name)
             .ToArray();
@@ -77,13 +69,8 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
         };
 
         // Add each type name to the Enumeration collection
-        foreach (var typeName in derivedTypeNames)
-        {
-            schema.Enumeration.Add(typeName);
-        }
+        foreach (var typeName in derivedTypeNames) schema.Enumeration.Add(typeName);
 
         context.Document.Definitions["StringConstants"] = schema;
     }
 }
-
-

@@ -21,13 +21,13 @@ public class EventDispatcher(
 
         try
         {
-            IMqttEvent mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
-                                   {
-                                       PropertyNameCaseInsensitive = true
-                                   }) as IMqttEvent ??
-                                   throw new Exception("Could not pass object as IMqttEvent " + payload +
-                                                       " with event type " + eventType);
-            
+            var mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
+                            {
+                                PropertyNameCaseInsensitive = true
+                            }) as IMqttEvent ??
+                            throw new Exception("Could not pass object as IMqttEvent " + payload +
+                                                " with event type " + eventType);
+
 
             var handlerType = typeof(IMqttEventHandler<>).MakeGenericType(eventType);
 

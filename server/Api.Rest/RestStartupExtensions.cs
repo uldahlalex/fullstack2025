@@ -1,6 +1,5 @@
 using Api.Rest.Controllers;
 using Api.Rest.Middleware;
-using Scalar.AspNetCore;
 
 namespace Api.Rest;
 
@@ -12,7 +11,7 @@ public static class RestStartupExtensions
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
 
-  
+
         var controllersAssembly = typeof(MyController).Assembly;
 
         services.AddControllers().AddApplicationPart(controllersAssembly);

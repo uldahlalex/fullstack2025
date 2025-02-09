@@ -20,7 +20,7 @@ public static class GenerateTypescriptClient
                 DateTimeType = TypeScriptDateTimeType.Date,
                 NullValue = TypeScriptNullValue.Undefined,
                 TypeScriptVersion = 4.3m,
-                GenerateCloneMethod = false,
+                GenerateCloneMethod = false
             }
         };
 
@@ -28,9 +28,9 @@ public static class GenerateTypescriptClient
         var code = generator.GenerateFile();
 
         // Define the output path - adjust as needed
-        
-        string outputPath = Path.Combine(Directory.GetCurrentDirectory()+"/../../client/src/generated-client.ts");
-        
+
+        var outputPath = Path.Combine(Directory.GetCurrentDirectory() + "/../../client/src/generated-client.ts");
+
         // Ensure directory exists
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 

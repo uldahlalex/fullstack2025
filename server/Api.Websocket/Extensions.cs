@@ -1,5 +1,3 @@
-using Api.Websocket.Documentation;
-using Scalar.AspNetCore;
 using WebSocketBoilerplate;
 
 namespace Api.Websocket;
@@ -17,8 +15,6 @@ public static class Extensions
 
     public static WebApplication ConfigureWebsocketApi(this WebApplication app)
     {
- 
-
         app.UseRouting();
         app.StartWsServer();
         return app;

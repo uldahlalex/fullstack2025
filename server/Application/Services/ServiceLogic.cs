@@ -21,22 +21,20 @@ public class ServiceLogic<W>(
 
     public async void Broadcast(object message, params string[] topics)
     {
-            var payload = JsonSerializer.Serialize(new
-            {
-                SensorId = "001",
-                Temperature = 25.5,
-                Timestamp = DateTime.UtcNow
-            });
-            ws.Broadcast(payload);
+        var payload = JsonSerializer.Serialize(new
+        {
+            SensorId = "001",
+            Temperature = 25.5,
+            Timestamp = DateTime.UtcNow
+        });
+        ws.Broadcast(payload);
 
 
-            await mqtt.PublishAsync($"sensors/001/temperature", payload);
-        
+        await mqtt.PublishAsync("sensors/001/temperature", payload);
     }
 
     public void Publish()
     {
-       
     }
 
     public object ChangePreferences(IClientWantsToChangePreferences dto)

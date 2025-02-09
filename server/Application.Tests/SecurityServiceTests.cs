@@ -15,10 +15,9 @@ public class SecurityServiceTests
     public SecurityServiceTests()
     {
         var mockAppOptions = new Mock<IOptionsMonitor<AppOptions>>();
-        mockAppOptions.SetupGet(x => x.CurrentValue).Returns(new AppOptions()
+        mockAppOptions.SetupGet(x => x.CurrentValue).Returns(new AppOptions
         {
-            JwtSecret = "",
-            
+            JwtSecret = ""
         });
         var mockRepo = new Mock<IDataRepository>();
         //mockRepo.Setup(x => x.GetDomainModels()).Returns()

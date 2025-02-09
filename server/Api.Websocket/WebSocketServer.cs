@@ -14,10 +14,10 @@ public static class CustomWebSocketServer
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         Action<IWebSocketConnection> config = ws =>
         {
-            ws.OnOpen = () => 
-               scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
-               ws.OnClose = () => { };
-              //  scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
+            ws.OnOpen = () =>
+                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
+            ws.OnClose = () => { };
+            //  scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
             ws.OnError = ex =>
             {
                 var problemDetails = new ServerSendsErrorMessage

@@ -8,8 +8,8 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-import axios, { AxiosError } from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
+import type {AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken} from 'axios';
+import axios, {AxiosError} from 'axios';
 
 export class AuthClient {
     protected instance: AxiosInstance;
@@ -65,7 +65,7 @@ export class AuthClient {
         if (status === 200) {
             const _responseText = response.data;
             let result200: any = null;
-            let resultData200  = _responseText;
+            let resultData200 = _responseText;
             result200 = JSON.parse(resultData200);
             return Promise.resolve<AuthResponseDto>(result200);
 
@@ -117,7 +117,7 @@ export class AuthClient {
         if (status === 200) {
             const _responseText = response.data;
             let result200: any = null;
-            let resultData200  = _responseText;
+            let resultData200 = _responseText;
             result200 = JSON.parse(resultData200);
             return Promise.resolve<AuthResponseDto>(result200);
 
@@ -128,7 +128,7 @@ export class AuthClient {
         return Promise.resolve<AuthResponseDto>(null as any);
     }
 
-    secured( cancelToken?: CancelToken): Promise<FileResponse> {
+    secured(cancelToken?: CancelToken): Promise<FileResponse> {
         let url_ = this.baseUrl + "/api/auth/Secured";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -173,7 +173,12 @@ export class AuthClient {
                 fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
                 fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
             }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+            return Promise.resolve({
+                fileName: fileName,
+                status: status,
+                data: new Blob([response.data], {type: response.headers["content-type"]}),
+                headers: _headers
+            });
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -195,7 +200,7 @@ export class MyClient {
 
     }
 
-    do( cancelToken?: CancelToken): Promise<FileResponse> {
+    do(cancelToken?: CancelToken): Promise<FileResponse> {
         let url_ = this.baseUrl + "/do";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -240,7 +245,12 @@ export class MyClient {
                 fileNameMatch = contentDisposition ? /filename="?([^"]*?)"?(;|$)/g.exec(contentDisposition) : undefined;
                 fileName = fileNameMatch && fileNameMatch.length > 1 ? fileNameMatch[1] : undefined;
             }
-            return Promise.resolve({ fileName: fileName, status: status, data: new Blob([response.data], { type: response.headers["content-type"] }), headers: _headers });
+            return Promise.resolve({
+                fileName: fileName,
+                status: status,
+                data: new Blob([response.data], {type: response.headers["content-type"]}),
+                headers: _headers
+            });
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -320,7 +330,9 @@ export class ApiException extends Error {
     }
 }
 
-function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): any {
+function throwException(message: string, status: number, response: string, headers: {
+    [key: string]: any;
+}, result?: any): any {
     if (result !== null && result !== undefined)
         throw result;
     else

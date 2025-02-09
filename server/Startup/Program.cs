@@ -3,7 +3,6 @@ using Api.Rest;
 using Api.Websocket;
 using Api.Websocket.Documentation;
 using Application;
-using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Fleck;
 using Infrastructure.Mqtt;
@@ -54,12 +53,12 @@ public class Program
         services.RegisterApplicationServices<IWebSocketConnection>();
 
         services.AddDataSourceAndRepositories();
-        services.AddWebsocketInfrastructure(); 
-        services.RegisterMqttInfrastructure();       
+        services.AddWebsocketInfrastructure();
+        services.RegisterMqttInfrastructure();
         services.RegisterWebsocketApiServices();
 
         services.RegisterRestApiServices();
-        
+
         services.AddOpenApiDocument(conf =>
         {
             conf.DocumentProcessors.Add(new AddAllDerivedTypesProcessor());
@@ -88,15 +87,14 @@ public class Program
         app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
 
         app.ConfigureRestApi();
-         app.ConfigureWebsocketApi();
+        app.ConfigureWebsocketApi();
         app.ConfigureMqtt();
-        
-        
+
 
         app.MapGet("Acceptance", () => "Accepted");
-        
+
         app.UseOpenApi();
         app.MapScalarApiReference();
-         app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();
+        app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();
     }
 }

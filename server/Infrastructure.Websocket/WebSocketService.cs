@@ -24,10 +24,7 @@ public class WebSocketService : IWebSocketService<IWebSocketConnection>
 
     public void Broadcast(string message)
     {
-        foreach (var connection in _connections.Values)
-        {
-            connection.Send(message);
-        }
+        foreach (var connection in _connections.Values) connection.Send(message);
     }
 
     public bool TryAddConnection(IWebSocketConnection connection)
