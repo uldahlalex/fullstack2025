@@ -39,11 +39,18 @@ jobs:
           service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }}
           region: europe-north1
           source: .
-          dockerfile: Dockerfile
           env_vars: |-
             APPOPTIONS__DbConnectionString=${{secrets.DB}} 
             APPOPTIONS__JwtSecret=${{secrets.JWT_SECRET}}
             APPOPTIONS__ASPNETCORE_ENVIRONMENT=Production
+            APPOPTIONS__Seed=false
+            APPOPTIONS__RunDbInTestContainer=false
+            APPOPTIONS__REDIS_HOST=${{secrets.REDIS_HOST}}
+            APPOPTIONS__REDIS_USERNAME=${{secrets.REDIS_USERNAME}}
+            APPOPTIONS__REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}
+            APPOPTIONS__MQTT_BROKER_HOST=${{secrets.MQTT_BROKER_HOST}}
+            APPOPTIONS__MQTT_USERNAME=${{secrets.MQTT_USERNAME}}
+            APPOPTIONS__MQTT_PASSWORD=${{secrets.MQTT_PASSWORD}}
             
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
