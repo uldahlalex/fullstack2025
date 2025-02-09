@@ -96,8 +96,7 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
     {
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
             MockObjects.GetAuthRequestDto());
-        Assert.Equal(HttpStatusCode.Unauthorized, response.HttpResponseMessage.StatusCode);
-        Assert.True(response.Object.Title.Length > 1);
+        Assert.Equal(HttpStatusCode.BadRequest, response.HttpResponseMessage.StatusCode);
     }
 
     [Fact]

@@ -1,10 +1,12 @@
-﻿using Infrastructure.Postgres;
+﻿using Application.Interfaces.Infrastructure.Mqtt;
+using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Moq;
 using PgCtx;
 using Startup;
 using Xunit.Abstractions;
@@ -26,6 +28,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
         RemoveExistingService<DbContextOptions<MyDbContext>>(services);
         RemoveExistingService<IProxyConfig>(services);
         RemoveExistingService<ISeeder>(services);
+        RemoveExistingService<IMqttClientService>(services);
 
         services.AddDbContext<MyDbContext>(opt =>
         {
@@ -35,6 +38,8 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
         });
         services.AddSingleton<IProxyConfig, MockProxyConfig>();
         services.AddSingleton<ISeeder, TestSeeder>();
+        var mockMqttClientService = new Mock<IMqttClientService>();
+        services.AddSingleton<IMqttClientService>(mockMqttClientService.Object);
     }
 
     private void RemoveExistingService<T>(IServiceCollection services)

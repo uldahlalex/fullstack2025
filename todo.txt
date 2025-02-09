@@ -1,13 +1,7 @@
 
-in extensions:
-            await mqttService.SubscribeAsync("sensors/+/temperature"); //todo single source of truth for sensors in dictionary and here
-in dispatcher:
-    private readonly Dictionary<string, Type> _topicMappings = new()
-    {
-        { "sensors/+/temperature", typeof(TemperatureEvent) },
-        { "sensors/+/humidity", typeof(HumidityEvent) }
-    };
 
+
+_____
 
 - Fix devcontainer startup
     - Kan man verificere dette i pipeline på nogen måde?    

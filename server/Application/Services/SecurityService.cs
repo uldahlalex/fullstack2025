@@ -20,7 +20,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
 {
     public AuthResponseDto Login(AuthRequestDto dto)
     {
-        var player = repository.GetUserByUsernameOrThrow(dto.Username);
+        var player = repository.GetUserOrNull(dto.Username) ?? throw new ValidationException("Username not found");
         VerifyPasswordOrThrow(dto.Password + player.Salt, player.Hash);
         return new AuthResponseDto
         {
@@ -37,7 +37,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
 
     public AuthResponseDto Register(AuthRequestDto dto)
     {
-        var player = repository.GetUserByUsernameOrThrow(dto.Username);
+        var player = repository.GetUserOrNull(dto.Username);
         if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);

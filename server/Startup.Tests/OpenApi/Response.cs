@@ -8,7 +8,7 @@ public class OpenApiTests(ITestOutputHelper outputHelper) : ApiTestBase(outputHe
     [Fact]
     public async Task CanGetJsonResponseFromOpenApi()
     {
-        var response = await CreateClient().GetAsync("/openapi/myapi.json");
+        var response = await CreateClient().GetAsync("/swagger/v1/swagger.json");
         var document = await OpenApiDocument.FromJsonAsync(await response.Content.ReadAsStringAsync());
         Assert.True(document.Paths.Count > 0);
     }

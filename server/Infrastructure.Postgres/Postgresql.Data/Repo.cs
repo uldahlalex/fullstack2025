@@ -11,10 +11,9 @@ public class Repo(MyDbContext ctx) : IDataRepository
         return ctx.Boards.ToList();
     }
 
-    public Player GetUserByUsernameOrThrow(string username)
+    public Player? GetUserOrNull(string username)
     {
-        return ctx.Players.FirstOrDefault(p => p.FullName == username) ??
-               throw new KeyNotFoundException("User not found");
+        return ctx.Players.FirstOrDefault(p => p.FullName == username);
     }
 
     public Player AddPlayer(Player player)
