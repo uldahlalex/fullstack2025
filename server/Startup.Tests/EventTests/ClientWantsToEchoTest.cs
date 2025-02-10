@@ -1,6 +1,5 @@
 using Api.Websocket.Events;
 using WebSocketBoilerplate;
-using Xunit.Abstractions;
 
 namespace Startup.Tests.EventTests;
 
@@ -16,8 +15,12 @@ public class
         var wsUri = new UriBuilder(httpClient.BaseAddress!)
         {
             Scheme = "ws",
-            Path = "/" 
-        }.Uri;
+            Path = "/ws"
+        }.Uri.ToString();
+        
+        // //remove last char of string
+        // wsUri = wsUri.Substring(0, wsUri.Length - 1);
+        // wsUri += ":5000/";
 
         outputHelper.WriteLine($"Connecting to WebSocket at: {wsUri}");
     

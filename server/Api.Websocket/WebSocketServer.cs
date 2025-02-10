@@ -11,23 +11,22 @@ public interface IWebSocketServerHost : IDisposable
     Task StopAsync();
 }
 
-public class FleckWebSocketServerHost : IWebSocketServerHost
+public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocketServerHost> logger)
+    : IWebSocketServerHost
 {
-    private readonly WebApplication _app;
+    private readonly WebApplication _app = app;
+    private readonly ILogger<FleckWebSocketServerHost> _logger = logger;
     private WebSocketServer? _server;
-
-    public FleckWebSocketServerHost(WebApplication app)
-    {
-        _app = app;
-    }
 
     public Task StartAsync(int port)
     {
-        _server = new WebSocketServer($"ws://0.0.0.0:{port}");
+        var url = $"ws://0.0.0.0:{port}/ws";
+        logger.LogInformation("WS running on url: "+url);
+        _server = new WebSocketServer(url);
         
         Action<IWebSocketConnection> config = ws =>
         {
-            using var scope = _app.Services.CreateScope();
+            using var scope = app.Services.CreateScope();
             var wsService = scope.ServiceProvider.GetRequiredService<IWebSocketService<IWebSocketConnection>>();
             
             ws.OnOpen = () => wsService.RegisterConnection(ws);
@@ -46,7 +45,7 @@ public class FleckWebSocketServerHost : IWebSocketServerHost
                 {
                     try
                     {
-                        await _app.CallEventHandler(ws, message);
+                        await app.CallEventHandler(ws, message);
                     }
                     catch (Exception e)
                     {

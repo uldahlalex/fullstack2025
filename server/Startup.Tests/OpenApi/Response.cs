@@ -1,5 +1,4 @@
 using NSwag;
-using Xunit.Abstractions;
 
 namespace Startup.Tests.OpenApi;
 

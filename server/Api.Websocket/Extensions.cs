@@ -1,6 +1,5 @@
+using Api.Websocket;
 using WebSocketBoilerplate;
-
-namespace Api.Websocket;
 
 public static class Extensions
 {
@@ -9,22 +8,44 @@ public static class Extensions
         services.AddEndpointsApiExplorer();
         var assembly = typeof(Extensions).Assembly;
         services.InjectEventHandlers(assembly);
+        services.AddSingleton<IWebSocketServerHostFactory, FleckWebSocketServerHostFactory>();
         return services;
     }
 
-
-    public static async Task<WebApplication> ConfigureWebsocketApi(this WebApplication app, int? productionPort = null)
+    public static async Task<WebApplication> ConfigureWebsocketApi(this WebApplication app)
     {
         app.UseRouting();
-        var wsHost = new FleckWebSocketServerHost(app);
+
+        var factory = app.Services.GetRequiredService<IWebSocketServerHostFactory>();
+        var wsHost = factory.Create(app);
     
         // Get the actual port being used
-        var serverAddress = app.Urls.Select(url => new Uri(url)).First();
-        var port = serverAddress.Port;
+        // var serverAddress = app.Urls.Select(url => new Uri(url)).First();
+        // var port = serverAddress.Port;
     
-        await wsHost.StartAsync(port);
+        await wsHost.StartAsync(5000);
     
         app.Lifetime.ApplicationStopping.Register(() => wsHost.Dispose());
         return app;
+    }
+}
+
+public interface IWebSocketServerHostFactory
+{
+    IWebSocketServerHost Create(WebApplication app);
+}
+
+public class FleckWebSocketServerHostFactory : IWebSocketServerHostFactory
+{
+    private readonly ILogger<FleckWebSocketServerHost> _logger;
+
+    public FleckWebSocketServerHostFactory(ILogger<FleckWebSocketServerHost> logger)
+    {
+        _logger = logger;
+    }
+
+    public IWebSocketServerHost Create(WebApplication app)
+    {
+        return new FleckWebSocketServerHost(app, _logger);
     }
 }

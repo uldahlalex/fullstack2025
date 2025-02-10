@@ -80,27 +80,32 @@ public class Program
         }
 
         app.Urls.Clear();
+
+        // if (app.Environment.IsEnvironment("Testing"))
+        // {
+        //     app.ConfigureRestApi();
+        //     await app.ConfigureWebsocketApi();
+        //     app.ConfigureMqtt();
+        // }
+        // else
+        // {
+            // const int restPort = 5000;
+            // const int wsPort = 5000;
+            // var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
+
+           // app.Urls.Add($"http://0.0.0.0:{restPort}");
         
-        // Define ports
-        const int restPort = 5000;
-        const int wsPort = 8181;
-        var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
+            // app.Services.GetRequiredService<IProxyConfig>()
+            //     .StartProxyServer(publicPort, restPort, wsPort);
 
-        // Configure the REST API endpoint
-        app.Urls.Add($"http://0.0.0.0:{restPort}");
-
-        // Configure proxy to handle both REST and WebSocket traffic
-        app.Services.GetRequiredService<IProxyConfig>()
-            .StartProxyServer(publicPort, restPort, wsPort);
-
-        // Configure the APIs
-        app.ConfigureRestApi();
-        await app.ConfigureWebsocketApi(wsPort);
-        app.ConfigureMqtt();
-
-
+            app.ConfigureRestApi();
+            await app.ConfigureWebsocketApi();
+            app.ConfigureMqtt();
+      //  }
+        //
+        //
         app.MapGet("Acceptance", () => "Accepted");
-
+        
         app.UseOpenApi();
         app.MapScalarApiReference();
         app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();

@@ -12,7 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PgCtx;
-using Xunit.Abstractions;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+
 
 namespace Startup.Tests;
 
@@ -24,9 +25,18 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
+    {          
+        builder.UseEnvironment("Testing");
+
+        builder.ConfigureLogging(logging =>
+             {
+                 logging.ClearProviders();
+                 logging.SetMinimumLevel(LogLevel.Trace);
+                 logging.AddXUnit(outputHelper);
+             });
         builder.ConfigureServices(ConfigureTestServices);
-        builder.ConfigureLogging(ConfigureTestLogging);
+    
+      
            
         // Use localhost with dynamic port for tests
         builder.UseUrls("http://127.0.0.1:0");
@@ -44,6 +54,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
                 
                 // Get the actual port being used
                 var serverAddress = webApp.Urls.Select(url => new Uri(url)).First();
+                outputHelper.WriteLine($"Test server running on port: {serverAddress.Port}");
             }
         });
     }
@@ -101,11 +112,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
             services.Remove(descriptor);
     }
 
-    private void ConfigureTestLogging(ILoggingBuilder logging)
-    {
-        logging.ClearProviders();
-        logging.AddXUnit(outputHelper);
-    }
+  
 }
 
 public class ApiTestBaseConfig

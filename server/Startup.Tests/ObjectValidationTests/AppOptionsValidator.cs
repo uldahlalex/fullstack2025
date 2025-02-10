@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Models;
-using Xunit.Abstractions;
 
 namespace Startup.Tests.ObjectValidationTests;
 

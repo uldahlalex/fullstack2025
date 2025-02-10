@@ -1,7 +1,6 @@
-
-Fix websocket klient forbindelse til localhost i tests
-
-
+- manual port allocation and force serving APIs on different ports (+ proxying) (probably hard)
+- the stackoverflow snippet (probably hard)
+- WebApplicationFactory conditional for ws or rest serving
 _____
 
 - README.md

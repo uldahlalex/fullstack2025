@@ -4,9 +4,9 @@ using Application.Models.Dtos;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit.Abstractions;
 
 namespace Startup.Tests.Auth;
+
 
 public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper, new ApiTestBaseConfig
 {
