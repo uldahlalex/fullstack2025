@@ -1,12 +1,8 @@
 
-Tests:
-- WS client change mqtt preferences
-    - Requires ws manager to behave
+Fix websocket klient forbindelse til localhost i tests
+
 
 _____
 
-- Fix devcontainer startup
-    - Kan man verificere dette i pipeline på nogen måde?    
-    
 - README.md
     - grafisk overblik

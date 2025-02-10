@@ -1,6 +1,10 @@
-﻿using Application.Interfaces.Infrastructure.Mqtt;
+﻿using Api.Websocket;
+using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Interfaces.Infrastructure.Websocket;
+using Fleck;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +27,27 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
     {
         builder.ConfigureServices(ConfigureTestServices);
         builder.ConfigureLogging(ConfigureTestLogging);
+           
+        // Use localhost with dynamic port for tests
+        builder.UseUrls("http://127.0.0.1:0");
+        
+        // Configure the application
+        builder.Configure(async app =>
+        {
+            if (app is WebApplication webApp)
+            {
+                // Configure your middleware and routing first
+                webApp.UseRouting();
+                
+                // Start the WebSocket server
+                await webApp.ConfigureWebsocketApi();
+                
+                // Get the actual port being used
+                var serverAddress = webApp.Urls.Select(url => new Uri(url)).First();
+            }
+        });
     }
+    
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
@@ -62,6 +86,11 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
         {
             RemoveExistingService<ISeeder>(services);
             services.AddSingleton<ISeeder, TestSeeder>();
+        }
+        if (_apiTestBaseConfig.MockWebSocketService)
+        {
+            var mockWsService = new Mock<IWebSocketService<IWebSocketConnection>>();
+            services.AddSingleton(mockWsService.Object);
         }
     }
 

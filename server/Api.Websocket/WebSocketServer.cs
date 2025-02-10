@@ -5,20 +5,33 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket;
 
-public static class CustomWebSocketServer
+public interface IWebSocketServerHost : IDisposable
 {
-    public static WebApplication StartWsServer(this WebApplication app)
-    {
-        var scopedServices = app.Services.CreateScope().ServiceProvider;
-        var logger = new LoggerFactory().CreateLogger("WS server");
+    Task StartAsync(int port);
+    Task StopAsync();
+}
 
-        var server = new WebSocketServer("ws://0.0.0.0:8181");
+public class FleckWebSocketServerHost : IWebSocketServerHost
+{
+    private readonly WebApplication _app;
+    private WebSocketServer? _server;
+
+    public FleckWebSocketServerHost(WebApplication app)
+    {
+        _app = app;
+    }
+
+    public Task StartAsync(int port)
+    {
+        _server = new WebSocketServer($"ws://0.0.0.0:{port}");
+        
         Action<IWebSocketConnection> config = ws =>
         {
-            ws.OnOpen = () =>
-                scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().RegisterConnection(ws);
+            using var scope = _app.Services.CreateScope();
+            var wsService = scope.ServiceProvider.GetRequiredService<IWebSocketService<IWebSocketConnection>>();
+            
+            ws.OnOpen = () => wsService.RegisterConnection(ws);
             ws.OnClose = () => { };
-            //  scopedServices.GetRequiredService<IWebSocketService<IWebSocketConnection>>().OnClose(ws);
             ws.OnError = ex =>
             {
                 var problemDetails = new ServerSendsErrorMessage
@@ -33,24 +46,33 @@ public static class CustomWebSocketServer
                 {
                     try
                     {
-                        await app.CallEventHandler(ws, message);
+                        await _app.CallEventHandler(ws, message);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e.InnerException);
-                        Console.WriteLine(e.StackTrace);
                         var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
                         ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto.requestId });
                     }
                 });
             };
         };
-        server.Start(config);
-        return app;
+
+        _server.Start(config);
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync()
+    {
+        _server?.Dispose();
+        _server = null;
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _server?.Dispose();
     }
 }
-
 public class ServerSendsErrorMessage : BaseDto
 {
     public string Error { get; set; }

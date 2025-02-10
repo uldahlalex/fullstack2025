@@ -31,7 +31,7 @@ namespace Startup;
 
 public class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
         var builder = WebApplication.CreateBuilder();
 
@@ -39,9 +39,9 @@ public class Program
 
         var app = builder.Build();
 
-        ConfigureMiddleware(app);
+        await ConfigureMiddleware(app);
 
-        app.Run();
+        await app.RunAsync();
     }
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration,
@@ -66,7 +66,7 @@ public class Program
         });
     }
 
-    public static void ConfigureMiddleware(WebApplication app)
+    public static async Task ConfigureMiddleware(WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
@@ -80,14 +80,22 @@ public class Program
         }
 
         app.Urls.Clear();
+        
+        // Define ports
         const int restPort = 5000;
         const int wsPort = 8181;
         var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-        app.Urls.Add($"http://0.0.0.0:{restPort}");
-        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
 
+        // Configure the REST API endpoint
+        app.Urls.Add($"http://0.0.0.0:{restPort}");
+
+        // Configure proxy to handle both REST and WebSocket traffic
+        app.Services.GetRequiredService<IProxyConfig>()
+            .StartProxyServer(publicPort, restPort, wsPort);
+
+        // Configure the APIs
         app.ConfigureRestApi();
-        app.ConfigureWebsocketApi();
+        await app.ConfigureWebsocketApi(wsPort);
         app.ConfigureMqtt();
 
 
