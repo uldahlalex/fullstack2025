@@ -10,6 +10,7 @@ public static class CustomWebSocketServer
     public static WebApplication StartWsServer(this WebApplication app)
     {
         var scopedServices = app.Services.CreateScope().ServiceProvider;
+        var logger = new LoggerFactory().CreateLogger("WS server");
 
         var server = new WebSocketServer("ws://0.0.0.0:8181");
         Action<IWebSocketConnection> config = ws =>

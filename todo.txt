@@ -1,5 +1,7 @@
 
-
+Tests:
+- WS client change mqtt preferences
+    - Requires ws manager to behave
 
 _____
 
@@ -8,5 +10,3 @@ _____
     
 - README.md
     - grafisk overblik
-
-- Testing

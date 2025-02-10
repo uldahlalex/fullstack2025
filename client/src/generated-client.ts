@@ -273,7 +273,6 @@ export interface ClientWantsToChangePreferencesDto extends BaseDto {
 }
 
 export interface ClientWantsToEchoDto extends BaseDto {
-    jwt?: string;
     message?: string;
 }
 
