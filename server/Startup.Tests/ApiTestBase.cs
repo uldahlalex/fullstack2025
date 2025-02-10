@@ -12,9 +12,12 @@ using Xunit.Abstractions;
 
 namespace Startup.Tests;
 
-public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory<Program>
+public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiTestBaseConfig = null)
+    : WebApplicationFactory<Program>
 {
+    private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
     private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
+
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -24,21 +27,42 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
-        RemoveExistingService<DbContextOptions<MyDbContext>>(services);
-        RemoveExistingService<IProxyConfig>(services);
-        RemoveExistingService<ISeeder>(services);
-        RemoveExistingService<IMqttClientService>(services);
-
-        services.AddDbContext<MyDbContext>(opt =>
+        if (_apiTestBaseConfig.MockRelationalDatabase)
         {
-            opt.UseNpgsql(_pgCtxSetup._postgres.GetConnectionString());
-            opt.EnableSensitiveDataLogging();
-            opt.LogTo(_ => { });
-        });
-        services.AddSingleton<IProxyConfig, MockProxyConfig>();
-        services.AddSingleton<ISeeder, TestSeeder>();
-        var mockMqttClientService = new Mock<IMqttClientService>();
-        services.AddSingleton<IMqttClientService>(mockMqttClientService.Object);
+            RemoveExistingService<DbContextOptions<MyDbContext>>(services);
+            var mock = new Mock<MyDbContext>().Object;
+            services.AddScoped<MyDbContext>(sp => mock);
+        }
+        else
+        {
+            RemoveExistingService<DbContextOptions<MyDbContext>>(services);
+            services.AddDbContext<MyDbContext>(opt =>
+            {
+                opt.UseNpgsql(_pgCtxSetup._postgres.GetConnectionString());
+                opt.EnableSensitiveDataLogging();
+                opt.LogTo(_ => { });
+            });
+        }
+
+
+        if (_apiTestBaseConfig.MockMqtt)
+        {
+            RemoveExistingService<IMqttClientService>(services);
+            var mockMqttClientService = new Mock<IMqttClientService>();
+            services.AddSingleton(mockMqttClientService.Object);
+        }
+
+        if (_apiTestBaseConfig.MockProxyConfig)
+        {
+            RemoveExistingService<IProxyConfig>(services);
+            services.AddSingleton<IProxyConfig, MockProxyConfig>();
+        }
+
+        if (_apiTestBaseConfig.UseCustomSeeder)
+        {
+            RemoveExistingService<ISeeder>(services);
+            services.AddSingleton<ISeeder, TestSeeder>();
+        }
     }
 
     private void RemoveExistingService<T>(IServiceCollection services)
@@ -53,4 +77,32 @@ public class ApiTestBase(ITestOutputHelper outputHelper) : WebApplicationFactory
         logging.ClearProviders();
         logging.AddXUnit(outputHelper);
     }
+}
+
+public class ApiTestBaseConfig
+{
+    /// <summary>
+    ///     Defaults to false
+    /// </summary>
+    public bool MockRelationalDatabase { get; set; } = false;
+
+    /// <summary>
+    ///     Defaults to false
+    /// </summary>
+    public bool MockMqtt { get; set; } = false;
+
+    /// <summary>
+    ///     Defaults to false
+    /// </summary>
+    public bool MockWebSocketService { get; set; } = false;
+
+    /// <summary>
+    ///     Defaults to true
+    /// </summary>
+    public bool MockProxyConfig { get; set; } = true;
+
+    /// <summary>
+    ///     Defaults to true
+    /// </summary>
+    public bool UseCustomSeeder { get; set; } = true;
 }

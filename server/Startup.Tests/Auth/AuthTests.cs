@@ -8,7 +8,11 @@ using Xunit.Abstractions;
 
 namespace Startup.Tests.Auth;
 
-public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper)
+public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper, new ApiTestBaseConfig
+{
+    MockMqtt = true,
+    MockWebSocketService = false
+})
 {
     private const string TestUsername = "bob@bob.dk";
     private const string TestPassword = "asdASD123,-.";

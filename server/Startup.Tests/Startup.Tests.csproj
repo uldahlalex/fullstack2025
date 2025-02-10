@@ -27,8 +27,4 @@
         <ProjectReference Include="..\Startup\Startup.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="GameTests\"/>
-    </ItemGroup>
-
 </Project>
