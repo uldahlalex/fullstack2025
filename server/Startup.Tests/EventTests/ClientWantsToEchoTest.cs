@@ -6,7 +6,7 @@ public class ClientWantsToEchoTest : ApiTestBase
 {
     private readonly ITestOutputHelper _outputHelper;
 
-    public ClientWantsToEchoTest(ITestOutputHelper outputHelper) 
+    public ClientWantsToEchoTest(ITestOutputHelper outputHelper)
         : base(outputHelper, new ApiTestBaseConfig())
     {
         _outputHelper = outputHelper;
@@ -16,14 +16,11 @@ public class ClientWantsToEchoTest : ApiTestBase
     public async Task ClientCanConnectAndRequestResponse()
     {
         _ = CreateClient();
-        string wsPort = Environment.GetEnvironmentVariable("WS_PORT");
+        var wsPort = Environment.GetEnvironmentVariable("WS_PORT");
 
-        if (string.IsNullOrEmpty(wsPort))
-        {
-            throw new Exception("Environment variable WS_PORT is not set");
-        }
-        
-        string url = "ws://localhost:" + wsPort;
+        if (string.IsNullOrEmpty(wsPort)) throw new Exception("Environment variable WS_PORT is not set");
+
+        var url = "ws://localhost:" + wsPort;
         _outputHelper.WriteLine($"Connecting to WebSocket at: {url}");
 
         var client = new WsRequestClient(
@@ -36,26 +33,23 @@ public class ClientWantsToEchoTest : ApiTestBase
 
         var dto = new ClientWantsToEchoDto
         {
-            Message = "hey there",
+            Message = "hey there"
         };
 
         var response = await client
             .SendMessage<ClientWantsToEchoDto, ServerSendsEchoDto>(dto);
         Assert.Equal(dto.Message, response.Message);
     }
-    
+
     [Fact]
     public async Task ClientCanConnectAndRequestResponse2()
     {
         _ = CreateClient();
-        string wsPort = Environment.GetEnvironmentVariable("WS_PORT");
+        var wsPort = Environment.GetEnvironmentVariable("WS_PORT");
 
-        if (string.IsNullOrEmpty(wsPort))
-        {
-            throw new Exception("Environment variable WS_PORT is not set");
-        }
-        
-        string url = "ws://localhost:" + wsPort;
+        if (string.IsNullOrEmpty(wsPort)) throw new Exception("Environment variable WS_PORT is not set");
+
+        var url = "ws://localhost:" + wsPort;
         _outputHelper.WriteLine($"Connecting to WebSocket at: {url}");
 
         var client = new WsRequestClient(
@@ -68,7 +62,7 @@ public class ClientWantsToEchoTest : ApiTestBase
 
         var dto = new ClientWantsToEchoDto
         {
-            Message = "hey there",
+            Message = "hey there"
         };
 
         var response = await client

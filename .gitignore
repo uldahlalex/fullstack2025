@@ -7,3 +7,4 @@ riderModule.iml
 fullstack2025.sln.DotSettings.user
 appsettings.Development.json
 server/Startup.Tests/appsettings.json
+appsettings.Production.json

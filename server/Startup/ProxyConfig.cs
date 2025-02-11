@@ -34,12 +34,3 @@ public class ProxyConfig : IProxyConfig
         new TcpProxyServer(proxyConfiguration).Start();
     }
 }
-public class MockProxyConfig : IProxyConfig
-{
-    /// <summary>
-    ///     Deliberately don't do anything for the mock proxy
-    /// </summary>
-    public void StartProxyServer(int publicPort, int restPort, int wsPort)
-    {
-    }
-}

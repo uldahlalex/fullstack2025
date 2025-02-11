@@ -1,5 +1,3 @@
-using System.Net;
-using System.Net.Sockets;
 using Api.Websocket;
 using WebSocketBoilerplate;
 
@@ -20,14 +18,13 @@ public static class Extensions
 
         var factory = app.Services.GetRequiredService<IWebSocketServerHostFactory>();
         var wsHost = factory.Create(app);
-        
-    
+
+
         await wsHost.StartAsync(wsPort);
 
         app.Lifetime.ApplicationStopping.Register(() => wsHost.Dispose());
-        return (app);
+        return app;
     }
-    
 }
 
 public interface IWebSocketServerHostFactory

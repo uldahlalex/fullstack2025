@@ -1,4 +1,9 @@
-apitestbase vælger ikke env vars over appsettings (som er gigignoret)
+- websocket service / connection manager / redis
+
+- test der bruger REST til at mutate ws state
+
+- nyt db schema og user stories
+
 _____
 
 - README.md

@@ -2,7 +2,6 @@ namespace Startup.Tests;
 
 public class ApiTestBaseConfig
 {
-
     /// <summary>
     ///     Defaults to false
     /// </summary>

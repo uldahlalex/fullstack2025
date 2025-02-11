@@ -8,8 +8,7 @@ public static class AppOptionsExtensions
 {
     public static AppOptions AddAppOptions(
         this IServiceCollection services,
-        IConfiguration configuration,
-        IWebHostEnvironment env)
+        IConfiguration configuration)
     {
         services.AddOptionsWithValidateOnStart<AppOptions>()
             .Bind(configuration.GetSection(nameof(AppOptions)))

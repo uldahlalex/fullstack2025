@@ -19,7 +19,7 @@ public static class GenerateTypescriptClient
                 TypeStyle = TypeScriptTypeStyle.Interface,
                 DateTimeType = TypeScriptDateTimeType.Date,
                 NullValue = TypeScriptNullValue.Undefined,
-                TypeScriptVersion = 4.3m,
+                TypeScriptVersion = 5.2m,
                 GenerateCloneMethod = false
             }
         };

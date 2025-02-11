@@ -7,7 +7,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Startup.Tests.Auth;
 
-
 public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper, new ApiTestBaseConfig
 {
     MockMqtt = true,

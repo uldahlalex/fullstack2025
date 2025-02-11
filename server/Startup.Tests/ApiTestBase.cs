@@ -1,12 +1,8 @@
-﻿using System.Text.Json;
-using Api.Websocket;
-using Application.Interfaces.Infrastructure.Mqtt;
+﻿using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Websocket;
-using Application.Models;
 using Fleck;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -24,10 +20,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
     : WebApplicationFactory<Program>
 {
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
-    private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();  
-    private readonly TaskCompletionSource<int> _wsPortInitialized = new();
-
-    
+    private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -39,23 +32,19 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
             logging.SetMinimumLevel(LogLevel.Trace);
             logging.AddXUnit(outputHelper);
         });
-        
+
         builder.ConfigureAppConfiguration((hostingContext, config) =>
         {
             config.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables(prefix: "APPOPTIONS__");
+                .AddJsonFile("appsettings.Development.json", true, true)
+                .AddEnvironmentVariables("APPOPTIONS__");
         });
         builder.ConfigureServices(ConfigureTestServices);
     }
 
-  
-
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
-        var configuration = context.Configuration;
-        outputHelper.WriteLine($"Loaded configuration: {JsonSerializer.Serialize(configuration.GetSection("AppOptions").Get<AppOptions>())}");
         if (_apiTestBaseConfig.MockRelationalDatabase)
         {
             RemoveExistingService<DbContextOptions<MyDbContext>>(services);
@@ -84,7 +73,8 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
         if (_apiTestBaseConfig.MockProxyConfig)
         {
             RemoveExistingService<IProxyConfig>(services);
-            services.AddSingleton<IProxyConfig, MockProxyConfig>();
+            var mockProxy = new Mock<IProxyConfig>();
+            services.AddSingleton(mockProxy.Object);
         }
 
         if (_apiTestBaseConfig.UseCustomSeeder)
@@ -92,6 +82,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
             RemoveExistingService<ISeeder>(services);
             services.AddSingleton<ISeeder, TestSeeder>();
         }
+
         if (_apiTestBaseConfig.MockWebSocketService)
         {
             var mockWsService = new Mock<IWebSocketService<IWebSocketConnection>>();
@@ -105,6 +96,4 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
         if (descriptor != null)
             services.Remove(descriptor);
     }
-
-  
 }

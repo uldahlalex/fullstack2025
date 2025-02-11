@@ -28,15 +28,15 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
         Environment.SetEnvironmentVariable("WS_PORT", port.ToString());
 
         var url = $"ws://0.0.0.0:{port}/ws";
-        logger.LogInformation("WS running on url: "+url);
+        logger.LogInformation("WS running on url: " + url);
         _server = new WebSocketServer(url);
 
-        
+
         Action<IWebSocketConnection> config = ws =>
         {
             using var scope = app.Services.CreateScope();
             var wsService = scope.ServiceProvider.GetRequiredService<IWebSocketService<IWebSocketConnection>>();
-            
+
             ws.OnOpen = () => wsService.RegisterConnection(ws);
             ws.OnClose = () => { };
             ws.OnError = ex =>
@@ -79,16 +79,17 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
     {
         _server?.Dispose();
     }
+
     private int GetAvailablePort(int startPort)
     {
-        int port = startPort;
-        bool isPortAvailable = false;
+        var port = startPort;
+        var isPortAvailable = false;
 
         do
         {
             try
             {
-                TcpListener tcpListener = new TcpListener(IPAddress.Loopback, port);
+                var tcpListener = new TcpListener(IPAddress.Loopback, port);
                 tcpListener.Start();
                 tcpListener.Stop();
                 isPortAvailable = true;
@@ -102,6 +103,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
         return port;
     }
 }
+
 public class ServerSendsErrorMessage : BaseDto
 {
     public string Error { get; set; }
