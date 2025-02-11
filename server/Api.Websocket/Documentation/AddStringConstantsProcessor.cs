@@ -5,6 +5,9 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket.Documentation;
 
+/// <summary>
+///     I want nswag to include event type names like "ClientWantsToDoX" as simple string constants
+/// </summary>
 public sealed class AddStringConstantsProcessor : IDocumentProcessor
 {
     public void Process(DocumentProcessorContext context)
@@ -35,7 +38,6 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
             Description = "Available eventType constants"
         };
 
-        // Add each type name to the Enumeration collection
         foreach (var typeName in derivedTypeNames) schema.Enumeration.Add(typeName);
 
         context.Document.Definitions["StringConstants"] = schema;

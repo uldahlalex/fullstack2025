@@ -4,6 +4,8 @@
 
 - nyt db schema og user stories
 
+- application layer request objects til at mappe fra dto'er
+
 _____
 
 - README.md

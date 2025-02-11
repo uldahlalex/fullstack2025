@@ -5,14 +5,15 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket.Documentation;
 
+/// <summary>
+///     I want nswag to generate schemas for all derived types of BaseDto
+/// </summary>
 public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
 {
     public void Process(DocumentProcessorContext context)
     {
-        // Get all assemblies in the current application domain
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        // Find all types that inherit from BaseDto
         var derivedTypes = assemblies
             .SelectMany(a =>
             {
@@ -26,12 +27,11 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
                 }
             })
             .Where(t =>
-                t != typeof(BaseDto) && // Exclude BaseDto itself
-                !t.IsAbstract && // Exclude abstract classes
-                typeof(BaseDto).IsAssignableFrom(t)) // Check if type inherits from BaseDto
+                t != typeof(BaseDto) &&
+                !t.IsAbstract &&
+                typeof(BaseDto).IsAssignableFrom(t))
             .ToList();
 
-        // Generate schema for each derived type
         foreach (var type in derivedTypes)
             context.SchemaGenerator.Generate(type.ToContextualType(), context.SchemaResolver);
     }

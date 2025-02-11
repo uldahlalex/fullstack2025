@@ -13,5 +13,9 @@
 
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Models\Dtos\Websocket\"/>
+    </ItemGroup>
+
 
 </Project>

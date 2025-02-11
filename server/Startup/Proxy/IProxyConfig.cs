@@ -1,4 +1,4 @@
-namespace Startup;
+namespace Startup.Proxy;
 
 public interface IProxyConfig
 {

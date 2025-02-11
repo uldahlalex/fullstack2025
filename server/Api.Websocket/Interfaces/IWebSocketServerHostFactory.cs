@@ -1,4 +1,4 @@
-using Api.Websocket;
+namespace Api.Websocket.Interfaces;
 
 public interface IWebSocketServerHostFactory
 {

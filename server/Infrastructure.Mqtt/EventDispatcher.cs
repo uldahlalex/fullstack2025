@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Infrastructure.Mqtt.EventHandlers.Dtos;
 using Infrastructure.Mqtt.Interfaces;
 
 namespace Infrastructure.Mqtt;
@@ -10,8 +11,8 @@ public class EventDispatcher(
 {
     public static readonly Dictionary<string, Type> TopicMappings = new()
     {
-        { "sensors/+/temperature", typeof(TemperatureEvent) },
-        { "sensors/+/humidity", typeof(HumidityEvent) }
+        { "sensors/+/temperature", typeof(TemperatureEventDto) },
+        { "sensors/+/humidity", typeof(HumidityEventDto) }
     };
 
 
@@ -24,7 +25,7 @@ public class EventDispatcher(
             var mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
                             {
                                 PropertyNameCaseInsensitive = true
-                            }) as IMqttEvent ??
+                            }) as IMqttEventDto ??
                             throw new Exception("Could not pass object as IMqttEvent " + payload +
                                                 " with event type " + eventType);
 

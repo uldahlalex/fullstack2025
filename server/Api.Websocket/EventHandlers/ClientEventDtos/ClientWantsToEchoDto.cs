@@ -1,6 +1,6 @@
 using WebSocketBoilerplate;
 
-namespace Api.Websocket.Events;
+namespace Api.Websocket.EventHandlers.ClientEventDtos;
 
 public class ClientWantsToEchoDto : BaseDto
 {

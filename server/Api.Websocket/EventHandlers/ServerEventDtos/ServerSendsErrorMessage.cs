@@ -1,6 +1,6 @@
 using WebSocketBoilerplate;
 
-namespace Api.Websocket;
+namespace Api.Websocket.EventHandlers.ServerEventDtos;
 
 public class ServerSendsErrorMessage : BaseDto
 {

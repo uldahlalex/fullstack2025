@@ -1,6 +1,6 @@
 using WebSocketBoilerplate;
 
-namespace Api.Websocket.Events;
+namespace Api.Websocket.EventHandlers.ServerEventDtos;
 
 public class ServerSendsEchoDto : BaseDto
 {

@@ -4,7 +4,6 @@ using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
-using Application.Models.Dtos.Websocket;
 using Application.Models.Entities;
 
 namespace Application.Services;
@@ -37,7 +36,7 @@ public class ServiceLogic<W>(
     {
     }
 
-    public object ChangePreferences(IClientWantsToChangePreferences dto)
+    public object ChangePreferences(double temperatureThreshold)
     {
         //Persist new changes to DB
         //Broadcast new preferences to IoT devices in 

@@ -1,4 +1,4 @@
-namespace Infrastructure.Mqtt;
+namespace Infrastructure.Mqtt.Interfaces;
 
 public interface IEventDispatcher
 {

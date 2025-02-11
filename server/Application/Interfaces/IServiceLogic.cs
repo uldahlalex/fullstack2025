@@ -1,5 +1,4 @@
 ﻿using Application.Models;
-using Application.Models.Dtos.Websocket;
 using Application.Models.Entities;
 
 namespace Application.Interfaces;
@@ -10,5 +9,5 @@ public interface IServiceLogic
     public void Broadcast(object message, params string[] topics);
 
     public void Publish();
-    object ChangePreferences(IClientWantsToChangePreferences dto);
+    object ChangePreferences(double temperatureThreshold); //todo request object instead of tech based dto
 }

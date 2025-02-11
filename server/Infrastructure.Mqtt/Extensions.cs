@@ -1,5 +1,6 @@
 using Application.Interfaces.Infrastructure.Mqtt;
-using Infrastructure.Mqtt.Events;
+using Infrastructure.Mqtt.EventHandlers;
+using Infrastructure.Mqtt.EventHandlers.Dtos;
 using Infrastructure.Mqtt.Interfaces;
 
 namespace Infrastructure.Mqtt;
@@ -10,8 +11,8 @@ public static class Extensions
     {
         services.AddSingleton<IEventDispatcher, EventDispatcher>();
 
-        services.AddScoped<IMqttEventHandler<TemperatureEvent>, TemperatureEventHandler>();
-        services.AddScoped<IMqttEventHandler<HumidityEvent>, HumidityEventHandler>();
+        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler>();
+        services.AddScoped<IMqttEventHandler<HumidityEventDto>, HumidityEventHandler>();
 
         services.AddSingleton<IMqttClientService, MqttClientService>();
         return services;

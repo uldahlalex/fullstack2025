@@ -1,4 +1,7 @@
+using Api.Websocket.Interfaces;
 using WebSocketBoilerplate;
+
+namespace Api.Websocket;
 
 public static class Extensions
 {

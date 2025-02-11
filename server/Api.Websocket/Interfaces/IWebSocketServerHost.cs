@@ -1,4 +1,4 @@
-namespace Api.Websocket;
+namespace Api.Websocket.Interfaces;
 
 public interface IWebSocketServerHost : IDisposable
 {

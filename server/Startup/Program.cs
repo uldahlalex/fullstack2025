@@ -1,4 +1,5 @@
 using Api.Rest;
+using Api.Websocket;
 using Api.Websocket.Documentation;
 using Application;
 using Application.Models;
@@ -9,6 +10,7 @@ using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
 using Startup.Extensions;
+using Startup.Proxy;
 
 namespace Startup;
 

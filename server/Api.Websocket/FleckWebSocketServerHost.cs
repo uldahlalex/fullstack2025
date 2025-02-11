@@ -1,6 +1,8 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
+using Api.Websocket.EventHandlers.ServerEventDtos;
+using Api.Websocket.Interfaces;
 using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
 using WebSocketBoilerplate;
@@ -10,22 +12,15 @@ namespace Api.Websocket;
 public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocketServerHost> logger)
     : IWebSocketServerHost
 {
-    private readonly WebApplication _app = app;
-    private readonly ILogger<FleckWebSocketServerHost> _logger = logger;
     private WebSocketServer? _server;
 
     public Task StartAsync(int port)
     {
         port = GetAvailablePort(port);
-
-        // Set the dynamic port to an environment variable
         Environment.SetEnvironmentVariable("WS_PORT", port.ToString());
-
         var url = $"ws://0.0.0.0:{port}/ws";
         logger.LogInformation("WS running on url: " + url);
         _server = new WebSocketServer(url);
-
-
         Action<IWebSocketConnection> config = ws =>
         {
             using var scope = app.Services.CreateScope();

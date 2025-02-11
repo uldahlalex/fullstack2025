@@ -1,5 +1,6 @@
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
+using Infrastructure.Mqtt.Interfaces;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Protocol;
@@ -18,8 +19,7 @@ public class MqttClientService : IMqttClientService, IDisposable
     public MqttClientService(
         IOptionsMonitor<AppOptions> optionsMonitor,
         ILogger<MqttClientService> logger,
-        IEventDispatcher eventDispatcher,
-        IConfiguration configuration)
+        IEventDispatcher eventDispatcher)
     {
         _logger = logger;
         _eventDispatcher = eventDispatcher;
@@ -27,10 +27,7 @@ public class MqttClientService : IMqttClientService, IDisposable
 
         var tlsOptions = new MqttClientTlsOptions
         {
-            UseTls = true,
-            AllowUntrustedCertificates = true, // Only during development!
-            IgnoreCertificateChainErrors = true, // Only during development!
-            IgnoreCertificateRevocationErrors = true // Only during development!
+            UseTls = true
         };
         _client = new MqttClientFactory().CreateMqttClient();
         _options = new MqttClientOptionsBuilder()

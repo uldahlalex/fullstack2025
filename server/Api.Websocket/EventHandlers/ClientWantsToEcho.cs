@@ -1,9 +1,11 @@
 using System.Text.Json;
+using Api.Websocket.EventHandlers.ClientEventDtos;
+using Api.Websocket.EventHandlers.ServerEventDtos;
 using Application.Interfaces;
 using Fleck;
 using WebSocketBoilerplate;
 
-namespace Api.Websocket.Events;
+namespace Api.Websocket.EventHandlers;
 
 public class ClientWantsToEcho(
     IServiceLogic service,

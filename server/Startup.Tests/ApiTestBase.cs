@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using PgCtx;
+using Startup.Proxy;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 
@@ -80,7 +81,7 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
         if (_apiTestBaseConfig.UseCustomSeeder)
         {
             RemoveExistingService<ISeeder>(services);
-            services.AddSingleton<ISeeder, TestSeeder>();
+            services.AddSingleton<ISeeder, TestEnvironmentSeeder>();
         }
 
         if (_apiTestBaseConfig.MockWebSocketService)
