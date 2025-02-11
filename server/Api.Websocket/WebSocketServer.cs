@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using System.Text.Json;
 using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
@@ -20,9 +22,15 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
 
     public Task StartAsync(int port)
     {
+        port = GetAvailablePort(port);
+
+        // Set the dynamic port to an environment variable
+        Environment.SetEnvironmentVariable("WS_PORT", port.ToString());
+
         var url = $"ws://0.0.0.0:{port}/ws";
         logger.LogInformation("WS running on url: "+url);
         _server = new WebSocketServer(url);
+
         
         Action<IWebSocketConnection> config = ws =>
         {
@@ -70,6 +78,28 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
     public void Dispose()
     {
         _server?.Dispose();
+    }
+    private int GetAvailablePort(int startPort)
+    {
+        int port = startPort;
+        bool isPortAvailable = false;
+
+        do
+        {
+            try
+            {
+                TcpListener tcpListener = new TcpListener(IPAddress.Loopback, port);
+                tcpListener.Start();
+                tcpListener.Stop();
+                isPortAvailable = true;
+            }
+            catch (SocketException)
+            {
+                port++;
+            }
+        } while (!isPortAvailable);
+
+        return port;
     }
 }
 public class ServerSendsErrorMessage : BaseDto

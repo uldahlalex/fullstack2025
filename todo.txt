@@ -1,7 +1,11 @@
-- manual port allocation and force serving APIs on different ports (+ proxying) (probably hard)
-- the stackoverflow snippet (probably hard)
-- WebApplicationFactory conditional for ws or rest serving
-    - Så kan der ikke testes features med rest request der laver ws state mutation eller broadcasting
+
+    
+Hvorfor kan webappfact ikke serve 2 porte?
+- fordi den dynamisk allokerer en port som API'en lytter på. Teknisk set kan man godt få ws til at serve på port 8181 manuelt, men når man kører tests i parallel vil de alle forsøge at anvende den port.
+    - Løsningsforslag: Lad WebAppFactory manuelt allokere port til rest API
+    
+Løsning: Dynamisk alloker ws port og anvend miljøvariabl (eller sekventiel eksevering med statisk port)
+
 _____
 
 - README.md

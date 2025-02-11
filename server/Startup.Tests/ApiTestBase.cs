@@ -1,6 +1,8 @@
-﻿using Api.Websocket;
+﻿using System.Text.Json;
+using Api.Websocket;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Websocket;
+using Application.Models;
 using Fleck;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
@@ -8,6 +10,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -35,6 +38,13 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
             logging.ClearProviders();
             logging.SetMinimumLevel(LogLevel.Trace);
             logging.AddXUnit(outputHelper);
+        });
+        
+        builder.ConfigureAppConfiguration((hostingContext, config) =>
+        {
+            config.SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables();
         });
         builder.ConfigureServices(ConfigureTestServices);
     }

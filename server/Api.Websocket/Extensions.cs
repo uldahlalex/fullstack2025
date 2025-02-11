@@ -35,17 +35,10 @@ public interface IWebSocketServerHostFactory
     IWebSocketServerHost Create(WebApplication app);
 }
 
-public class FleckWebSocketServerHostFactory : IWebSocketServerHostFactory
+public class FleckWebSocketServerHostFactory(ILogger<FleckWebSocketServerHost> logger) : IWebSocketServerHostFactory
 {
-    private readonly ILogger<FleckWebSocketServerHost> _logger;
-
-    public FleckWebSocketServerHostFactory(ILogger<FleckWebSocketServerHost> logger)
-    {
-        _logger = logger;
-    }
-
     public IWebSocketServerHost Create(WebApplication app)
     {
-        return new FleckWebSocketServerHost(app, _logger);
+        return new FleckWebSocketServerHost(app, logger);
     }
 }
