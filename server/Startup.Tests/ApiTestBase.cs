@@ -43,8 +43,8 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
         builder.ConfigureAppConfiguration((hostingContext, config) =>
         {
             config.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables(prefix: "APPOPTIONS__");
         });
         builder.ConfigureServices(ConfigureTestServices);
     }
@@ -54,6 +54,8 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
+        var configuration = context.Configuration;
+        outputHelper.WriteLine($"Loaded configuration: {JsonSerializer.Serialize(configuration.GetSection("AppOptions").Get<AppOptions>())}");
         if (_apiTestBaseConfig.MockRelationalDatabase)
         {
             RemoveExistingService<DbContextOptions<MyDbContext>>(services);
@@ -105,35 +107,4 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
     }
 
   
-}
-
-
-
-public class ApiTestBaseConfig
-{
-
-    /// <summary>
-    ///     Defaults to false
-    /// </summary>
-    public bool MockRelationalDatabase { get; set; } = false;
-
-    /// <summary>
-    ///     Defaults to false
-    /// </summary>
-    public bool MockMqtt { get; set; } = false;
-
-    /// <summary>
-    ///     Defaults to false
-    /// </summary>
-    public bool MockWebSocketService { get; set; } = false;
-
-    /// <summary>
-    ///     Defaults to true
-    /// </summary>
-    public bool MockProxyConfig { get; set; } = true;
-
-    /// <summary>
-    ///     Defaults to true
-    /// </summary>
-    public bool UseCustomSeeder { get; set; } = true;
 }
