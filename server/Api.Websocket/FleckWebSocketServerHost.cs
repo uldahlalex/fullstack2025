@@ -7,12 +7,6 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket;
 
-public interface IWebSocketServerHost : IDisposable
-{
-    Task StartAsync(int port);
-    Task StopAsync();
-}
-
 public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocketServerHost> logger)
     : IWebSocketServerHost
 {
@@ -102,10 +96,4 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
 
         return port;
     }
-}
-
-public class ServerSendsErrorMessage : BaseDto
-{
-    public string Error { get; set; }
-    public string RequestId { get; set; }
 }

@@ -5,16 +5,6 @@ using WebSocketBoilerplate;
 
 namespace Api.Websocket.Events;
 
-public class ClientWantsToEchoDto : BaseDto
-{
-    public string Message { get; set; }
-}
-
-public class ServerSendsEchoDto : BaseDto
-{
-    public string Message { get; set; }
-}
-
 public class ClientWantsToEcho(
     IServiceLogic service,
     ISecurityService securityService,

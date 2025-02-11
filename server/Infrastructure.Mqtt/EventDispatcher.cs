@@ -67,8 +67,3 @@ public class EventDispatcher(
         return true;
     }
 }
-
-public interface IEventDispatcher
-{
-    Task DispatchAsync(string topic, string payload);
-}

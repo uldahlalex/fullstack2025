@@ -1,4 +1,3 @@
-using Api.Websocket;
 using WebSocketBoilerplate;
 
 public static class Extensions
@@ -24,18 +23,5 @@ public static class Extensions
 
         app.Lifetime.ApplicationStopping.Register(() => wsHost.Dispose());
         return app;
-    }
-}
-
-public interface IWebSocketServerHostFactory
-{
-    IWebSocketServerHost Create(WebApplication app);
-}
-
-public class FleckWebSocketServerHostFactory(ILogger<FleckWebSocketServerHost> logger) : IWebSocketServerHostFactory
-{
-    public IWebSocketServerHost Create(WebApplication app)
-    {
-        return new FleckWebSocketServerHost(app, logger);
     }
 }

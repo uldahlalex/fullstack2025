@@ -1,14 +1,8 @@
 using Application.Interfaces;
-using Application.Models.Dtos.Websocket;
 using Fleck;
 using WebSocketBoilerplate;
 
 namespace Api.Websocket.Events;
-
-public class ClientWantsToChangePreferencesDto : BaseDto, IClientWantsToChangePreferences
-{
-    public double TemperatureThreshold { get; }
-}
 
 public class ClientWantsToChangePreferences(IServiceLogic service) : BaseEventHandler<ClientWantsToChangePreferencesDto>
 {

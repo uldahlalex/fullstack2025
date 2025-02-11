@@ -247,11 +247,3 @@ public class MqttClientService : IMqttClientService, IDisposable
         _isDisposed = true;
     }
 }
-
-public class MqttConfig
-{
-    public string Host { get; set; }
-    public int Port { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
-}
