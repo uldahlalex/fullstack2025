@@ -1,6 +1,5 @@
 using System.Text.Json;
 using Api.Rest;
-using Api.Websocket;
 using Api.Websocket.Documentation;
 using Application;
 using Application.Models;
@@ -14,20 +13,6 @@ using Startup.Extensions;
 
 namespace Startup;
 
-// public class D;
-//
-// public class Mock : IWebSocketService<D>
-// {
-//     public D RegisterConnection(D connection)
-//     {
-//         return connection;
-//     }
-//
-//     public D OnClose(D ws)
-//     {
-//         return ws;
-//     }
-// }
 
 public class Program
 {
@@ -81,31 +66,21 @@ public class Program
 
         app.Urls.Clear();
 
-        // if (app.Environment.IsEnvironment("Testing"))
-        // {
-        //     app.ConfigureRestApi();
-        //     await app.ConfigureWebsocketApi();
-        //     app.ConfigureMqtt();
-        // }
-        // else
-        // {
-            // const int restPort = 5000;
-            // const int wsPort = 5000;
-            // var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
 
-           // app.Urls.Add($"http://0.0.0.0:{restPort}");
-        
-            // app.Services.GetRequiredService<IProxyConfig>()
-            //     .StartProxyServer(publicPort, restPort, wsPort);
+        const int restPort = 5000;
+        const int wsPort = 8181;
+        var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
 
-            app.ConfigureRestApi();
-            await app.ConfigureWebsocketApi();
-            app.ConfigureMqtt();
-      //  }
-        //
-        //
+        app.Urls.Add($"http://0.0.0.0:{restPort}");
+
+        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
+
+        app.ConfigureRestApi();
+        await app.ConfigureWebsocketApi(wsPort);
+        app.ConfigureMqtt();
+
         app.MapGet("Acceptance", () => "Accepted");
-        
+
         app.UseOpenApi();
         app.MapScalarApiReference();
         app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();

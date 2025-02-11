@@ -21,44 +21,26 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
     : WebApplicationFactory<Program>
 {
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
-    private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
+    private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();  
+    private readonly TaskCompletionSource<int> _wsPortInitialized = new();
 
+    
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {          
+    {
         builder.UseEnvironment("Testing");
 
         builder.ConfigureLogging(logging =>
-             {
-                 logging.ClearProviders();
-                 logging.SetMinimumLevel(LogLevel.Trace);
-                 logging.AddXUnit(outputHelper);
-             });
-        builder.ConfigureServices(ConfigureTestServices);
-    
-      
-           
-        // Use localhost with dynamic port for tests
-        builder.UseUrls("http://127.0.0.1:0");
-        
-        // Configure the application
-        builder.Configure(async app =>
         {
-            if (app is WebApplication webApp)
-            {
-                // Configure your middleware and routing first
-                webApp.UseRouting();
-                
-                // Start the WebSocket server
-                await webApp.ConfigureWebsocketApi();
-                
-                // Get the actual port being used
-                var serverAddress = webApp.Urls.Select(url => new Uri(url)).First();
-                outputHelper.WriteLine($"Test server running on port: {serverAddress.Port}");
-            }
+            logging.ClearProviders();
+            logging.SetMinimumLevel(LogLevel.Trace);
+            logging.AddXUnit(outputHelper);
         });
+        builder.ConfigureServices(ConfigureTestServices);
     }
-    
+
+  
+
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
@@ -115,8 +97,11 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
   
 }
 
+
+
 public class ApiTestBaseConfig
 {
+
     /// <summary>
     ///     Defaults to false
     /// </summary>

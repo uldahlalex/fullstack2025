@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using Api.Websocket;
 using WebSocketBoilerplate;
 
@@ -12,22 +14,20 @@ public static class Extensions
         return services;
     }
 
-    public static async Task<WebApplication> ConfigureWebsocketApi(this WebApplication app)
+    public static async Task<WebApplication> ConfigureWebsocketApi(this WebApplication app, int wsPort = 8181)
     {
         app.UseRouting();
 
         var factory = app.Services.GetRequiredService<IWebSocketServerHostFactory>();
         var wsHost = factory.Create(app);
+        
     
-        // Get the actual port being used
-        // var serverAddress = app.Urls.Select(url => new Uri(url)).First();
-        // var port = serverAddress.Port;
-    
-        await wsHost.StartAsync(5000);
-    
+        await wsHost.StartAsync(wsPort);
+
         app.Lifetime.ApplicationStopping.Register(() => wsHost.Dispose());
-        return app;
+        return (app);
     }
+    
 }
 
 public interface IWebSocketServerHostFactory

@@ -1,6 +1,7 @@
 - manual port allocation and force serving APIs on different ports (+ proxying) (probably hard)
 - the stackoverflow snippet (probably hard)
 - WebApplicationFactory conditional for ws or rest serving
+    - Så kan der ikke testes features med rest request der laver ws state mutation eller broadcasting
 _____
 
 - README.md
