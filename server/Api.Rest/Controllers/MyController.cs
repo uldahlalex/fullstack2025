@@ -16,6 +16,7 @@ public class MyController(
     public ActionResult Do()
     {
         var claims = securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        return Ok(service.GetDomainModels(claims));
+        // return Ok(service.GetDomainModels(claims));
+        return null;
     }
 }

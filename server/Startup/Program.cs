@@ -29,7 +29,7 @@ public class Program
     {
         services.AddAppOptions(configuration);
 
-        services.RegisterApplicationServices<IWebSocketConnection>();
+        services.RegisterApplicationServices();
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();

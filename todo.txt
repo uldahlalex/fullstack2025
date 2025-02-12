@@ -1,10 +1,14 @@
-- websocket service / connection manager / redis
+- ws infra skal miste ref til ws nuget og base passe en delegate til message sending
+
+
 
 - test der bruger REST til at mutate ws state
 
 - nyt db schema og user stories
 
 - application layer request objects til at mappe fra dto'er
+
+- mqttclient tests
 
 _____
 

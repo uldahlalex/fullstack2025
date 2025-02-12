@@ -9,7 +9,7 @@ public class ClientWantsToChangePreferences(IServiceLogic service) : BaseEventHa
 {
     public override Task Handle(ClientWantsToChangePreferencesDto dto, IWebSocketConnection socket)
     {
-        service.ChangePreferences(dto.TemperatureThreshold);
+        //service.ChangePreferences(dto.TemperatureThreshold);
         return Task.CompletedTask;
     }
 }

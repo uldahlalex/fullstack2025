@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Interfaces;
 using Infrastructure.Mqtt.EventHandlers.Dtos;
 using Infrastructure.Mqtt.Interfaces;
@@ -11,7 +12,7 @@ public class TemperatureEventHandler(ILogger<TemperatureEventHandler> logger, IS
     {
         logger.LogInformation("Temperature reading: {Temperature}°C from sensor {SensorId}",
             eventDtoData.Temperature, eventDtoData.SensorId);
-        service.Broadcast(new { eventType = "temperature", eventDtoData.Temperature, eventDtoData.SensorId },
-            "temperature");
+        // service.Broadcast(JsonSerializer.Serialize(new { eventType = "temperature", eventDtoData.Temperature, eventDtoData.SensorId }),
+        //     "temperature");
     }
 }

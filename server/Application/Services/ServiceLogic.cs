@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -8,28 +7,31 @@ using Application.Models.Entities;
 
 namespace Application.Services;
 
-public class ServiceLogic<W>(
+/// <summary>
+/// Exposes concrete service 
+/// </summary>
+/// <param name="repo"></param>
+/// <param name="mqtt"></param>
+/// <param name="redisRepo"></param>
+public class ServiceLogic(
     IDataRepository repo,
     IMqttClientService mqtt,
-    IWebSocketService<W> ws) : IServiceLogic
+    IRedisConnectionRepository redisRepo
+) : IServiceLogic
 {
+    public async void BroadcastToTopic(string message, string topic)
+    {
+       
+    }
+    
+    public async void SubscribeToTopic(string guid, string topic)
+    {
+        
+    }
+
     public IEnumerable<Board> GetDomainModels(JwtClaims claims)
     {
         return repo.GetDomainModels();
-    }
-
-    public async void Broadcast(object message, params string[] topics)
-    {
-        var payload = JsonSerializer.Serialize(new
-        {
-            SensorId = "001",
-            Temperature = 25.5,
-            Timestamp = DateTime.UtcNow
-        });
-        ws.Broadcast(payload);
-
-
-        await mqtt.PublishAsync("sensors/001/temperature", payload);
     }
 
     public void Publish()
@@ -43,5 +45,16 @@ public class ServiceLogic<W>(
         //Broadcast new preferences to web clients
         //messagePublisher.PublishAsync("preferences", dto);
         throw new NotImplementedException();
+    }
+
+    public void Connect(object connection)
+    {
+        
+    }
+
+
+    public async Task Broadcast<WConnection>(string topic, Action<IList<WConnection>> broadcastAction)
+    {
+        return redisRepo.BroadcastToTopic(topic, broadcastAction);
     }
 }

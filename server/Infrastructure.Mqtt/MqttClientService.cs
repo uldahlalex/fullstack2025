@@ -13,7 +13,7 @@ public class MqttClientService : IMqttClientService, IDisposable
     private readonly IEventDispatcher _eventDispatcher;
     private readonly ILogger<MqttClientService> _logger;
     private readonly MqttClientOptions _options;
-    private readonly HashSet<string> _subscriptions;
+    private readonly HashSet<string> _topicSubscriptions;
     private bool _isDisposed;
 
     public MqttClientService(
@@ -23,7 +23,7 @@ public class MqttClientService : IMqttClientService, IDisposable
     {
         _logger = logger;
         _eventDispatcher = eventDispatcher;
-        _subscriptions = new HashSet<string>();
+        _topicSubscriptions = new HashSet<string>();
 
         var tlsOptions = new MqttClientTlsOptions
         {
@@ -133,7 +133,7 @@ public class MqttClientService : IMqttClientService, IDisposable
                 firstResult?.ResultCode != MqttClientSubscribeResultCode.GrantedQoS0)
                 throw new Exception($"Failed to subscribe to topic {topic}. Result: {firstResult?.ResultCode}");
 
-            _subscriptions.Add(topic);
+            _topicSubscriptions.Add(topic);
             _logger.LogInformation("Successfully subscribed to topic: {Topic}", topic);
         }
         catch (Exception ex)
@@ -159,7 +159,7 @@ public class MqttClientService : IMqttClientService, IDisposable
             if (firstResult?.ResultCode != MqttClientUnsubscribeResultCode.Success)
                 throw new Exception($"Failed to unsubscribe from topic {topic}. Result: {firstResult?.ResultCode}");
 
-            _subscriptions.Remove(topic);
+            _topicSubscriptions.Remove(topic);
             _logger.LogInformation("Successfully unsubscribed from topic: {Topic}", topic);
         }
         catch (Exception ex)
@@ -171,7 +171,7 @@ public class MqttClientService : IMqttClientService, IDisposable
 
     public IReadOnlyCollection<string> GetSubscribedTopics()
     {
-        return _subscriptions.ToList().AsReadOnly();
+        return _topicSubscriptions.ToList().AsReadOnly();
     }
 
     private async Task HandleDisconnection(MqttClientDisconnectedEventArgs args)
@@ -210,19 +210,19 @@ public class MqttClientService : IMqttClientService, IDisposable
 
     private async Task ResubscribeToTopics()
     {
-        if (_subscriptions.Count == 0) return;
+        if (_topicSubscriptions.Count == 0) return;
 
         try
         {
             var subscribeOptions = new MqttClientSubscribeOptionsBuilder();
-            foreach (var topic in _subscriptions)
+            foreach (var topic in _topicSubscriptions)
                 subscribeOptions.WithTopicFilter(
                     topic,
                     MqttQualityOfServiceLevel.AtLeastOnce
                 );
 
             await _client.SubscribeAsync(subscribeOptions.Build());
-            _logger.LogInformation("Resubscribed to {Count} topics", _subscriptions.Count);
+            _logger.LogInformation("Resubscribed to {Count} topics", _topicSubscriptions.Count);
         }
         catch (Exception ex)
         {
@@ -235,11 +235,11 @@ public class MqttClientService : IMqttClientService, IDisposable
         if (_isDisposed) return;
 
         if (disposing)
-            if (_client != null)
-            {
-                if (_client.IsConnected) _client.DisconnectAsync().GetAwaiter().GetResult();
-                _client.Dispose();
-            }
+        {
+            if (_client.IsConnected)
+                _client.DisconnectAsync().GetAwaiter().GetResult();
+            _client.Dispose();
+        }
 
         _isDisposed = true;
     }
