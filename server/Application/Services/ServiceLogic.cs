@@ -53,8 +53,8 @@ public class ServiceLogic(
     }
 
 
-    public async Task Broadcast<WConnection>(string topic, Action<IList<WConnection>> broadcastAction)
+    public async Task Broadcast<T>(string topic, Action<List<T>> broadcastAction)
     {
-        return redisRepo.BroadcastToTopic(topic, broadcastAction);
+         redisRepo.BroadcastToTopic(topic, broadcastAction);
     }
 }

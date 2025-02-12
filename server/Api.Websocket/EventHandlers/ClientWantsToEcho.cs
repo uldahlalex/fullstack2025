@@ -18,12 +18,13 @@ public class ClientWantsToEcho(
         logger.LogInformation(socket.ConnectionInfo.Id + " has sent: " + JsonSerializer.Serialize(dto));
         var message = new ServerSendsEchoDto { Message = dto.Message, requestId = dto.requestId };
         
-        await service.Broadcast<IWebSocketConnection>("Messages", connections =>
-        {
-            foreach (var connection in connections)
-            {
-                ((WebSocketConnection)connection).Send(JsonSerializer.Serialize(message));
-            }
-        });
+        // await service.Broadcast<IWebSocketConnection>("Messages", connections =>
+        // {
+        //     foreach (var connection in connections)
+        //     {
+        //         ((WebSocketConnection)connection).Send(JsonSerializer.Serialize(message));
+        //     }
+        // });
+        return Task.CompletedTask;
     }
 }

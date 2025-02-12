@@ -8,7 +8,7 @@ public static class Extensions
 {
     public static IServiceCollection AddWebsocketInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<IRedisConnectionRepository, RedisConnectionRepository<IWebSocketConnection>>();
+        services.AddSingleton<IRedisConnectionRepository, RedisConnectionRepository>();
         return services;
     }
 }
