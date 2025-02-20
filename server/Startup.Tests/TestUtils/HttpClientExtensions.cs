@@ -1,9 +1,9 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace Startup.Tests;
+namespace Startup.Tests.TestUtils;
 
-public static class Extensions
+public static class HttpClientExtensions
 {
     public static async Task<HttpResponseWithObject<T>> GetFromJsonAsync<T>(this HttpClient httpClient,
         string requestUri)

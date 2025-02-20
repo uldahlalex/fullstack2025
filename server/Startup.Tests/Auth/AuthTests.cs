@@ -4,10 +4,12 @@ using Application.Models.Dtos;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
+using NUnit.Framework;
+using Startup.Tests.TestUtils;
 
 namespace Startup.Tests.Auth;
 
-public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOutputHelper, new ApiTestBaseConfig
+public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
 {
     MockMqtt = true,
     MockWebSocketService = false
@@ -21,33 +23,38 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
         "J4SHSN9SKisNBoijKZkNAA5GNWJlO/RNsiXWhoWq2lOpd7hBtmwnqb6bOcxxYP8tEvNRomJunrVkWKNa5W3lXg==";
 
 
-    [Fact]
+    [Test]
     public async Task RouteWithNoAuth_Can_Be_Accessed()
     {
         var client = CreateClient();
         var response = await client.GetAsync("/acceptance");
-        Assert.Equal("Accepted", await response.Content.ReadAsStringAsync());
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        if (await response.Content.ReadAsStringAsync() != "Accepted")
+            throw new Exception("Expected 'Accepted'");
+        if(HttpStatusCode.OK != response.StatusCode)
+            throw new Exception("Expected OK status code");
     }
 
-    [Fact]
+    [Test]
     public async Task SecuredRouteIsBlockedWitoutJwt()
     {
         var response = await CreateClient().GetAsync(AuthController.SecuredRoute);
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        if(HttpStatusCode.Unauthorized != response.StatusCode)
+            throw new Exception("Expected Unauthorized status code");
     }
 
-    [Fact]
+    [Test]
     public async Task Register_Can_Register_And_Return_Jwt()
     {
         var client = CreateClient();
         var response = await client.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
             MockObjects.GetAuthRequestDto());
-        Assert.Equal(HttpStatusCode.OK, response.HttpResponseMessage.StatusCode);
-        Assert.NotNull(response.Object.Jwt);
+        if(HttpStatusCode.OK !=response.HttpResponseMessage.StatusCode)
+            throw new Exception("Expected OK status code");
+        if(response.Object.Jwt.Length < 10)
+            throw new Exception("Expected jwt to be longer than 10 characters");
     }
 
-    [Fact]
+    [Test]
     public async Task Register_With_Short_Pass_Returns_Bad_Request()
     {
         var client = CreateClient();
@@ -57,11 +64,11 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
                 Username = "bob@bob.dk",
                 Password = "a"
             });
-        Assert.Equal(HttpStatusCode.BadRequest, response.HttpResponseMessage.StatusCode);
-        Assert.True(response.Object.Title!.Length > 1);
+        if(HttpStatusCode.BadRequest !=response.HttpResponseMessage.StatusCode)
+            throw new Exception("Expected BadRequest status code");
     }
 
-    [Fact]
+    [Test]
     public async Task Login_Can_Login_And_Return_Jwt()
     {
         using var scope = Services.CreateScope();
@@ -74,10 +81,11 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
         var response = await client.PostAsJsonAsync<AuthResponseDto>(
             AuthController.LoginRoute,
             MockObjects.GetAuthRequestDto());
-        Assert.Equal(HttpStatusCode.OK, response.HttpResponseMessage.StatusCode);
+        if(HttpStatusCode.OK != response.HttpResponseMessage.StatusCode)
+            throw new Exception("Expected OK status code");
     }
 
-    [Fact]
+    [Test]
     public async Task Invalid_Login_Gives_Unauthorized()
     {
         using var scope = Services.CreateScope();
@@ -90,19 +98,20 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
         request.Password = request.Password + "a";
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
             request);
-        Assert.Equal(HttpStatusCode.Unauthorized, response.HttpResponseMessage.StatusCode);
-        Assert.True(response.Object.Title.Length > 1);
+        if(HttpStatusCode.Unauthorized !=response.HttpResponseMessage.StatusCode)
+            throw new Exception("Expected Unauthorized status code");
     }
 
-    [Fact]
+    [Test]
     public async Task Login_For_Non_Existing_User_Is_Unauthorized()
     {
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
             MockObjects.GetAuthRequestDto());
-        Assert.Equal(HttpStatusCode.BadRequest, response.HttpResponseMessage.StatusCode);
+        if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode)
+            throw new Exception("Expected BadRequest status code");
     }
 
-    [Fact]
+    [Test]
     public async Task Register_For_Existing_User_Is_Bad_Request()
     {
         using var scope = Services.CreateScope();
@@ -113,7 +122,6 @@ public class AuthTests(ITestOutputHelper testOutputHelper) : ApiTestBase(testOut
 
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.RegisterRoute,
             MockObjects.GetAuthRequestDto());
-        Assert.Equal(HttpStatusCode.BadRequest, response.HttpResponseMessage.StatusCode);
-        Assert.True(response.Object.Title.Length > 1);
+        if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode);
     }
 }

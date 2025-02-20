@@ -4,6 +4,7 @@ using Application.Models;
 using Application.Services;
 using Microsoft.Extensions.Options;
 using Moq;
+using NUnit.Framework;
 
 namespace Application.Tests;
 
@@ -24,7 +25,7 @@ public class SecurityServiceTests
         _service = new SecurityService(mockAppOptions.Object, mockRepo.Object);
     }
 
-    [Fact]
+    [Test]
     public async Task Hash_Can_Correctly_Hash_A_String()
     {
         var hash = _service.HashPassword("");

@@ -1,4 +1,7 @@
 using System.Collections.Concurrent;
+
+namespace Application.Interfaces.Infrastructure.Websocket;
+
 public interface IRedisConnectionRepository
 {
     ConcurrentDictionary<string, object> LocalConnections { get; set; }

@@ -1,6 +1,6 @@
 using Infrastructure.Postgres;
 
-namespace Startup.Tests;
+namespace Startup.Tests.TestUtils;
 
 public class TestEnvironmentSeeder : ISeeder
 {

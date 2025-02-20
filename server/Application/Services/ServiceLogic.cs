@@ -15,8 +15,8 @@ namespace Application.Services;
 /// <param name="redisRepo"></param>
 public class ServiceLogic(
     IDataRepository repo,
-    IMqttClientService mqtt,
-    IRedisConnectionRepository redisRepo
+    IMqttClientService mqtt
+   // IRedisConnectionRepository redisRepo
 ) : IServiceLogic
 {
     public async void BroadcastToTopic(string message, string topic)
@@ -55,6 +55,6 @@ public class ServiceLogic(
 
     public async Task Broadcast<T>(string topic, Action<List<T>> broadcastAction)
     {
-         redisRepo.BroadcastToTopic(topic, broadcastAction);
+      //   redisRepo.BroadcastToTopic(topic, broadcastAction);
     }
 }

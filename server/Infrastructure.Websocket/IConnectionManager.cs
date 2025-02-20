@@ -1,11 +1,3 @@
-- flyt redis og dictionary ting fra 8_2 her over
-    - er det okay med ws nuget kendskab?
-    - test også med redis reconnection + auth
-    - hvad gør jeg med iwebsocetconnection i interfacen her som skal være i app layer
-    
-    
-i have an onion architecture and this interface for my infrastructure should reside in my application layer without and knowledge of IWebSocketConnection:
-
 using System.Collections.Concurrent;
 using Fleck;
 using WebSocketBoilerplate;
@@ -29,20 +21,3 @@ public interface IConnectionManager
     Task OnClose(IWebSocketConnection socket, string clientId);
     Task BroadcastToTopic<T>(string topic, T message) where T : BaseDto;
 }
-
-Can i use a generic without letting the appllication layer know about the concrete classes?
-
-I have a startup project dogin    
-
-- test der bruger REST til at mutate ws state
-
-- nyt db schema og user stories
-
-- application layer request objects til at mappe fra dto'er
-
-- mqttclient tests
-
-_____
-
-- README.md
-    - grafisk overblik

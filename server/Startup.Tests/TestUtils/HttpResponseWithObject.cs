@@ -1,4 +1,4 @@
-namespace Startup.Tests;
+namespace Startup.Tests.TestUtils;
 
 public class HttpResponseWithObject<T>
 {

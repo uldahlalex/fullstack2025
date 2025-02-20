@@ -1,16 +1,18 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Models;
+using NUnit.Framework;
+using Startup.Tests.TestUtils;
 
 namespace Startup.Tests.ObjectValidationTests;
 
-public class AppOptionsValidator(ITestOutputHelper outputHelper) : ApiTestBase(outputHelper, new ApiTestBaseConfig
+public class AppOptionsValidator() : ApiTestBase( new ApiTestBaseConfig
 {
     MockRelationalDatabase = true,
     MockWebSocketService = true,
     MockMqtt = true
 })
 {
-    [Fact]
+    [Test]
     public async Task AppOptionsValidatorThrowsException()
     {
         var opts = new AppOptions();
@@ -18,7 +20,7 @@ public class AppOptionsValidator(ITestOutputHelper outputHelper) : ApiTestBase(o
         Assert.Throws<ValidationException>(() => Validator.ValidateObject(opts, context));
     }
 
-    [Fact]
+    [Test]
     public async Task AppOptionsValidatorAcceptsValidAppOptions()
     {
         var opts = new AppOptions

@@ -8,16 +8,14 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Moq;
 using PgCtx;
 using Startup.Proxy;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 
-namespace Startup.Tests;
+namespace Startup.Tests.TestUtils;
 
-public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiTestBaseConfig = null)
+public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     : WebApplicationFactory<Program>
 {
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
@@ -26,13 +24,6 @@ public class ApiTestBase(ITestOutputHelper outputHelper, ApiTestBaseConfig? apiT
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
-
-        builder.ConfigureLogging(logging =>
-        {
-            logging.ClearProviders();
-            logging.SetMinimumLevel(LogLevel.Trace);
-            logging.AddXUnit(outputHelper);
-        });
 
         builder.ConfigureAppConfiguration((hostingContext, config) =>
         {
