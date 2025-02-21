@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Api;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
@@ -15,8 +16,8 @@ namespace Application.Services;
 /// <param name="redisRepo"></param>
 public class ServiceLogic(
     IDataRepository repo,
-    IMqttClientService mqtt
-   // IRedisConnectionRepository redisRepo
+    IMqttClientService mqtt,
+        IConnectionManager connectionManager
 ) : IServiceLogic
 {
     public async void BroadcastToTopic(string message, string topic)

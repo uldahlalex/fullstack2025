@@ -1,3 +1,4 @@
+using Api;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,7 +35,7 @@ public static class Extensions
             var multiplexer = ConnectionMultiplexer.Connect(redisConfig);
             return multiplexer;
         });
-        services.AddSingleton<IRedisConnectionRepository, RedisConnectionRepository>();
+        services.AddSingleton<IConnectionManager, RedisConnectionManager>();
         return services;
     }
 }

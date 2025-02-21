@@ -7,7 +7,7 @@ using WebSocketBoilerplate;
 
 namespace Api;
 
-public class RedisConnectionManager 
+public class RedisConnectionManager : IConnectionManager<IWebSocketConnection>
 {
     // Redis key prefixes
     private const string CONNECTION_TO_SOCKET = "conn:socket:"; // conn:socket:{clientId} -> socketId
@@ -192,20 +192,21 @@ public class RedisConnectionManager
         }
     }
 
-    public async Task BroadcastToTopic<T>(string topic, T message) where T : BaseDto
+    public async Task BroadcastToTopic<T>(string topic, T message)
     {
+        if (message is not BaseDto baseMessage)
+            throw new Exception("Message must be derived from BaseDto for broadcasting");
+        
         var members = await GetMembersFromTopicId(topic);
-        if (members.Count == 0)
+        foreach (var memberId in members)
         {
-            _logger.LogWarning($"No members found for topic: {topic}");
-            return;
+            await BroadcastToMember(topic, memberId, baseMessage);
         }
-
-        foreach (var memberId in members) await BroadcastToMember(topic, memberId, message);
     }
 
     private async Task BroadcastToMember<T>(string topic, string memberId, T message) where T : BaseDto
     {
+
         if (!_connections.TryGetValue(memberId, out var socket))
         {
             _logger.LogWarning($"No socket found for member: {memberId}");

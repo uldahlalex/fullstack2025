@@ -1,12 +1,10 @@
 using System.Collections.Concurrent;
-using Fleck;
-using WebSocketBoilerplate;
+
 
 namespace Api;
 
 public interface IConnectionManager
 {
-    ConcurrentDictionary<string, IWebSocketConnection> ConnectionIdToSocket { get; }
     ConcurrentDictionary<string, string> SocketToConnectionId { get; }
     Task<Dictionary<string, string>> GetAllSocketIdsWithConnectionId();
     public Task<ConcurrentDictionary<string, HashSet<string>>> GetAllTopicsWithMembers();
@@ -17,7 +15,14 @@ public interface IConnectionManager
     Task RemoveFromTopic(string topic, string memberId);
     Task<List<string>> GetMembersFromTopicId(string topic);
     Task<List<string>> GetTopicsFromMemberId(string memberId);
-    Task OnOpen(IWebSocketConnection socket, string clientId);
-    Task OnClose(IWebSocketConnection socket, string clientId);
-    Task BroadcastToTopic<T>(string topic, T message) where T : BaseDto;
+
+}
+
+public interface IConnectionManager<TConection> : IConnectionManager
+{
+    ConcurrentDictionary<string, TConection> ConnectionIdToSocket { get; }
+
+    Task OnOpen(TConection socket, string clientId);
+    Task OnClose(TConection socket, string clientId);
+    Task BroadcastToTopic<T>(string topic, T message);
 }
