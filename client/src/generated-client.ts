@@ -263,6 +263,10 @@ export interface BaseDto {
     requestId?: string;
 }
 
+export interface ServerSendsEchoDto extends BaseDto {
+    message?: string;
+}
+
 export interface ServerSendsErrorMessage extends BaseDto {
     error?: string;
     requestId?: string;
@@ -276,16 +280,12 @@ export interface ClientWantsToEchoDto extends BaseDto {
     message?: string;
 }
 
-export interface ServerSendsEchoDto extends BaseDto {
-    message?: string;
-}
-
 /** Available eventType constants */
 export enum StringConstants {
+    ServerSendsEchoDto = "ServerSendsEchoDto",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
     ClientWantsToChangePreferencesDto = "ClientWantsToChangePreferencesDto",
     ClientWantsToEchoDto = "ClientWantsToEchoDto",
-    ServerSendsEchoDto = "ServerSendsEchoDto",
 }
 
 export interface FileResponse {

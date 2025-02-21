@@ -1,5 +1,5 @@
-﻿using Application.Interfaces.Infrastructure.Mqtt;
-using Application.Interfaces.Infrastructure.Websocket;
+﻿using Api;
+using Application.Interfaces.Infrastructure.Mqtt;
 using Fleck;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using PgCtx;
 using Startup.Proxy;
+using WebSocketBoilerplate;
 
 
 namespace Startup.Tests.TestUtils;
@@ -77,7 +78,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         if (_apiTestBaseConfig.MockWebSocketService)
         {
-            var mockWsService = new Mock<IWebSocketService<IWebSocketConnection>>();
+            var mockWsService = new Mock<IConnectionManager<IWebSocketConnection, BaseDto>>();
             services.AddSingleton(mockWsService.Object);
         }
     }

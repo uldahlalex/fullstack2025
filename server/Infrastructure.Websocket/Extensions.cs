@@ -1,9 +1,10 @@
 using Api;
-using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
+using Fleck;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using WebSocketBoilerplate;
 
 namespace Infrastructure.Websocket;
 
@@ -35,7 +36,7 @@ public static class Extensions
             var multiplexer = ConnectionMultiplexer.Connect(redisConfig);
             return multiplexer;
         });
-        services.AddSingleton<IConnectionManager, RedisConnectionManager>();
+        services.AddSingleton<IConnectionManager<IWebSocketConnection, BaseDto>, RedisConnectionManager>();
         return services;
     }
 }

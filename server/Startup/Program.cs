@@ -32,7 +32,7 @@ public class Program
         services.RegisterApplicationServices();
 
         services.AddDataSourceAndRepositories();
-        //services.AddWebsocketInfrastructure();
+        services.AddWebsocketInfrastructure();
         services.RegisterMqttInfrastructure();
 
 

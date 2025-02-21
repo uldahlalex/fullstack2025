@@ -1,8 +1,6 @@
-- flyt redis og dictionary ting fra 8_2 her over
-    - er det okay med ws nuget kendskab?
-    - test også med redis reconnection + auth
-    - hvad gør jeg med iwebsocetconnection i interfacen her som skal være i app layer
-    
+- test med auth hvor uid identificerer de andre ID'er
+
+- vil jeg stadig base basedto med i iconncetionmanager interfacens generic args? (det er meget lidt jeg får ud af det)    
     
 
 

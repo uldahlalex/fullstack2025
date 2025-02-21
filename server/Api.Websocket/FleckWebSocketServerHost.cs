@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text.Json;
+using System.Web;
 using Api.Websocket.EventHandlers.ServerEventDtos;
 using Api.Websocket.Interfaces;
-using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
 using WebSocketBoilerplate;
 
@@ -23,11 +23,16 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
         _server = new WebSocketServer(url);
         Action<IWebSocketConnection> config = ws =>
         {
-            using var scope = app.Services.CreateScope();
-            var wsService = scope.ServiceProvider.GetRequiredService<IWebSocketService<IWebSocketConnection>>();
+            var queryString = ws.ConnectionInfo.Path.Split('?').Length > 1
+                ? ws.ConnectionInfo.Path.Split('?')[1]
+                : "";
 
-            ws.OnOpen = () => wsService.RegisterConnection(ws);
-            ws.OnClose = () => { };
+            var id = HttpUtility.ParseQueryString(queryString)["id"];
+            using var scope = app.Services.CreateScope();
+            var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager<IWebSocketConnection, BaseDto>>();
+
+            ws.OnOpen = () => manager.OnOpen(ws, id ); //todo
+            ws.OnClose = () => manager.OnClose(ws, id);
             ws.OnError = ex =>
             {
                 var problemDetails = new ServerSendsErrorMessage

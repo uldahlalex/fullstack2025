@@ -3,8 +3,14 @@ using System.Collections.Concurrent;
 
 namespace Api;
 
-public interface IConnectionManager
+public interface IConnectionManager<T, TBaseDto>
 {
+    ConcurrentDictionary<string, T> ConnectionIdToSocket { get; }
+
+    Task OnOpen(T socket, string clientId);
+    Task OnClose(T socket, string clientId);
+    Task BroadcastToTopic<TMessage>(string topic, TMessage message) where TMessage : TBaseDto;
+    
     ConcurrentDictionary<string, string> SocketToConnectionId { get; }
     Task<Dictionary<string, string>> GetAllSocketIdsWithConnectionId();
     public Task<ConcurrentDictionary<string, HashSet<string>>> GetAllTopicsWithMembers();
@@ -15,14 +21,4 @@ public interface IConnectionManager
     Task RemoveFromTopic(string topic, string memberId);
     Task<List<string>> GetMembersFromTopicId(string topic);
     Task<List<string>> GetTopicsFromMemberId(string memberId);
-
-}
-
-public interface IConnectionManager<TConection> : IConnectionManager
-{
-    ConcurrentDictionary<string, TConection> ConnectionIdToSocket { get; }
-
-    Task OnOpen(TConection socket, string clientId);
-    Task OnClose(TConection socket, string clientId);
-    Task BroadcastToTopic<T>(string topic, T message);
 }

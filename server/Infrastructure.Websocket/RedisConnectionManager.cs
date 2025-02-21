@@ -7,7 +7,7 @@ using WebSocketBoilerplate;
 
 namespace Api;
 
-public class RedisConnectionManager : IConnectionManager<IWebSocketConnection>
+public class RedisConnectionManager : IConnectionManager<IWebSocketConnection, BaseDto>
 {
     // Redis key prefixes
     private const string CONNECTION_TO_SOCKET = "conn:socket:"; // conn:socket:{clientId} -> socketId
@@ -34,6 +34,15 @@ public class RedisConnectionManager : IConnectionManager<IWebSocketConnection>
     }
 
     public ConcurrentDictionary<string, IWebSocketConnection> ConnectionIdToSocket { get; }
+    public async Task BroadcastToTopic<TMessage>(string topic, TMessage message) where TMessage : BaseDto
+    {
+        var members = await GetMembersFromTopicId(topic);
+        foreach (var memberId in members)
+        {
+            await BroadcastToMember(topic, memberId, message);
+        }
+    }
+
     public ConcurrentDictionary<string, string> SocketToConnectionId { get; }
 
     public async Task<ConcurrentDictionary<string, HashSet<string>>> GetAllTopicsWithMembers()
@@ -111,12 +120,10 @@ public class RedisConnectionManager : IConnectionManager<IWebSocketConnection>
 
         tx.SetAddAsync($"{TOPIC_MEMBERS}{topic}", memberId);
         tx.SetAddAsync($"{MEMBER_TOPICS}{memberId}", topic);
-
-        if (expiry.HasValue)
-        {
-            tx.KeyExpireAsync($"{TOPIC_MEMBERS}{topic}", expiry.Value);
-            tx.KeyExpireAsync($"{MEMBER_TOPICS}{memberId}", expiry.Value);
-        }
+        
+        tx.KeyExpireAsync($"{TOPIC_MEMBERS}{topic}", expiry.Value);
+        tx.KeyExpireAsync($"{MEMBER_TOPICS}{memberId}", expiry.Value);
+        
 
         await tx.ExecuteAsync();
         await LogCurrentState();
@@ -192,17 +199,7 @@ public class RedisConnectionManager : IConnectionManager<IWebSocketConnection>
         }
     }
 
-    public async Task BroadcastToTopic<T>(string topic, T message)
-    {
-        if (message is not BaseDto baseMessage)
-            throw new Exception("Message must be derived from BaseDto for broadcasting");
-        
-        var members = await GetMembersFromTopicId(topic);
-        foreach (var memberId in members)
-        {
-            await BroadcastToMember(topic, memberId, baseMessage);
-        }
-    }
+
 
     private async Task BroadcastToMember<T>(string topic, string memberId, T message) where T : BaseDto
     {
