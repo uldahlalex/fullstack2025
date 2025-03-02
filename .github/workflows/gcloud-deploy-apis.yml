@@ -2,6 +2,7 @@ name: Deploy to Google Cloud Run
 
 on:
   workflow_dispatch:
+  push:
 
 jobs:
   deploy:
@@ -14,42 +15,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-
-#1. find the service account: gcloud iam service-accounts list
-  #if you don't have one: 
-    #gcloud iam service-accounts create YOUR_SERVICE_ACCOUNT_NAME          
-  #if you don't have necessary roles for service accounts: 
-    #gcloud projects add-iam-policy-binding YOUR_PROJECT_ID --member=serviceAccount:YOUR_SERVICE_ACCOUNT_NAME@YOUR_PROJECT_ID.iam.gserviceaccount.com --role=roles/cloudrun.admin
-    #gcloud projects add-iam-policy-binding YOUR_PROJECT_ID --member=serviceAccount:YOUR_SERVICE_ACCOUNT_NAME@YOUR_PROJECT_ID.iam.gserviceaccount.com --role=roles/iam.serviceAccountUser           
-
-#2. create key for service account: gcloud iam service-accounts keys create key.json --iam-account YOUR_SERVICE_ACCOUNT_EMAIL
-  
-#3. find name for cloud run service like this: gcloud run services list
       - name: Deploy to Cloud Run
         id: deploy
-        uses: google-github-actions/deploy-cloudrun@v1
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: ${{ secrets.CLOUD_RUN_SERVICE_NAME }}
+          service: kahoottemplate
           region: europe-north1
           source: .
-          env_vars: |-
-            APPOPTIONS__DbConnectionString=${{secrets.DbConnectionString}} 
-            APPOPTIONS__JwtSecret=${{secrets.JWT_SECRET}}
-            APPOPTIONS__ASPNETCORE_ENVIRONMENT=Production
-            APPOPTIONS__Seed=false
-            APPOPTIONS__RunDbInTestContainer=false
-            APPOPTIONS__REDIS_HOST=${{secrets.REDIS_HOST}}
-            APPOPTIONS__REDIS_USERNAME=${{secrets.REDIS_USERNAME}}
-            APPOPTIONS__REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}
-            APPOPTIONS__MQTT_BROKER_HOST=${{secrets.MQTT_BROKER_HOST}}
-            APPOPTIONS__MQTT_USERNAME=${{secrets.MQTT_USERNAME}}
-            APPOPTIONS__MQTT_PASSWORD=${{secrets.MQTT_PASSWORD}}
-            
-      - name: Show Output
-        run: echo ${{ steps.deploy.outputs.url }}
+          flags: --allow-unauthenticated
+          env_vars: |
+            APPOPTIONS__DbConnectionString=${{ secrets.DBCONNECTIONSTRING }}
+
+      - run: echo "${{ steps.deploy.outputs.url }}"

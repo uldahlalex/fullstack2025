@@ -7,10 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3"/>
-        <PackageReference Include="Npgsql" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9">
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1"/>

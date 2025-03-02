@@ -7,11 +7,11 @@ namespace Infrastructure.Mqtt;
 
 public static class Extensions
 {
-    public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
+    public static IServiceCollection RegisterMqttInfrastructure<T, TBaseDto>(this IServiceCollection services)
     {
         services.AddSingleton<IEventDispatcher, EventDispatcher>();
 
-        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler>();
+        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler<T, TBaseDto>>();
         services.AddScoped<IMqttEventHandler<HumidityEventDto>, HumidityEventHandler>();
 
         services.AddSingleton<IMqttClientService, MqttClientService>();

@@ -1,6 +1,6 @@
 using Api.Rest;
+using Api.Utilities;
 using Api.Websocket;
-using Api.Websocket.Documentation;
 using Application;
 using Application.Models;
 using Fleck;
@@ -9,8 +9,11 @@ using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
-using Startup.Extensions;
+using Startup.Documentation;
 using Startup.Proxy;
+using WebSocketBoilerplate;
+using AddAllDerivedTypesProcessor = Api.Websocket.Documentation.AddAllDerivedTypesProcessor;
+using AddStringConstantsProcessor = Api.Websocket.Documentation.AddStringConstantsProcessor;
 
 namespace Startup;
 
@@ -33,7 +36,7 @@ public class Program
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure();
+        services.RegisterMqttInfrastructure<IWebSocketConnection, BaseDto>();
 
 
         services.RegisterWebsocketApiServices();
@@ -70,6 +73,6 @@ public class Program
 
         app.UseOpenApi();
         app.MapScalarApiReference();
-        await app.GenerateTypeScriptClient("v1");
+        app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
     }
 }
