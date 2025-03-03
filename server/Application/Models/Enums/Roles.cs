@@ -1,7 +1,9 @@
 namespace Application.Models.Enums;
 
-public enum Roles
+
+public static class Constants
 {
-    Admin,
-    User
+    
+    public static string UserRole = "user";
+    public static string AdminRole = "admin";
 }

@@ -7,7 +7,7 @@ namespace Startup.Tests.ObjectValidationTests;
 
 public class AppOptionsValidator() : ApiTestBase( new ApiTestBaseConfig
 {
-    MockRelationalDatabase = true,
+    UseTestContainer = false,
     MockWebSocketService = true,
     MockMqtt = true
 })

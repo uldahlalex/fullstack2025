@@ -6,13 +6,15 @@ namespace Infrastructure.Postgres.Postgresql.Data;
 
 public class Repo(MyDbContext ctx) : IDataRepository
 {
-    public User GetUserOrNull(string username)
+    public User? GetUserOrNull(string email)
     {
-        throw new NotImplementedException();
+         return ctx.Users.FirstOrDefault(u => u.Email == email);
     }
 
     public User AddUser(User user)
     {
-        throw new NotImplementedException();
+        ctx.Users.Add(user);
+        ctx.SaveChanges();
+        return user;
     }
 }

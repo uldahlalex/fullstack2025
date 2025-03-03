@@ -1,4 +1,5 @@
 ﻿using Api;
+using Api.Websocket.EventHandlers.ClientEventDtos;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Fleck;
 using Infrastructure.Postgres;
@@ -8,7 +9,10 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit;
+using NUnit.Framework;
 using PgCtx;
 using Startup.Proxy;
 using WebSocketBoilerplate;
@@ -22,23 +26,28 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
     private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
 
+    
+    public ILogger<ConnectionWithWsClient> _logger;
+    public HttpClient _httpClient;
+    public MyDbContext _dbContext;
+    public IConnectionManager<IWebSocketConnection, BaseDto> _connectionManager;
+    public string _wsClientId;
+    public WsRequestClient _wsClient;
+    public IServiceScope _scope;
+    
+
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-
-   
         builder.ConfigureServices(ConfigureTestServices);
+        
+        
     }
 
 
     private void ConfigureTestServices(WebHostBuilderContext context, IServiceCollection services)
     {
-        if (_apiTestBaseConfig.MockRelationalDatabase)
-        {
-            RemoveExistingService<DbContextOptions<MyDbContext>>(services);
-            var mock = new Mock<MyDbContext>().Object;
-            services.AddScoped<MyDbContext>(sp => mock);
-        }
-        else
+        if (_apiTestBaseConfig.UseTestContainer)
         {
             RemoveExistingService<DbContextOptions<MyDbContext>>(services);
             services.AddDbContext<MyDbContext>(opt =>
@@ -48,7 +57,6 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
                 opt.LogTo(_ => { });
             });
         }
-
 
         if (_apiTestBaseConfig.MockMqtt)
         {
@@ -82,5 +90,33 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
         var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(T));
         if (descriptor != null)
             services.Remove(descriptor);
+    }
+    
+    [SetUp]
+    public async Task Setup()
+    {
+        _httpClient = CreateClient();
+
+        //Singletons
+        _logger = Services.GetRequiredService<ILogger<ConnectionWithWsClient>>();
+        _connectionManager =  Services.GetRequiredService<IConnectionManager<IWebSocketConnection, BaseDto>>();
+
+        //Scoped services
+        using var scope = Services.CreateScope();
+        {
+            _scope = Services.CreateScope();
+            _dbContext = _scope.ServiceProvider.GetRequiredService<MyDbContext>();
+        }
+        
+        var wsPort = Environment.GetEnvironmentVariable("PORT");
+        if (string.IsNullOrEmpty(wsPort)) throw new Exception("Environment variable PORT is not set");
+        _wsClientId = Guid.NewGuid().ToString();
+        var url = "ws://localhost:" + wsPort + "?id=" + _wsClientId;
+        _wsClient = new WsRequestClient(
+            new[] { typeof(ClientWantsToEchoDto).Assembly },
+            url
+        );
+        await _wsClient.ConnectAsync();
+        await Task.Delay(1000);
     }
 }

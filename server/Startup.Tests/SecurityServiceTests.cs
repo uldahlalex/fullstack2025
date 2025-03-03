@@ -12,7 +12,7 @@ using Startup.Tests.TestUtils;
 
 namespace Application.Tests;
 
-public class SecurityServiceTests : WebApplicationFactory<Program>
+public class SecurityServiceTests : ApiTestBase
 {
     
 

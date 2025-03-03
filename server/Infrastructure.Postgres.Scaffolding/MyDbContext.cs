@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Scaffolding;
 
-public partial class MyDbContext : DbContext
+public partial class MyDbContext : DbContext, IMyDbContext
 {
     public MyDbContext(DbContextOptions<MyDbContext> options)
         : base(options)

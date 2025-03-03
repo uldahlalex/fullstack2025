@@ -5,7 +5,7 @@ public class ApiTestBaseConfig
     /// <summary>
     ///     Defaults to false
     /// </summary>
-    public bool MockRelationalDatabase { get; set; } = false;
+    public bool UseTestContainer { get; set; } = false;
 
     /// <summary>
     ///     Defaults to false

@@ -44,8 +44,9 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         var hash = HashPassword(dto.Password + salt);
         var insertedPlayer = repository.AddUser(new User()
         {
+            Id = Guid.NewGuid().ToString(),
             Email = dto.Email,
-            Role = Roles.User.ToString(),
+            Role = Constants.UserRole,
             Salt = salt,
             Hash = hash
         });

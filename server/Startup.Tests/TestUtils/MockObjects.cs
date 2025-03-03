@@ -1,43 +1,18 @@
-using Application.Models.Dtos;
 using Application.Models.Entities;
 using Application.Models.Enums;
 
 namespace Startup.Tests.TestUtils;
 
-public class MockObjects
+public static class MockObjects
 {
-    public const string TestUsername = "bob@bob.dk";
-    public const string TestPassword = "asdASD123,-.";
-    public const string TestSalt = "5cbd23b9-0cb4-4afe-8497-c81bc6691a42";
-
-    public const string TestHash =
-        "J4SHSN9SKisNBoijKZkNAA5GNWJlO/RNsiXWhoWq2lOpd7hBtmwnqb6bOcxxYP8tEvNRomJunrVkWKNa5W3lXg==";
-
-    public static User GetUser(
-        string? username = TestUsername,
-        string? role = null,
-        bool activated = true,
-        DateTime? createdAt = null,
-        string? email = TestUsername,
-        string? salt = TestSalt,
-        string? hash = TestHash
-    )
-    {
-        return new User()
+    public static User GetUser(string? role = null)
+        => new User
         {
-
-            Role = role ?? Roles.User.ToString(),
-            Salt = salt,
-            Hash = hash
+            Role = role ?? Constants.UserRole,
+            Email = "test" + Guid.NewGuid() + "@test.com",
+            Id = Guid.NewGuid().ToString(),
+            Salt = "word", //password + salt is just "password"
+            Hash =
+                "b109f3bbbc244eb82441917ed06d618b9008dd09b3befd1b5e07394c706a8bb980b1d7785e5976ec049b46df5f1326af5a2ea6d103fd07c95385ffab0cacbc86"
         };
-    }
-
-    public static AuthRequestDto GetAuthRequestDto(string? username = TestUsername, string? password = TestPassword)
-    {
-        return new AuthRequestDto
-        {
-            Email = username,
-            Password = password
-        };
-    }
 }

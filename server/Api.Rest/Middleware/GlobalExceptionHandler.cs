@@ -5,13 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Rest.Middleware;
 
-internal sealed class GlobalExceptionHandler : IExceptionHandler
+internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
         Exception exception,
         CancellationToken cancellationToken)
     {
+        logger.LogInformation(exception, exception.Message);
+        
         var status = exception switch
         {
             ValidationException => StatusCodes.Status400BadRequest,

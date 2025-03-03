@@ -4,6 +4,6 @@ namespace Application.Interfaces.Infrastructure.Postgres;
 
 public interface IDataRepository
 {
-    User GetUserOrNull(string username);
+    User? GetUserOrNull(string email);
     User AddUser(User user);
 }

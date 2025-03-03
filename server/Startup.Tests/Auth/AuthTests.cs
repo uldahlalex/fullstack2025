@@ -45,9 +45,14 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     [Test]
     public async Task Register_Can_Register_And_Return_Jwt()
     {
-        var client = CreateClient();
-        var response = await client.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
-            MockObjects.GetAuthRequestDto());
+
+        var user = MockObjects.GetUser();
+        var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
+            new AuthRequestDto() 
+            {
+                Email = user.Email,
+                Password = "pass"
+            });
         if(HttpStatusCode.OK !=response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected OK status code");
         if(response.Object.Jwt.Length < 10)
@@ -73,14 +78,16 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     {
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-
-        ctx.Users.Add(MockObjects.GetUser());
+        var user = MockObjects.GetUser();
+        ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
-        var client = CreateClient();
-        var response = await client.PostAsJsonAsync<AuthResponseDto>(
-            AuthController.LoginRoute,
-            MockObjects.GetAuthRequestDto());
+        var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(
+            AuthController.LoginRoute, new AuthRequestDto()
+            {
+                Email = user.Email,
+                Password = "pass"
+            });
         if(HttpStatusCode.OK != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected OK status code");
     }
@@ -93,11 +100,13 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         var user = MockObjects.GetUser();
         ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
-
-        var request = MockObjects.GetAuthRequestDto();
-        request.Password = request.Password + "a";
+        
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
-            request);
+            new AuthRequestDto()
+            {
+                Email = user.Email,
+                Password = "invalid password"
+            });
         if(HttpStatusCode.Unauthorized !=response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected Unauthorized status code");
     }
@@ -106,7 +115,7 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     public async Task Login_For_Non_Existing_User_Is_Unauthorized()
     {
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
-            MockObjects.GetAuthRequestDto());
+            new AuthRequestDto() {Email = "bob@bob.dk", Password = "password"});
         if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected BadRequest status code");
     }
@@ -121,7 +130,11 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         await ctx.SaveChangesAsync();
 
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.RegisterRoute,
-            MockObjects.GetAuthRequestDto());
+            new AuthRequestDto()
+            {
+                Email = user.Email,
+                Password = "password"
+            });
         if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode);
     }
 }
