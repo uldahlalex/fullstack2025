@@ -29,9 +29,6 @@ public class MqttClientService : IMqttClientService, IDisposable
         var tlsOptions = new MqttClientTlsOptions
         {
             UseTls = true,
-            IgnoreCertificateChainErrors = true,
-            IgnoreCertificateRevocationErrors = true,
-            AllowUntrustedCertificates = true
             
         };
         _client = new MqttClientFactory().CreateMqttClient();
