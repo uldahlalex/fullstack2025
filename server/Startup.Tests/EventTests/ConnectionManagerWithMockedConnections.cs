@@ -12,8 +12,7 @@ using WebSocketBoilerplate;
 
 namespace NUnit;
 
-[TestFixture(typeof(DictionaryConnectionManager))]
-public class ConnectionManagerWithMockedConnections(Type connectionManagerType) : ApiTestBase
+public class ConnectionManagerWithMockedConnections() : ApiTestBase
 {
 
     [Test]

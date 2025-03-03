@@ -6,10 +6,10 @@ using Infrastructure.Mqtt.Interfaces;
 
 namespace Infrastructure.Mqtt.EventHandlers;
 
-public class TemperatureEventHandler<T, TBaseDto>(
-    ILogger<TemperatureEventHandler<T, TBaseDto>> logger,
+public class TemperatureEventHandler(
+    ILogger<TemperatureEventHandler> logger,
     IServiceLogic service,
-    IConnectionManager<T, TBaseDto> connectionManager)
+    IConnectionManager connectionManager)
     : IMqttEventHandler<TemperatureEventDto>
 {
     public async Task HandleAsync(TemperatureEventDto eventDtoData)

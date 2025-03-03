@@ -11,7 +11,7 @@ public static class Extensions
     {
         services.AddSingleton<IEventDispatcher, EventDispatcher>();
 
-        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler<T, TBaseDto>>();
+        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler>();
         services.AddScoped<IMqttEventHandler<HumidityEventDto>, HumidityEventHandler>();
 
         services.AddSingleton<IMqttClientService, MqttClientService>();

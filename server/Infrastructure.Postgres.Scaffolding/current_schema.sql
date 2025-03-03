@@ -6,10 +6,13 @@ BEGIN
 END $EF$;
 
 
-CREATE TABLE surveillance.device (
+CREATE TABLE surveillance.devicelog (
     id text NOT NULL,
-    name text NOT NULL,
-    CONSTRAINT device_pkey PRIMARY KEY (id)
+    deviceid text NOT NULL,
+    value double precision NOT NULL,
+    timestamp timestamp with time zone NOT NULL,
+    unit text NOT NULL,
+    CONSTRAINT devicelog_pkey PRIMARY KEY (id)
 );
 
 
@@ -21,19 +24,5 @@ CREATE TABLE surveillance."user" (
     role text NOT NULL,
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
-
-
-CREATE TABLE surveillance.devicelog (
-    id text NOT NULL,
-    deviceid text NOT NULL,
-    value double precision NOT NULL,
-    timestamp timestamp with time zone NOT NULL,
-    unit text NOT NULL,
-    CONSTRAINT devicelog_pkey PRIMARY KEY (id),
-    CONSTRAINT devicelog_deviceid_fkey FOREIGN KEY (deviceid) REFERENCES surveillance.device (id)
-);
-
-
-CREATE INDEX "IX_devicelog_deviceid" ON surveillance.devicelog (deviceid);
 
 

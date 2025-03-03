@@ -18,7 +18,6 @@ using Startup.Tests.TestUtils;
 
 namespace NUnit;
 
-[TestFixture(typeof(DictionaryConnectionManager))]
 public class ConnectionWithWsClient(Type connectionManagerType) : ApiTestBase
 {
 

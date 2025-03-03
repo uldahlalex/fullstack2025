@@ -30,7 +30,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     public ILogger<ConnectionWithWsClient> _logger;
     public HttpClient _httpClient;
     public MyDbContext _dbContext;
-    public IConnectionManager<IWebSocketConnection, BaseDto> _connectionManager;
+    public IConnectionManager _connectionManager;
     public string _wsClientId;
     public WsRequestClient _wsClient;
     public IServiceScope _scope;
@@ -80,7 +80,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         if (_apiTestBaseConfig.MockWebSocketService)
         {
-            var mockWsService = new Mock<IConnectionManager<IWebSocketConnection, BaseDto>>();
+            var mockWsService = new Mock<IConnectionManager>();
             services.AddSingleton(mockWsService.Object);
         }
     }
@@ -99,7 +99,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         //Singletons
         _logger = Services.GetRequiredService<ILogger<ConnectionWithWsClient>>();
-        _connectionManager =  Services.GetRequiredService<IConnectionManager<IWebSocketConnection, BaseDto>>();
+        _connectionManager =  Services.GetRequiredService<IConnectionManager>();
 
         //Scoped services
         using var scope = Services.CreateScope();

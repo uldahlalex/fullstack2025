@@ -132,7 +132,7 @@ export class AuthClient {
     }
 }
 
-export class MyClient {
+export class DeviceClient {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -142,8 +142,8 @@ export class MyClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    do(): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/do";
+    changePreferencesForDevice(): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/ChangePreferencesForDevice";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
@@ -154,11 +154,11 @@ export class MyClient {
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processDo(_response);
+            return this.processChangePreferencesForDevice(_response);
         });
     }
 
-    protected processDo(response: Response): Promise<FileResponse> {
+    protected processChangePreferencesForDevice(response: Response): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200 || status === 206) {
@@ -191,8 +191,10 @@ export interface AuthRequestDto {
 }
 
 
-export interface MemberHasLeftDto extends BaseDto {
+export interface MemberLeftNotification extends BaseDto {
     memberId?: string;
+    topic?: string;
+    timestamp?: Date;
 }
 
 export interface ServerSendsEchoDto extends BaseDto {
@@ -214,7 +216,7 @@ export interface ClientWantsToEchoDto extends BaseDto {
 
 /** Available eventType constants */
 export enum StringConstants {
-    MemberHasLeftDto = "MemberHasLeftDto",
+    MemberLeftNotification = "MemberLeftNotification",
     ServerSendsEchoDto = "ServerSendsEchoDto",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
     ClientWantsToChangePreferencesDto = "ClientWantsToChangePreferencesDto",

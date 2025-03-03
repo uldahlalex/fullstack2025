@@ -29,7 +29,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
 
             var id = HttpUtility.ParseQueryString(queryString)["id"];
             using var scope = app.Services.CreateScope();
-            var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager<IWebSocketConnection, BaseDto>>();
+            var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager>();
 
             ws.OnOpen = () => manager.OnOpen(ws, id ); //todo
             ws.OnClose = () => manager.OnClose(ws, id);
