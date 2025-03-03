@@ -9,3 +9,4 @@ server/Startup.Tests/appsettings.json
 appsettings.Production.json
 appsettings.json
 mosquitto.commands.with.secrets.sh
+scripts/mosquitto-commands.with.secrets.sh
