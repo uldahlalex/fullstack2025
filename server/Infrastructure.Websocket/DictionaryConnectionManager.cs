@@ -9,9 +9,18 @@ using WebSocketBoilerplate;
 
 namespace Api.WebSockets
 {
-    public class WebSocketConnectionManager(ILogger<WebSocketConnectionManager> logger) : IConnectionManager
+    public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnectionManager
+        where TConnection : class
+        where TMessageBase : class
     {
-        private readonly ConcurrentDictionary<string /* Client ID */, IWebSocketConnection> _connectionIdToSocket = new();
+        private readonly ILogger<WebSocketConnectionManager<TConnection, TMessageBase>> _logger;
+
+        public WebSocketConnectionManager(ILogger<WebSocketConnectionManager<TConnection, TMessageBase>> logger)
+        {
+            _logger = logger;
+        }
+
+        private readonly ConcurrentDictionary<string /* Client ID */, TConnection> _connectionIdToSocket = new();
         private readonly ConcurrentDictionary<string /* Socket ID */, string /* Client ID */> _socketToConnectionId = new();
         
         public ConcurrentDictionary<string, object> ConnectionIdToSocket => 
@@ -79,7 +88,7 @@ namespace Api.WebSockets
                 _ = Task.Delay(expiry.Value).ContinueWith(async _ =>
                 {
                     await RemoveFromTopic(topic, memberId);
-                    logger.LogInformation($"Removed member {memberId} from topic {topic} due to expiry");
+                    _logger.LogInformation($"Removed member {memberId} from topic {topic} due to expiry");
                 });
             }
         }
@@ -143,42 +152,42 @@ namespace Api.WebSockets
 
         public async Task OnOpen<T>(T socket, string clientId)
         {
-            if (socket is not IWebSocketConnection webSocket)
+            if (socket is not TConnection typedSocket)
             {
-                throw new ArgumentException($"Expected socket of type IWebSocketConnection but got {typeof(T).Name}");
+                throw new ArgumentException($"Expected socket of type {typeof(TConnection).Name} but got {typeof(T).Name}");
             }
             
-            logger.LogDebug($"OnOpen called with clientId: {clientId}");
+            _logger.LogDebug($"OnOpen called with clientId: {clientId}");
 
             if (_connectionIdToSocket.TryRemove(clientId, out var oldSocket))
             {
                 var oldSocketId = GetSocketId(oldSocket);
                 _socketToConnectionId.TryRemove(oldSocketId, out _);
-                logger.LogInformation($"Removed old connection {oldSocketId} for client {clientId}");
+                _logger.LogInformation($"Removed old connection {oldSocketId} for client {clientId}");
             }
 
-            _connectionIdToSocket[clientId] = webSocket;
-            _socketToConnectionId[GetSocketId(webSocket)] = clientId;
+            _connectionIdToSocket[clientId] = typedSocket;
+            _socketToConnectionId[GetSocketId(typedSocket)] = clientId;
 
-            logger.LogInformation($"Added new connection {GetSocketId(webSocket)} for client {clientId}");
+            _logger.LogInformation($"Added new connection {GetSocketId(typedSocket)} for client {clientId}");
             await LogCurrentState();
         }
 
         public async Task OnClose<T>(T socket, string clientId)
         {
-            if (socket is not IWebSocketConnection webSocket)
+            if (socket is not TConnection typedSocket)
             {
-                throw new ArgumentException($"Expected socket of type IWebSocketConnection but got {typeof(T).Name}");
+                throw new ArgumentException($"Expected socket of type {typeof(TConnection).Name} but got {typeof(T).Name}");
             }
             
-            var socketId = GetSocketId(webSocket);
-            logger.LogDebug($"OnClose called with clientId: {clientId} and socketId: {socketId}");
+            var socketId = GetSocketId(typedSocket);
+            _logger.LogDebug($"OnClose called with clientId: {clientId} and socketId: {socketId}");
 
             if (_connectionIdToSocket.TryGetValue(clientId, out var currentSocket) &&
                 GetSocketId(currentSocket) == socketId)
             {
                 _connectionIdToSocket.TryRemove(clientId, out _);
-                logger.LogInformation($"Removed connection for client {clientId}");
+                _logger.LogInformation($"Removed connection for client {clientId}");
             }
 
             _socketToConnectionId.TryRemove(socketId, out _);
@@ -191,14 +200,7 @@ namespace Api.WebSockets
 
                     if (TopicMembers.TryGetValue(topic, out var members) && members.Count > 0)
                     {
-                        var notification = new MemberLeftNotification 
-                        { 
-                            MemberId = clientId,
-                            Topic = topic,
-                            Timestamp = DateTime.UtcNow
-                        };
-                        
-                        await BroadcastToTopic(topic, notification);
+                        await NotifyMemberLeft(topic, clientId);
                     }
                 }
             }
@@ -213,7 +215,7 @@ namespace Api.WebSockets
             
             if (!TopicMembers.TryGetValue(topic, out var members))
             {
-                logger.LogWarning($"No topic found: {topic}");
+                _logger.LogWarning($"No topic found: {topic}");
                 return;
             }
 
@@ -228,14 +230,14 @@ namespace Api.WebSockets
         {
             if (!_connectionIdToSocket.TryGetValue(memberId, out var socket))
             {
-                logger.LogWarning($"No socket found for member: {memberId}");
+                _logger.LogWarning($"No socket found for member: {memberId}");
                 await RemoveFromTopic(topic, memberId);
                 return;
             }
 
             if (!IsSocketAvailable(socket))
             {
-                logger.LogWarning($"Socket not available for {memberId}");
+                _logger.LogWarning($"Socket not available for {memberId}");
                 await RemoveFromTopic(topic, memberId);
                 return;
             }
@@ -246,51 +248,107 @@ namespace Api.WebSockets
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error sending message to {memberId}");
+                _logger.LogError(ex, $"Error sending message to {memberId}");
                 await RemoveFromTopic(topic, memberId);
             }
         }
 
-        private string GetSocketId(IWebSocketConnection socket)
+        protected virtual string GetSocketId(TConnection socket)
         {
-            return socket.ConnectionInfo.Id.ToString();
+
+            if (socket is IWebSocketConnection webSocket)
+            {
+                return webSocket.ConnectionInfo.Id.ToString();
+            }
+
+            return socket.GetHashCode().ToString();
         }
 
-        private bool IsSocketAvailable(IWebSocketConnection socket)
+        protected virtual bool IsSocketAvailable(TConnection socket)
         {
-            return socket.IsAvailable;
+
+            if (socket is IWebSocketConnection webSocket)
+            {
+                return webSocket.IsAvailable;
+            }
+
+            return true;
         }
 
-        private void SendToSocket<TMessage>(IWebSocketConnection socket, TMessage message) where TMessage : class
+        protected virtual void SendToSocket<TMessage>(TConnection socket, TMessage message) 
+            where TMessage : class
         {
             try
             {
 
-                if (message is BaseDto baseDto)
+                if (socket is IWebSocketConnection webSocket)
                 {
-                    socket.SendDto(baseDto);
-                }
-                else
-                {
+                    if (message is TMessageBase baseMessage && typeof(TMessageBase) == typeof(BaseDto))
+                    {
+
+
+                        dynamic dynamicMessage = baseMessage;
+                        webSocket.SendDto((BaseDto)dynamicMessage);
+                        _logger.LogDebug($"Sent BaseDto message to socket {GetSocketId(socket)}");
+                        return;
+                    }
 
                     var json = JsonSerializer.Serialize(message);
-                    socket.Send(json);
+                    webSocket.Send(json);
+                    _logger.LogDebug($"Sent JSON message to socket {GetSocketId(socket)}");
+                    return;
                 }
-                
-                logger.LogDebug($"Message sent to socket {GetSocketId(socket)}");
+
+                throw new NotImplementedException(
+                    $"Sending messages to {typeof(TConnection).Name} with message type {typeof(TMessage).Name} " +
+                    $"is not implemented. Override SendToSocket in a derived class.");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, $"Error sending message to socket {GetSocketId(socket)}");
+                _logger.LogError(ex, $"Error sending message to socket {GetSocketId(socket)}");
                 throw;
             }
+        }
+
+        protected virtual async Task NotifyMemberLeft(string topic, string memberId)
+        {
+
+            if (typeof(TMessageBase) == typeof(BaseDto))
+            {
+
+                var notification = CreateMemberLeftNotification(memberId, topic);
+
+
+                await BroadcastToTopic(topic, (TMessageBase)(object)notification);
+            }
+        }
+
+        protected virtual object CreateMemberLeftNotification(string memberId, string topic)
+        {
+            if (typeof(TMessageBase) == typeof(BaseDto))
+            {
+                return new MemberLeftNotification
+                {
+                    MemberId = memberId,
+                    Topic = topic,
+                    Timestamp = DateTime.UtcNow
+                };
+            }
+            
+            return new
+            {
+                Type = "member_left",
+                MemberId = memberId,
+                Topic = topic,
+                Timestamp = DateTime.UtcNow
+            };
         }
 
         public async Task LogCurrentState()
         {
             try
             {
-                logger.LogDebug(JsonSerializer.Serialize(new
+                _logger.LogDebug(JsonSerializer.Serialize(new
                 {
                     ConnectionIdToSocket = await GetAllConnectionIdsWithSocketId(),
                     SocketToConnectionId = await GetAllSocketIdsWithConnectionId(),
@@ -303,7 +361,7 @@ namespace Api.WebSockets
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error logging current state");
+                _logger.LogError(ex, "Error logging current state");
             }
         }
     }

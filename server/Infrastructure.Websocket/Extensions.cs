@@ -16,7 +16,7 @@ public static class Extensions
             .BuildServiceProvider()
             .GetRequiredService<IOptionsMonitor<AppOptions>>()
             .CurrentValue;
-        services.AddSingleton<IConnectionManager, WebSocketConnectionManager>();
+        services.AddSingleton<IConnectionManager, WebSocketConnectionManager<IWebSocketConnection, BaseDto>>();
         return services;
     }
 }
