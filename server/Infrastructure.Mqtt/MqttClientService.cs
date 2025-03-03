@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using Infrastructure.Mqtt.Interfaces;
@@ -84,7 +85,11 @@ public class MqttClientService : IMqttClientService, IDisposable
 
             var result = await _client.ConnectAsync(_options);
             if (result.ResultCode != MqttClientConnectResultCode.Success)
-                throw new Exception($"Failed to connect to MQTT broker. Result: {result.ResultCode}");
+            {
+                _logger.LogCritical(JsonSerializer.Serialize(result));
+                                throw new Exception($"Failed to connect to MQTT broker. Result: {result.ResultCode}");
+
+            }
 
             _logger.LogInformation("Successfully connected to MQTT broker");
 
