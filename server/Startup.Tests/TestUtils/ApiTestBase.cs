@@ -24,14 +24,8 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
 
-        builder.ConfigureAppConfiguration((hostingContext, config) =>
-        {
-            config.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json", true, true)
-                .AddEnvironmentVariables("APPOPTIONS__");
-        });
+   
         builder.ConfigureServices(ConfigureTestServices);
     }
 

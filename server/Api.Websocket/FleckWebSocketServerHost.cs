@@ -17,7 +17,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
     public Task StartAsync(int port)
     {
         port = GetAvailablePort(port);
-        Environment.SetEnvironmentVariable("WS_PORT", port.ToString());
+        Environment.SetEnvironmentVariable("PORT", port.ToString());
         var url = $"ws://0.0.0.0:{port}/ws";
         logger.LogInformation("WS running on url: " + url);
         _server = new WebSocketServer(url);

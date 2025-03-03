@@ -30,10 +30,6 @@ public class AppOptionsValidator() : ApiTestBase( new ApiTestBaseConfig
             MQTT_BROKER_HOST = "abc",
             MQTT_PASSWORD = "abc",
             MQTT_USERNAME = "abc",
-            REDIS_HOST = "abc",
-            REDIS_PASSWORD = "abc",
-            REDIS_USERNAME = "abc",
-            RunDbInTestContainer = true,
             Seed = true
         };
         var context = new ValidationContext(opts, null, null);

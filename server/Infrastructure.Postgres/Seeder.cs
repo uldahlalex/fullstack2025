@@ -10,6 +10,9 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
     public async Task Seed()
     {
         await context.Database.EnsureCreatedAsync();
-        await File.WriteAllTextAsync("../Infrastructure.Postgres.Scaffolding/current_schema.sql", context.Database.GenerateCreateScript());
+        //Write to relative directory
+        var outputPath = Path.Combine(Directory.GetCurrentDirectory() + "/../Infrastructure.Postgres.Scaffolding/current_schema.sql");
+        Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+        await File.WriteAllTextAsync(outputPath, context.Database.GenerateCreateScript());
     }
 }

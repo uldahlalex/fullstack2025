@@ -61,12 +61,17 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         };
     }
 
+    /// <summary>
+    /// Gives hex representation of SHA512 hash
+    /// </summary>
+    /// <param name="password"></param>
+    /// <returns></returns>
     public string HashPassword(string password)
     {
         using var sha512 = SHA512.Create();
         var bytes = Encoding.UTF8.GetBytes(password);
         var hash = sha512.ComputeHash(bytes);
-        return Convert.ToBase64String(hash);
+        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
     }
 
     public void VerifyPasswordOrThrow(string password, string hashedPassword)
