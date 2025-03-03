@@ -12,7 +12,7 @@ public static class RestStartupExtensions
         services.AddProblemDetails();
 
 
-        var controllersAssembly = typeof(MyController).Assembly;
+        var controllersAssembly = typeof(DeviceController).Assembly;
 
         services.AddControllers().AddApplicationPart(controllersAssembly);
         return services;

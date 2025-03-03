@@ -14,6 +14,4 @@ public partial class Devicelog
     public DateTime Timestamp { get; set; }
 
     public string Unit { get; set; } = null!;
-
-    public virtual Device Device { get; set; } = null!;
 }
