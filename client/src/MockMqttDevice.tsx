@@ -1,5 +1,5 @@
 import mqtt from "mqtt";
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 
 export interface MqttCredentials {
     username: string;
@@ -11,6 +11,8 @@ export default function MockMqttDevice() {
         username: '',
         password: ''
     });
+    const [newTopic, setNewTopic] = useState("");
+    const [topicSubscriptions, setTopicSubscriptions] = useState<string[]>([]);
     const [client, setClient] = useState<mqtt.MqttClient | null>(null);
     const [status, setStatus] = useState('Disconnected');
 
@@ -20,19 +22,23 @@ export default function MockMqttDevice() {
                 username: credentials.username,
                 password: credentials.password,
                 protocol: 'wss',
-                rejectUnauthorized: false
+                rejectUnauthorized: false,
+                keepalive: 60,
+                reconnectPeriod: 1000
             });
 
             mqttClient.on('connect', () => {
                 setStatus('Connected');
                 console.log('Connected to MQTT broker');
 
-                mqttClient.subscribe('devices/A', (err) => {
-                    if (err) {
-                        console.error('Subscribe error:', err);
-                    } else {
-                        console.log('Subscribed to devices/A');
-                    }
+                topicSubscriptions.forEach(topic => {
+                    mqttClient.subscribe(topic, (err) => {
+                        if (err) {
+                            console.error('Subscribe error:', err);
+                        } else {
+                            console.log('Subscribed to ' + topic);
+                        }
+                    });
                 });
             });
 
@@ -45,6 +51,14 @@ export default function MockMqttDevice() {
                 setStatus('Error: ' + err.message);
             });
 
+            mqttClient.on('disconnect', () => {
+                setStatus('Disconnected');
+            });
+
+            mqttClient.on('offline', () => {
+                setStatus('Offline');
+            });
+
             setClient(mqttClient);
         } catch (err) {
             console.error('Connection error:', err);
@@ -52,9 +66,9 @@ export default function MockMqttDevice() {
         }
     };
 
-    const publishMessage = () => {
+    const publishMessage = (topic: string) => {
         if (client?.connected) {
-            client.publish('devices/A', JSON.stringify({ myKey: "hey" }), (err) => {
+            client.publish(topic, JSON.stringify({ myKey: "hey" }), (err) => {
                 if (err) {
                     console.error('Publish error:', err);
                 } else {
@@ -64,13 +78,29 @@ export default function MockMqttDevice() {
         }
     };
 
+    const subscribeToTopic = () => {
+        if (!client?.connected || !newTopic) return;
+
+        client.subscribe(newTopic, (err) => {
+            if (err) {
+                console.error('Subscribe error:', err);
+            } else {
+                console.log('Subscribed to ' + newTopic);
+                setTopicSubscriptions(prev => [...prev, newTopic]);
+                setNewTopic(''); 
+            }
+        });
+    };
+
     useEffect(() => {
         return () => {
             if (client) {
-                client.end();
+                client.end(true); 
+                setClient(null);
+                setStatus('Disconnected');
             }
         };
-    }, [client]);
+    }, []);
 
     return (
         <div className="p-4 space-y-4">
@@ -92,7 +122,7 @@ export default function MockMqttDevice() {
                 />
             </div>
 
-            <div className="space-x-2">
+            <div className="space-y-4">
                 <button
                     onClick={connectToBroker}
                     className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -101,13 +131,36 @@ export default function MockMqttDevice() {
                     Connect
                 </button>
 
-                <button
-                    onClick={publishMessage}
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    disabled={!client?.connected}
-                >
-                    Publish Test Message
-                </button>
+                <div className="space-y-2">
+                    {topicSubscriptions.map(topic => (
+                        <div key={topic} className="flex items-center space-x-2">
+                            <div>Subscribed to: {topic}</div>
+                            <button
+                                onClick={() => publishMessage(topic)}
+                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                                disabled={!client?.connected}
+                            >
+                                Publish Test Message
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="flex space-x-2">
+                    <input
+                        placeholder="topic"
+                        value={newTopic}
+                        onChange={e => setNewTopic(e.target.value)}
+                        className="block p-2 border rounded"
+                    />
+                    <button
+                        onClick={subscribeToTopic}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        disabled={!client?.connected || !newTopic}
+                    >
+                        Subscribe to topic
+                    </button>
+                </div>
             </div>
         </div>
     );
