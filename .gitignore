@@ -8,3 +8,4 @@ fullstack2025.sln.DotSettings.user
 server/Startup.Tests/appsettings.json
 appsettings.Production.json
 appsettings.json
+mosquitto.commands.with.secrets.sh
