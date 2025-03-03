@@ -1,5 +1,6 @@
 import mqtt from "mqtt";
 import {useState, useEffect} from "react";
+import toast from "react-hot-toast";
 
 export interface MqttCredentials {
     username: string;
@@ -15,6 +16,16 @@ interface Param {
     id: string;
 }
 
+interface Preferences {
+    intervalMilliseconds: number,
+    unit: string
+}
+
+interface Metric {
+    value: number,
+    unit: string
+}
+
 export default function MockMqttDevice({id: id}: Param) {
     const [credentials, setCredentials] = useState<MqttCredentials>({
         username: '',
@@ -24,6 +35,10 @@ export default function MockMqttDevice({id: id}: Param) {
         topic: "device/"+id+"/changePreferences", messages: []
     }, {        topic: "device/"+id+"/feedback", messages: []
     }]);
+    const [preferences, setPreferences] = useState<Preferences>({
+        intervalMilliseconds: 10000,
+        unit: "Celcius"
+    });
     const [client, setClient] = useState<mqtt.MqttClient | null>(null);
     const [status, setStatus] = useState('Disconnected');
 
@@ -83,7 +98,33 @@ export default function MockMqttDevice({id: id}: Param) {
         }
     };
 
-  
+
+    useEffect(() => {
+        const intervals: NodeJS.Timeout[] = [];
+
+        if (client?.connected ) {
+                const interval = setInterval(() => {
+                    const topic = "device/"+id+"/metric";
+                    const metric: Metric = {
+                        value: Math.random()*100,
+                        unit: preferences.unit
+                    }
+                    client.publish(topic, JSON.stringify(metric), (err) => {
+                        if (err) {
+                            console.error('Publish error:', err);
+                        } else {
+                            console.log(`Message published to ${topic}`);
+                        }
+                    });
+                    toast("Sending: "+JSON.stringify(metric))
+                }, preferences.intervalMilliseconds);
+                intervals.push(interval);
+            
+        }
+        return () => {
+            intervals.forEach(interval => clearInterval(interval));
+        };
+    }, [client?.connected, preferences]);
 
 
 
