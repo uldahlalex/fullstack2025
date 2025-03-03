@@ -1,10 +1,9 @@
-til mockmqtt gui: ingen sub udover det som devicet naturligt ville have
 
 
 - test med auth hvor uid identificerer de andre ID'er
 
 - test der bruger REST til at mutate ws state
-- mqttclient tests
+- mqttclient tests 
 
 _____
 

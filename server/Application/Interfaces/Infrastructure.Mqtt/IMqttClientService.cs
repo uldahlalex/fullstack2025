@@ -9,4 +9,5 @@ public interface IMqttClientService
     Task UnsubscribeAsync(string topic);
     IReadOnlyCollection<string> GetSubscribedTopics();
     Task PublishAsync(string topic, string payload, bool retain = false, int qos = 1);
+    IEnumerable<string> GetSubscriptionTopics();
 }

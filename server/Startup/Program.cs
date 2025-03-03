@@ -36,7 +36,7 @@ public class Program
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure<IWebSocketConnection, BaseDto>();
+        services.RegisterMqttInfrastructure();
 
 
         services.RegisterWebsocketApiServices();

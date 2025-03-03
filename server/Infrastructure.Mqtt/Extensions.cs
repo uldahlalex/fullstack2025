@@ -7,13 +7,9 @@ namespace Infrastructure.Mqtt;
 
 public static class Extensions
 {
-    public static IServiceCollection RegisterMqttInfrastructure<T, TBaseDto>(this IServiceCollection services)
+    public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
     {
-        services.AddSingleton<IEventDispatcher, EventDispatcher>();
-
-        services.AddScoped<IMqttEventHandler<TemperatureEventDto>, TemperatureEventHandler>();
-        services.AddScoped<IMqttEventHandler<HumidityEventDto>, HumidityEventHandler>();
-
+        services.AddScoped<IMqttEventHandler<MetricEventDto>, MetricEventHandler>();
         services.AddSingleton<IMqttClientService, MqttClientService>();
         return services;
     }
@@ -24,12 +20,12 @@ public static class Extensions
         {
             using var scope = app.Services.CreateScope();
             var mqttService = scope.ServiceProvider.GetRequiredService<IMqttClientService>();
-
             await mqttService.ConnectAsync();
-            EventDispatcher.TopicMappings.Keys.ToList().ForEach(async void (topicStrings) =>
+            foreach (var topic in mqttService.GetSubscriptionTopics())
             {
-                await mqttService.SubscribeAsync(topicStrings);
-            });
+                await mqttService.SubscribeAsync(topic);
+            }
+
         });
 
         return app;

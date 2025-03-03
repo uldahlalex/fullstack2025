@@ -192,9 +192,8 @@ export interface AuthRequestDto {
 
 
 export interface MemberLeftNotification extends BaseDto {
-    memberId?: string;
+    clientId?: string;
     topic?: string;
-    timestamp?: Date;
 }
 
 export interface ServerSendsEchoDto extends BaseDto {
