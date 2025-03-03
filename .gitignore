@@ -5,6 +5,6 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea
 fullstack2025.sln.DotSettings.user
-appsettings.Development.json
 server/Startup.Tests/appsettings.json
 appsettings.Production.json
+appsettings.json
