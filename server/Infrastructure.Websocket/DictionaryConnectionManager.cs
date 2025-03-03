@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Fleck;
 using Microsoft.Extensions.Logging;
 using WebSocketBoilerplate;
@@ -312,37 +309,17 @@ namespace Api.WebSockets
 
         protected virtual async Task NotifyMemberLeft(string topic, string memberId)
         {
-
-            if (typeof(TMessageBase) == typeof(BaseDto))
-            {
-
-                var notification = CreateMemberLeftNotification(memberId, topic);
-
-
-                await BroadcastToTopic(topic, (TMessageBase)(object)notification);
-            }
-        }
-
-        protected virtual object CreateMemberLeftNotification(string memberId, string topic)
-        {
-            if (typeof(TMessageBase) == typeof(BaseDto))
-            {
-                return new MemberLeftNotification
+         
+                var dto = new MemberLeftNotification
                 {
-                    MemberId = memberId,
-                    Topic = topic,
-                    Timestamp = DateTime.UtcNow
+                    ClientId = memberId, 
+                    Topic = topic
                 };
-            }
-            
-            return new
-            {
-                Type = "member_left",
-                MemberId = memberId,
-                Topic = topic,
-                Timestamp = DateTime.UtcNow
-            };
+
+                await BroadcastToTopic(topic, dto);
         }
+
+    
 
         public async Task LogCurrentState()
         {
@@ -368,8 +345,7 @@ namespace Api.WebSockets
 
     public class MemberLeftNotification : BaseDto
     {
-        public string MemberId { get; set; }
+        public string ClientId { get; set; }
         public string Topic { get; set; }
-        public DateTime Timestamp { get; set; }
     }
 }
