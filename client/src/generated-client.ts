@@ -186,7 +186,7 @@ export interface AuthResponseDto {
 }
 
 export interface AuthRequestDto {
-    username?: string;
+    email?: string;
     password?: string;
 }
 

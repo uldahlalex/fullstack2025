@@ -1,62 +1,39 @@
 DO $EF$
 BEGIN
-    IF NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'jerneif') THEN
-        CREATE SCHEMA jerneif;
+    IF NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'surveillance') THEN
+        CREATE SCHEMA surveillance;
     END IF;
 END $EF$;
 
 
-CREATE TABLE jerneif.game (
-    id uuid NOT NULL,
-    weeknumber integer NOT NULL,
-    yearnumber integer NOT NULL,
-    CONSTRAINT "PK_game" PRIMARY KEY (id)
+CREATE TABLE surveillance.device (
+    id text NOT NULL,
+    name text NOT NULL,
+    CONSTRAINT device_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE jerneif.player (
-    id uuid NOT NULL,
-    created_at timestamp with time zone,
-    activated boolean NOT NULL,
-    "Salt" text NOT NULL,
-    "Hash" text NOT NULL,
-    "Email" text NOT NULL,
-    "FullName" text NOT NULL,
-    "Role" text NOT NULL,
-    CONSTRAINT "PK_player" PRIMARY KEY (id)
+CREATE TABLE surveillance."user" (
+    id text NOT NULL,
+    email text NOT NULL,
+    hash text NOT NULL,
+    salt text NOT NULL,
+    role text NOT NULL,
+    CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
 
-CREATE TABLE jerneif.winnersequence (
-    id uuid NOT NULL,
-    gameid uuid NOT NULL,
-    created_at timestamp with time zone,
-    sequence integer[] NOT NULL,
-    CONSTRAINT "PK_winnersequence" PRIMARY KEY (id),
-    CONSTRAINT "FK_winnersequence_game_gameid" FOREIGN KEY (gameid) REFERENCES jerneif.game (id) ON DELETE CASCADE
+CREATE TABLE surveillance.devicelog (
+    id text NOT NULL,
+    deviceid text NOT NULL,
+    value double precision NOT NULL,
+    timestamp timestamp with time zone NOT NULL,
+    unit text NOT NULL,
+    CONSTRAINT devicelog_pkey PRIMARY KEY (id),
+    CONSTRAINT devicelog_deviceid_fkey FOREIGN KEY (deviceid) REFERENCES surveillance.device (id)
 );
 
 
-CREATE TABLE jerneif.board (
-    id uuid NOT NULL,
-    userid uuid NOT NULL,
-    gameid uuid NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    sortednumbers integer[] NOT NULL,
-    afviklet boolean NOT NULL,
-    won boolean NOT NULL,
-    CONSTRAINT "PK_board" PRIMARY KEY (id),
-    CONSTRAINT "FK_board_game_gameid" FOREIGN KEY (gameid) REFERENCES jerneif.game (id) ON DELETE CASCADE,
-    CONSTRAINT "FK_board_player_userid" FOREIGN KEY (userid) REFERENCES jerneif.player (id) ON DELETE CASCADE
-);
-
-
-CREATE INDEX "IX_board_gameid" ON jerneif.board (gameid);
-
-
-CREATE INDEX "IX_board_userid_gameid" ON jerneif.board (userid, gameid);
-
-
-CREATE UNIQUE INDEX winnersequence_gameid_key ON jerneif.winnersequence (gameid);
+CREATE INDEX "IX_devicelog_deviceid" ON surveillance.devicelog (deviceid);
 
 
