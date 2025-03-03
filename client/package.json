@@ -5,16 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "scaffold": "npx swagger-typescript-api -p http://localhost:8080/openapi/myapi.json -o ./src/models -n Api.ts --axios --union-enums --no-client",
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
   "dependencies": {
-    "ws-request-hook": "^1.0.9",
+    "mqtt": "^5.10.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "jotai": "^2.10.2"
+    "ws-request-hook": "^1.0.13"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",
