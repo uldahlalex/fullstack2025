@@ -1,22 +1,10 @@
-Aktuelt:
-- mqtt infra har ikke kendskab til iwebsocketonnection til at bruge manageren - skal dette "provides" udefra eller skal jeg tilføje en reference?
-    - Skal jeg lave en model med 2 generiske parametre?
+
 
 
 - test med auth hvor uid identificerer de andre ID'er
 
-- vil jeg stadig base basedto med i iconncetionmanager interfacens generic args? (det er meget lidt jeg får ud af det)    
-    
-
-
 - test der bruger REST til at mutate ws state
-
-- nyt db schema og user stories
-
-- application layer request objects til at mappe fra dto'er
-
 - mqttclient tests
-
 
 _____
 

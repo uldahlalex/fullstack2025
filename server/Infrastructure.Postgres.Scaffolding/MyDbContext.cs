@@ -1,4 +1,6 @@
-﻿using Application.Models.Entities;
+﻿using System;
+using System.Collections.Generic;
+using Application.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Scaffolding;
@@ -10,75 +12,53 @@ public partial class MyDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Board> Boards { get; set; }
+    public virtual DbSet<Device> Devices { get; set; }
 
-    public virtual DbSet<Game> Games { get; set; }
+    public virtual DbSet<Devicelog> Devicelogs { get; set; }
 
-    public virtual DbSet<Player> Players { get; set; }
-
-    public virtual DbSet<Winnersequence> Winnersequences { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Board>(entity =>
+        modelBuilder.Entity<Device>(entity =>
         {
-            entity.ToTable("board", "jerneif");
+            entity.HasKey(e => e.Id).HasName("device_pkey");
 
-            entity.HasIndex(e => e.Gameid, "IX_board_gameid");
+            entity.ToTable("device", "surveillance");
 
-            entity.HasIndex(e => new { e.Userid, e.Gameid }, "IX_board_userid_gameid");
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.Afviklet).HasColumnName("afviklet");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.Gameid).HasColumnName("gameid");
-            entity.Property(e => e.Sortednumbers).HasColumnName("sortednumbers");
-            entity.Property(e => e.Userid).HasColumnName("userid");
-            entity.Property(e => e.Won).HasColumnName("won");
-
-            entity.HasOne(d => d.Game).WithMany(p => p.Boards).HasForeignKey(d => d.Gameid);
-
-            entity.HasOne(d => d.User).WithMany(p => p.Boards).HasForeignKey(d => d.Userid);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasColumnName("name");
         });
 
-        modelBuilder.Entity<Game>(entity =>
+        modelBuilder.Entity<Devicelog>(entity =>
         {
-            entity.ToTable("game", "jerneif");
+            entity.HasKey(e => e.Id).HasName("devicelog_pkey");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.Weeknumber).HasColumnName("weeknumber");
-            entity.Property(e => e.Yearnumber).HasColumnName("yearnumber");
+            entity.ToTable("devicelog", "surveillance");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Deviceid).HasColumnName("deviceid");
+            entity.Property(e => e.Timestamp).HasColumnName("timestamp");
+            entity.Property(e => e.Unit).HasColumnName("unit");
+            entity.Property(e => e.Value).HasColumnName("value");
+
+            entity.HasOne(d => d.Device).WithMany(p => p.Devicelogs)
+                .HasForeignKey(d => d.Deviceid)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("devicelog_deviceid_fkey");
         });
 
-        modelBuilder.Entity<Player>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
-            entity.ToTable("player", "jerneif");
+            entity.HasKey(e => e.Id).HasName("user_pkey");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.Activated).HasColumnName("activated");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-        });
+            entity.ToTable("user", "surveillance");
 
-        modelBuilder.Entity<Winnersequence>(entity =>
-        {
-            entity.ToTable("winnersequence", "jerneif");
-
-            entity.HasIndex(e => e.Gameid, "winnersequence_gameid_key").IsUnique();
-
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.Gameid).HasColumnName("gameid");
-            entity.Property(e => e.Sequence).HasColumnName("sequence");
-
-            entity.HasOne(d => d.Game).WithOne(p => p.Winnersequence).HasForeignKey<Winnersequence>(d => d.Gameid);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Hash).HasColumnName("hash");
+            entity.Property(e => e.Role).HasColumnName("role");
+            entity.Property(e => e.Salt).HasColumnName("salt");
         });
 
         OnModelCreatingPartial(modelBuilder);

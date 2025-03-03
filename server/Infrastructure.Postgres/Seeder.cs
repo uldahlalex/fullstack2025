@@ -10,6 +10,6 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
     public async Task Seed()
     {
         await context.Database.EnsureCreatedAsync();
-        await File.WriteAllTextAsync("current_schema.sql", context.Database.GenerateCreateScript());
+        await File.WriteAllTextAsync("../Infrastructure.Postgres.Scaffolding/current_schema.sql", context.Database.GenerateCreateScript());
     }
 }

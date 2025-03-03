@@ -61,7 +61,7 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         var response = await client.PostAsJsonAsync<ProblemDetails>(
             AuthController.RegisterRoute, new AuthRequestDto
             {
-                Username = "bob@bob.dk",
+                Email = "bob@bob.dk",
                 Password = "a"
             });
         if(HttpStatusCode.BadRequest !=response.HttpResponseMessage.StatusCode)
@@ -74,7 +74,7 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
 
-        ctx.Players.Add(MockObjects.GetPlayer());
+        ctx.Users.Add(MockObjects.GetUser());
         await ctx.SaveChangesAsync();
 
         var client = CreateClient();
@@ -90,8 +90,8 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     {
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-        var player = MockObjects.GetPlayer();
-        ctx.Players.Add(player);
+        var user = MockObjects.GetUser();
+        ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
         var request = MockObjects.GetAuthRequestDto();
@@ -116,8 +116,8 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     {
         using var scope = Services.CreateScope();
         var ctx = scope.ServiceProvider.GetRequiredService<MyDbContext>();
-        var player = MockObjects.GetPlayer();
-        ctx.Players.Add(player);
+        var user = MockObjects.GetUser();
+        ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.RegisterRoute,

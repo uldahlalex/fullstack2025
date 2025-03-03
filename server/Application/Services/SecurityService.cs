@@ -20,31 +20,31 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
 {
     public AuthResponseDto Login(AuthRequestDto dto)
     {
-        var player = repository.GetUserOrNull(dto.Username) ?? throw new ValidationException("Username not found");
+        var player = repository.GetUserOrNull(dto.Email) ?? throw new ValidationException("Username not found");
         VerifyPasswordOrThrow(dto.Password + player.Salt, player.Hash);
         return new AuthResponseDto
         {
             Jwt = GenerateJwt(new JwtClaims
             {
                 Id = player.Id.ToString(),
-                Username = player.FullName,
                 Role = player.Role,
-                Email = player.Email,
-                Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
+                Exp = DateTimeOffset.UtcNow.AddHours(1000)
+                    .ToUnixTimeSeconds()
+                    .ToString(),
+                Email = dto.Email
             })
         };
     }
 
     public AuthResponseDto Register(AuthRequestDto dto)
     {
-        var player = repository.GetUserOrNull(dto.Username);
+        var player = repository.GetUserOrNull(dto.Email);
         if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);
-        var insertedPlayer = repository.AddPlayer(new Player
+        var insertedPlayer = repository.AddUser(new User()
         {
-            FullName = dto.Username,
-            Email = dto.Username,
+            Email = dto.Email,
             Role = Roles.User.ToString(),
             Salt = salt,
             Hash = hash
@@ -54,10 +54,9 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
             Jwt = GenerateJwt(new JwtClaims
             {
                 Id = insertedPlayer.Id.ToString(),
-                Username = insertedPlayer.FullName,
                 Role = insertedPlayer.Role,
-                Email = insertedPlayer.Email,
-                Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString()
+                Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString(),
+                Email = insertedPlayer.Email
             })
         };
     }

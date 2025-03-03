@@ -13,7 +13,7 @@ public class MockObjects
     public const string TestHash =
         "J4SHSN9SKisNBoijKZkNAA5GNWJlO/RNsiXWhoWq2lOpd7hBtmwnqb6bOcxxYP8tEvNRomJunrVkWKNa5W3lXg==";
 
-    public static Player GetPlayer(
+    public static User GetUser(
         string? username = TestUsername,
         string? role = null,
         bool activated = true,
@@ -23,12 +23,9 @@ public class MockObjects
         string? hash = TestHash
     )
     {
-        return new Player
+        return new User()
         {
-            FullName = username,
-            Activated = activated,
-            CreatedAt = createdAt ?? DateTime.UtcNow,
-            Email = username,
+
             Role = role ?? Roles.User.ToString(),
             Salt = salt,
             Hash = hash
@@ -39,7 +36,7 @@ public class MockObjects
     {
         return new AuthRequestDto
         {
-            Username = username,
+            Email = username,
             Password = password
         };
     }

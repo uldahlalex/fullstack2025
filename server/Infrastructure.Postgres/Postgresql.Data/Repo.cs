@@ -6,20 +6,13 @@ namespace Infrastructure.Postgres.Postgresql.Data;
 
 public class Repo(MyDbContext ctx) : IDataRepository
 {
-    public IEnumerable<Board> GetDomainModels()
+    public User GetUserOrNull(string username)
     {
-        return ctx.Boards.ToList();
+        throw new NotImplementedException();
     }
 
-    public Player? GetUserOrNull(string username)
+    public User AddUser(User user)
     {
-        return ctx.Players.FirstOrDefault(p => p.FullName == username);
-    }
-
-    public Player AddPlayer(Player player)
-    {
-        ctx.Players.Add(player);
-        ctx.SaveChanges();
-        return player;
+        throw new NotImplementedException();
     }
 }
