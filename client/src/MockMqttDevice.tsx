@@ -6,13 +6,24 @@ export interface MqttCredentials {
     password: string;
 }
 
-export default function MockMqttDevice() {
+export interface TopicAndMessages {
+    topic: string;
+    messages: string[] 
+}
+
+interface Param {
+    id: string;
+}
+
+export default function MockMqttDevice({id: id}: Param) {
     const [credentials, setCredentials] = useState<MqttCredentials>({
         username: '',
         password: ''
     });
-    const [newTopic, setNewTopic] = useState("");
-    const [topicSubscriptions, setTopicSubscriptions] = useState<string[]>([]);
+    const [topicSubscriptions, setTopicSubscriptions] = useState<TopicAndMessages[]>([{
+        topic: "device/"+id+"/changePreferences", messages: []
+    }, {        topic: "device/"+id+"/feedback", messages: []
+    }]);
     const [client, setClient] = useState<mqtt.MqttClient | null>(null);
     const [status, setStatus] = useState('Disconnected');
 
@@ -32,7 +43,7 @@ export default function MockMqttDevice() {
                 console.log('Connected to MQTT broker');
 
                 topicSubscriptions.forEach(topic => {
-                    mqttClient.subscribe(topic, (err) => {
+                    mqttClient.subscribe(topic.topic, (err) => {
                         if (err) {
                             console.error('Subscribe error:', err);
                         } else {
@@ -44,6 +55,12 @@ export default function MockMqttDevice() {
 
             mqttClient.on('message', (topic, message) => {
                 console.log('Received message:', topic, message.toString());
+                const duplicate = [...topicSubscriptions];
+                const id= duplicate.findIndex((item) => item.topic === topic);
+                if (id !== -1) {
+                    duplicate[id].messages.push(message.toString());
+                    setTopicSubscriptions([...duplicate]);
+                }
             });
 
             mqttClient.on('error', (err) => {
@@ -66,31 +83,9 @@ export default function MockMqttDevice() {
         }
     };
 
-    const publishMessage = (topic: string) => {
-        if (client?.connected) {
-            client.publish(topic, JSON.stringify({ myKey: "hey" }), (err) => {
-                if (err) {
-                    console.error('Publish error:', err);
-                } else {
-                    console.log('Message published');
-                }
-            });
-        }
-    };
+  
 
-    const subscribeToTopic = () => {
-        if (!client?.connected || !newTopic) return;
 
-        client.subscribe(newTopic, (err) => {
-            if (err) {
-                console.error('Subscribe error:', err);
-            } else {
-                console.log('Subscribed to ' + newTopic);
-                setTopicSubscriptions(prev => [...prev, newTopic]);
-                setNewTopic(''); 
-            }
-        });
-    };
 
     useEffect(() => {
         return () => {
@@ -104,6 +99,11 @@ export default function MockMqttDevice() {
 
     return (
         <div className="p-4 space-y-4">
+            <img style={
+            {height: "200px"}
+                
+            } src="https://joy-it.net/files/files/Produkte/SBC-NodeMCU-ESP32/SBC-NodeMCU-ESP32-01.png"
+                 />
             <div className="space-y-2">
                 <div>Status: {status}</div>
                 <input
@@ -133,34 +133,28 @@ export default function MockMqttDevice() {
 
                 <div className="space-y-2">
                     {topicSubscriptions.map(topic => (
-                        <div key={topic} className="flex items-center space-x-2">
-                            <div>Subscribed to: {topic}</div>
-                            <button
-                                onClick={() => publishMessage(topic)}
-                                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                                disabled={!client?.connected}
-                            >
-                                Publish Test Message
-                            </button>
+                        <div key={topic.topic} className="flex items-center space-x-2">
+                            <div>Subscribed to: {topic.topic}</div>
+                            <span>{JSON.stringify(topic.messages)}</span>
                         </div>
                     ))}
                 </div>
 
-                <div className="flex space-x-2">
-                    <input
-                        placeholder="topic"
-                        value={newTopic}
-                        onChange={e => setNewTopic(e.target.value)}
-                        className="block p-2 border rounded"
-                    />
-                    <button
-                        onClick={subscribeToTopic}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                        disabled={!client?.connected || !newTopic}
-                    >
-                        Subscribe to topic
-                    </button>
-                </div>
+                {/*<div className="flex space-x-2">*/}
+                {/*    <input*/}
+                {/*        placeholder="topic"*/}
+                {/*        value={newTopic}*/}
+                {/*        onChange={e => setNewTopic(e.target.value)}*/}
+                {/*        className="block p-2 border rounded"*/}
+                {/*    />*/}
+                {/*    <button*/}
+                {/*        onClick={subscribeToTopic}*/}
+                {/*        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"*/}
+                {/*        disabled={!client?.connected || !newTopic}*/}
+                {/*    >*/}
+                {/*        Subscribe to topic*/}
+                {/*    </button>*/}
+                {/*</div>*/}
             </div>
         </div>
     );
