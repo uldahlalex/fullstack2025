@@ -228,8 +228,8 @@ export interface MockMqttObject extends IMqttEventDto {
 export interface ClientWantsToEnterDashboardDto extends BaseDto {
 }
 
-export interface ServerSendsEchoDto extends BaseDto {
-    message?: string;
+export interface ServerAddsAdminToDashboard extends BaseDto {
+    devicelogs?: Devicelog[];
 }
 
 export interface ServerSendsErrorMessage extends BaseDto {
@@ -241,19 +241,14 @@ export interface ClientWantsToChangePreferencesDto extends BaseDto {
     temperatureThreshold?: number;
 }
 
-export interface ClientWantsToEchoDto extends BaseDto {
-    message?: string;
-}
-
 /** Available eventType constants */
 export enum StringConstants {
     MemberLeftNotification = "MemberLeftNotification",
     ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
-    ServerSendsEchoDto = "ServerSendsEchoDto",
+    ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
     ClientWantsToChangePreferencesDto = "ClientWantsToChangePreferencesDto",
-    ClientWantsToEchoDto = "ClientWantsToEchoDto",
 }
 
 export interface FileResponse {

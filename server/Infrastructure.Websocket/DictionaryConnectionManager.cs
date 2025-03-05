@@ -280,7 +280,7 @@ namespace Api.WebSockets
 
                 if (socket is IWebSocketConnection webSocket)
                 {
-                    if (message is TMessageBase baseMessage && typeof(TMessageBase) == typeof(BaseDto))
+                    if (message is TMessageBase baseMessage && typeof(TMessageBase) == typeof(BaseDto ))
                     {
 
 
@@ -290,7 +290,7 @@ namespace Api.WebSockets
                         return;
                     }
 
-                    var json = JsonSerializer.Serialize(message);
+                    var json = JsonSerializer.Serialize(message, new JsonSerializerOptions() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
                     webSocket.Send(json);
                     _logger.LogDebug($"Sent JSON message to socket {GetSocketId(socket)}");
                     return;
