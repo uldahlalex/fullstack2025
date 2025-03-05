@@ -196,6 +196,38 @@ export interface MemberLeftNotification extends BaseDto {
     topic?: string;
 }
 
+export interface ApplicationBaseDto {
+    eventType?: string;
+}
+
+export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
+    metrics?: Devicelog[];
+    eventType?: string;
+}
+
+export interface Devicelog {
+    id?: string;
+    deviceid?: string;
+    value?: number;
+    timestamp?: Date;
+    unit?: string;
+}
+
+export interface IMqttEventDto {
+    deviceId?: string;
+}
+
+export interface MetricEventDto extends IMqttEventDto {
+    value?: number;
+    unit?: string;
+}
+
+export interface MockMqttObject extends IMqttEventDto {
+}
+
+export interface ClientWantsToEnterDashboardDto extends BaseDto {
+}
+
 export interface ServerSendsEchoDto extends BaseDto {
     message?: string;
 }
@@ -216,6 +248,8 @@ export interface ClientWantsToEchoDto extends BaseDto {
 /** Available eventType constants */
 export enum StringConstants {
     MemberLeftNotification = "MemberLeftNotification",
+    ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
+    ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerSendsEchoDto = "ServerSendsEchoDto",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
     ClientWantsToChangePreferencesDto = "ClientWantsToChangePreferencesDto",

@@ -11,7 +11,7 @@ public static class Extensions
 {
     public static IServiceCollection AddDataSourceAndRepositories(this IServiceCollection services)
     {
-        services.AddDbContext<MyDbContext>(options =>
+        services.AddDbContext<MyDbContext>((service, options) =>
         {
             var provider = services.BuildServiceProvider();
             options.UseNpgsql(

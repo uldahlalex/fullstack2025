@@ -1,6 +1,7 @@
 import mqtt from "mqtt";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
+import {MetricEventDto} from "../generated-client.ts";
 
 export interface MqttCredentials {
     username: string;
@@ -21,10 +22,6 @@ interface DevicePreferences {
     unit: string
 }
 
-interface Metric {
-    value: number,
-    unit: string
-}
 
 export default function MockMqttDevice({id: id}: Param) {
     const [credentials, setCredentials] = useState<MqttCredentials>({
@@ -104,11 +101,12 @@ export default function MockMqttDevice({id: id}: Param) {
         if (!client?.connected) return;
 
         const topic = "device/" + id + "/metric";
-        const metric: Metric = {
+        const metric: MetricEventDto = {
             value: Math.random() * 100,
-            unit: preferences.unit
+            unit: preferences.unit,
+            deviceId: id
         };
-
+        console.log(metric)
         client.publish(topic, JSON.stringify(metric), (err) => {
             if (err) {
                 console.error('Publish error:', err);
@@ -148,6 +146,7 @@ export default function MockMqttDevice({id: id}: Param) {
             } src="https://joy-it.net/files/files/Produkte/SBC-NodeMCU-ESP32/SBC-NodeMCU-ESP32-01.png"
             />
             <div className="space-y-2">
+                <b>Connection to broker</b>
                 <div>Status: {status}</div>
                 <input
                     placeholder="username"

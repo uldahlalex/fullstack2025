@@ -1,4 +1,5 @@
-
+aktuelt:
+- timeseries dashboard
 
 - test med auth hvor uid identificerer de andre ID'er
 

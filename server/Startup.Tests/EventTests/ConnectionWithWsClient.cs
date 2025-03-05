@@ -18,7 +18,7 @@ using Startup.Tests.TestUtils;
 
 namespace NUnit;
 
-public class ConnectionWithWsClient(Type connectionManagerType) : ApiTestBase
+public class ConnectionWithWsClientSt : ApiTestBase
 {
 
  

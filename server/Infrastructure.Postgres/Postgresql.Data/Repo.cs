@@ -17,4 +17,16 @@ public class Repo(MyDbContext ctx) : IDataRepository
         ctx.SaveChanges();
         return user;
     }
+
+    public Devicelog AddMetric(Devicelog eventDtoData)
+    {
+        ctx.Devicelogs.Add(eventDtoData);
+        ctx.SaveChanges();
+        return eventDtoData;
+    }
+
+    public List<Devicelog> GetAllMetrics()
+    {
+        return ctx.Devicelogs.ToList();
+    }
 }

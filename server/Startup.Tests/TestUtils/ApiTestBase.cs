@@ -1,4 +1,5 @@
 ﻿using Api;
+using Api.Websocket.EventHandlers;
 using Api.Websocket.EventHandlers.ClientEventDtos;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Fleck;
@@ -27,7 +28,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
 
     
-    public ILogger<ConnectionWithWsClient> _logger;
+    public ILogger<ApiTestBase> _logger;
     public HttpClient _httpClient;
     public MyDbContext _dbContext;
     public IConnectionManager _connectionManager;
@@ -98,7 +99,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
         _httpClient = CreateClient();
 
         //Singletons
-        _logger = Services.GetRequiredService<ILogger<ConnectionWithWsClient>>();
+        _logger = Services.GetRequiredService<ILogger<ApiTestBase>>();
         _connectionManager =  Services.GetRequiredService<IConnectionManager>();
 
         //Scoped services
@@ -113,7 +114,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
         _wsClientId = Guid.NewGuid().ToString();
         var url = "ws://localhost:" + wsPort + "?id=" + _wsClientId;
         _wsClient = new WsRequestClient(
-            new[] { typeof(ClientWantsToEchoDto).Assembly },
+            new[] { typeof(ClientWantsToEnterDashboardDto).Assembly },
             url
         );
         await _wsClient.ConnectAsync();

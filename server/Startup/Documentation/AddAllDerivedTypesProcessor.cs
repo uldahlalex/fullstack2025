@@ -1,3 +1,5 @@
+using Application.Models.Dtos;
+using Infrastructure.Mqtt.Interfaces;
 using Namotion.Reflection;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -29,7 +31,14 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
             .Where(t =>
                 t != typeof(BaseDto) &&
                 !t.IsAbstract &&
-                typeof(BaseDto).IsAssignableFrom(t))
+                typeof(BaseDto).IsAssignableFrom(t) ||
+                t != typeof(ApplicationBaseDto) &&
+                !t.IsAbstract &&
+                typeof(ApplicationBaseDto).IsAssignableFrom(t) ||
+                t != typeof(IMqttEventDto) &&
+                !t.IsAbstract &&
+                typeof(IMqttEventDto).IsAssignableFrom(t)
+            )
             .ToList();
 
         foreach (var type in derivedTypes)

@@ -22,13 +22,10 @@ public class MqttClientService : IMqttClientService, IDisposable
     private static readonly Dictionary<string, Type> TopicActionMap = new()
     {
         { "metric", typeof(MetricEventDto) },
-        // Add more mappings here
     };
     
-    // Add this method to get subscription topics
     public IEnumerable<string> GetSubscriptionTopics()
     {
-        // For each action in the TopicActionMap, create a full topic pattern with wildcard
         return TopicActionMap.Keys.Select(action => $"{DevicePrefix}+/{action}");
     }
 

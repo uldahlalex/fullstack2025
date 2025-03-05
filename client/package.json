@@ -13,8 +13,9 @@
     "mqtt": "^5.10.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "ws-request-hook": "^1.0.13",
-    "react-hot-toast": "^2.5.2"
+    "react-hot-toast": "^2.5.2",
+    "recharts": "^2.15.1",
+    "ws-request-hook": "^1.0.13"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

@@ -6,4 +6,6 @@ public interface IDataRepository
 {
     User? GetUserOrNull(string email);
     User AddUser(User user);
+    Devicelog AddMetric(Devicelog eventDtoData);
+    List<Devicelog> GetAllMetrics();
 }
