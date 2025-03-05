@@ -1,8 +1,6 @@
 aktuelt:
-- timeseries dashboard
-
+- admin dashboard controls
 - test med auth hvor uid identificerer de andre ID'er
-
 - test der bruger REST til at mutate ws state
 - mqttclient tests 
 
