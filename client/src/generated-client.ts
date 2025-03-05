@@ -142,8 +142,16 @@ export class DeviceClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    changePreferencesForDevice(): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/ChangePreferencesForDevice";
+    changePreferencesForDevice(deviceId: string | undefined, milliseconds: number | undefined): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/ChangePreferencesForDevice?";
+        if (deviceId === null)
+            throw new Error("The parameter 'deviceId' cannot be null.");
+        else if (deviceId !== undefined)
+            url_ += "deviceId=" + encodeURIComponent("" + deviceId) + "&";
+        if (milliseconds === null)
+            throw new Error("The parameter 'milliseconds' cannot be null.");
+        else if (milliseconds !== undefined)
+            url_ += "milliseconds=" + encodeURIComponent("" + milliseconds) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {

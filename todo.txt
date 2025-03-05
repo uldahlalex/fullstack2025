@@ -1,5 +1,9 @@
 aktuelt:
 - admin dashboard controls
+    - bug: change prefernces no unit present
+        - forslag: typesafety mellem mqtt og andre API'er
+
+
 - test med auth hvor uid identificerer de andre ID'er
 - test der bruger REST til at mutate ws state
 - mqttclient tests 

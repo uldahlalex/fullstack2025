@@ -18,7 +18,7 @@ interface Param {
 }
 
 interface DevicePreferences {
-    intervalMilliseconds: number,
+    interval: number,
     unit: string
 }
 
@@ -29,7 +29,7 @@ export default function MockMqttDevice({id: id}: Param) {
         password: ''
     });
     const [preferences, setPreferences] = useState<DevicePreferences>({
-        intervalMilliseconds: 10000,
+        interval: 10000,
         unit: "Celcius",
     });
     const [client, setClient] = useState<mqtt.MqttClient | null>(null);
@@ -127,13 +127,13 @@ export default function MockMqttDevice({id: id}: Param) {
         publishMetric();
 
         // Set up interval
-        const interval = setInterval(publishMetric, preferences.intervalMilliseconds);
+        const interval = setInterval(publishMetric, preferences.interval);
 
         // Cleanup
         return () => clearInterval(interval);
     }, [
         client?.connected,
-        preferences.intervalMilliseconds,
+        preferences.interval,
         preferences.unit,
         id
     ]);

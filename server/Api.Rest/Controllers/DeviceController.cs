@@ -17,21 +17,14 @@ public class DeviceController(
     IMqttClientService mqttClientService) : ControllerBase
 {
     [Route(nameof(ChangePreferencesForDevice))]
-    public ActionResult ChangePreferencesForDevice()
+    public ActionResult ChangePreferencesForDevice(string  deviceId, int milliseconds)
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        mqttClientService.PublishAsync("device/A/changePreferences", JsonSerializer.Serialize(new
+        mqttClientService.PublishAsync("device/"+deviceId+"/changePreferences", JsonSerializer.Serialize(new
         {
-            units = "Celcius",
-            interval = 2000
+            unit = "Celcius",
+            interval = milliseconds
         }));
-        var dto = new
-        {
-            eventType = "ServerSpams",
-            message = "loool"
-        };
-        connectionManager.BroadcastToTopic("messages", dto);
-        var result = new { key = "value" };
-        return Ok(result);
+        return Ok();
     }
 }
