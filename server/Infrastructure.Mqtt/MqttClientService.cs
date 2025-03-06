@@ -337,25 +337,50 @@ public class MqttClientService : IMqttClientService, IDisposable
 
     private async Task InvokeHandlerAsync(Type handlerType, IMqttEventDto mqttEvent)
     {
-        using var scope = _serviceProvider.CreateScope();
-        var handler = scope.ServiceProvider.GetService(handlerType);
+        try
+        {
+            using var scope = _serviceProvider.CreateScope();
         
-        if (handler == null)
-        {
-            _logger.LogWarning("Could not resolve handler for type: {HandlerType}", handlerType.Name);
-            return;
-        }
+            // Get the handler interface type (IMqttEventHandler<T>) that this handler implements
+            var handlerInterface = handlerType.GetInterfaces()
+                .First(i => i.IsGenericType && 
+                            i.GetGenericTypeDefinition() == typeof(IMqttEventHandler<>));
+        
+            // Get the DTO type from the interface
+            var dtoType = handlerInterface.GetGenericArguments()[0];
+        
+            // Create a closed generic type for the specific interface (IMqttEventHandler<YourSpecificDto>)
+            var closedHandlerInterfaceType = typeof(IMqttEventHandler<>).MakeGenericType(dtoType);
+        
+            // Resolve the handler by its interface
+            var handler = scope.ServiceProvider.GetService(closedHandlerInterfaceType);
 
-        var method = handler.GetType().GetMethod(nameof(IMqttEventHandler<IMqttEventDto>.HandleAsync));
-        if (method == null)
-        {
-            _logger.LogError("Method HandleAsync not found on handler type: {HandlerType}", handler.GetType().Name);
-            return;
-        }
+            if (handler == null)
+            {
+                _logger.LogWarning("Could not resolve handler for interface: {InterfaceType}", 
+                    closedHandlerInterfaceType.Name);
+                return;
+            }
 
-        await (Task)method.Invoke(handler, new object[] { mqttEvent })!;
+            _logger.LogInformation("Successfully resolved handler: {HandlerType}", handler.GetType().Name);
+
+            // Get the HandleAsync method
+            var method = handler.GetType().GetMethod(nameof(IMqttEventHandler<IMqttEventDto>.HandleAsync));
+            if (method == null)
+            {
+                _logger.LogError("Method HandleAsync not found on handler type: {HandlerType}", 
+                    handler.GetType().Name);
+                return;
+            }
+
+            // Invoke the method
+            await (Task)method.Invoke(handler, new object[] { mqttEvent })!;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error invoking handler {HandlerType}", handlerType.Name);
+        }
     }
-
     private bool ParseTopic(string topic, out string deviceId, out string action)
     {
         deviceId = string.Empty;

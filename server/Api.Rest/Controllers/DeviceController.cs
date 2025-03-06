@@ -24,7 +24,7 @@ public class DeviceController(
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
         var serialized = JsonSerializer.Serialize(dto);
-        mqttClientService.PublishAsync("device/" + dto.DeviceId + "/changePreferences", serialized);
+        mqttClientService.PublishAsync("device/" + dto.DeviceId + "/"+nameof(AdminWantsToChangePreferencesForDeviceDto), serialized);
         return Ok();
     }
 }
