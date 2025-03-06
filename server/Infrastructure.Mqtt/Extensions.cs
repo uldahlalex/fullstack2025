@@ -1,7 +1,8 @@
+using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
-using Infrastructure.Mqtt.EventHandlers;
-using Infrastructure.Mqtt.EventHandlers.Dtos;
-using Infrastructure.Mqtt.Interfaces;
+using Application.Models;
+using Microsoft.Extensions.Options;
+using MQTTnet;
 
 namespace Infrastructure.Mqtt;
 
@@ -9,24 +10,39 @@ public static class Extensions
 {
     public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
     {
-        services.Scan(scan => scan
-            .FromAssemblyOf<IMqttEventHandler<IMqttEventDto>>() 
-            .AddClasses(classes => classes.AssignableTo(typeof(IMqttEventHandler<>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
-        
-        services.AddSingleton<IMqttClientService, MqttClientService>();
+        services.AddSingleton<IMqttClient>(new MqttClientFactory().CreateMqttClient());
+        services.AddSingleton<MqttEventBus>();
         return services;
     }
 
-    public static WebApplication ConfigureMqtt(this WebApplication app)
+    public static async Task<WebApplication> ConfigureMqtt(this WebApplication app)
     {
-        _ = Task.Run(async () =>
+        var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
+        var mqttClient = app.Services.GetRequiredService<IMqttClient>();
+        var eventBus =  app.Services.GetRequiredService<MqttEventBus>();
+        await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
+            .WithTcpServer(appOptions.MQTT_BROKER_HOST, 1883)
+            .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
+            .WithTlsOptions(new MqttClientTlsOptions
+            {
+                UseTls = true
+            })
+            .Build());
+
+        await eventBus.SubscribeAsync("device/+/status", async (evt) =>
         {
-            using var scope = app.Services.CreateScope();
-            var mqttService = scope.ServiceProvider.GetRequiredService<IMqttClientService>();
-            await mqttService.ConnectAsync();
-            foreach (var topic in mqttService.GetSubscriptionTopics()) await mqttService.SubscribeAsync(topic);
+            var payload = JsonSerializer.Serialize(new {});
+            var message = new MqttApplicationMessageBuilder()
+                .WithTopic($"device/{""}/command")
+                .WithPayload(payload)
+                .Build();
+
+            await mqttClient.PublishAsync(message);
+        });
+
+        await eventBus.SubscribeAsync("device/+/telemetry", (evt) =>
+        {
+            // Handle telemetry
         });
 
         return app;
