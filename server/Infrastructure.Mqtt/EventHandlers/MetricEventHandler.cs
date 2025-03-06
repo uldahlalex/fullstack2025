@@ -20,11 +20,10 @@ public class MetricEventHandler(
     IServiceLogic service,
     IDataRepository repo,
     IConnectionManager connectionManager)
-    : IMqttEventHandler<MetricEventDto>
+    : IMqttEventHandler<IoTDeviceSendsMetricEventDto>
 {
-    public async Task HandleAsync(MetricEventDto eventDtoData)
+    public async Task HandleAsync(IoTDeviceSendsMetricEventDto eventDtoData)
     {
-        logger.LogInformation(JsonSerializer.Serialize(eventDtoData));
         var deviceLog = new Devicelog
         {
             Timestamp = DateTime.UtcNow,

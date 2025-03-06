@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Collections.Concurrent;
+using System.Reflection;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using Infrastructure.Mqtt.EventHandlers.Dtos;
@@ -13,18 +15,19 @@ public class MqttClientService : IMqttClientService, IDisposable
 {
     private const string DevicePrefix = "device/";
 
-    private static readonly Dictionary<string, Type> TopicActionMap = new()
-    {
-        { "metric", typeof(MetricEventDto) }
-    };
-
+    // Mapping from DTO type name to handler type
+    private readonly ConcurrentDictionary<string, Type> _dtoTypeNameToHandlerTypeMap;
+    // Mapping from DTO type to its corresponding handler type
+    private readonly ConcurrentDictionary<Type, Type> _dtoTypeToHandlerTypeMap;
+    // Collection of all known DTO types
+    private readonly List<Type> _allDtoTypes;
+    
     private readonly IMqttClient _client;
     private readonly ILogger<MqttClientService> _logger;
     private readonly MqttClientOptions _options;
     private readonly IServiceProvider _serviceProvider;
     private readonly HashSet<string> _topicSubscriptions;
     private bool _isDisposed;
-
 
     public MqttClientService(
         IOptionsMonitor<AppOptions> optionsMonitor,
@@ -34,6 +37,12 @@ public class MqttClientService : IMqttClientService, IDisposable
         _logger = logger;
         _serviceProvider = serviceProvider;
         _topicSubscriptions = new HashSet<string>();
+        _dtoTypeNameToHandlerTypeMap = new ConcurrentDictionary<string, Type>();
+        _dtoTypeToHandlerTypeMap = new ConcurrentDictionary<Type, Type>();
+        _allDtoTypes = new List<Type>();
+
+        // Initialize the handler mappings
+        InitializeHandlerMappings();
 
         var tlsOptions = new MqttClientTlsOptions
         {
@@ -52,6 +61,46 @@ public class MqttClientService : IMqttClientService, IDisposable
         _client.ApplicationMessageReceivedAsync += HandleMessage;
     }
 
+    private void InitializeHandlerMappings()
+    {
+        try
+        {
+            // Find all handler types that implement IMqttEventHandler<T>
+            var handlerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.IsClass && !t.IsAbstract &&
+                    t.GetInterfaces().Any(i => i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IMqttEventHandler<>)))
+                .ToList();
+
+            foreach (var handlerType in handlerTypes)
+            {
+                // Get the handler interface and extract the DTO type
+                var handlerInterface = handlerType.GetInterfaces()
+                    .First(i => i.IsGenericType &&
+                        i.GetGenericTypeDefinition() == typeof(IMqttEventHandler<>));
+                
+                var dtoType = handlerInterface.GetGenericArguments()[0];
+                
+                // Add to all known DTO types
+                _allDtoTypes.Add(dtoType);
+                
+                // Map the DTO type name to its handler
+                _dtoTypeNameToHandlerTypeMap[dtoType.Name] = handlerType;
+                
+                // Map the DTO type to its handler
+                _dtoTypeToHandlerTypeMap[dtoType] = handlerType;
+                
+                _logger.LogInformation("Registered handler {HandlerType} for DTO {DtoType}", 
+                    handlerType.Name, dtoType.Name);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing handler mappings");
+        }
+    }
+
     public void Dispose()
     {
         Dispose(true);
@@ -60,7 +109,7 @@ public class MqttClientService : IMqttClientService, IDisposable
 
     public IEnumerable<string> GetSubscriptionTopics()
     {
-        return TopicActionMap.Keys.Select(action => $"{DevicePrefix}+/{action}");
+        return new[] { $"{DevicePrefix}+/"+nameof(IoTDeviceSendsMetricEventDto) };
     }
 
     public async Task PublishAsync(string topic, string payload, bool retain = false, int qos = 1)
@@ -89,7 +138,6 @@ public class MqttClientService : IMqttClientService, IDisposable
             throw;
         }
     }
-
 
     public bool IsConnected => _client?.IsConnected ?? false;
 
@@ -236,24 +284,50 @@ public class MqttClientService : IMqttClientService, IDisposable
                 return;
             }
 
-            if (!TopicActionMap.TryGetValue(action, out var eventType))
+            // First try to parse as generic JSON to extract eventType
+            try
             {
-                _logger.LogWarning("Unsupported action: {Action} for device: {DeviceId}", action, deviceId);
-                return;
+                var jsonDoc = JsonDocument.Parse(payload);
+                
+                // Try to get eventType property
+                if (jsonDoc.RootElement.TryGetProperty(nameof(IMqttEventDto.eventType), out var eventTypeElement) && 
+                    eventTypeElement.ValueKind == JsonValueKind.String)
+                {
+                    var eventTypeName = eventTypeElement.GetString();
+                    if (!string.IsNullOrEmpty(eventTypeName))
+                    {
+                        if (_dtoTypeNameToHandlerTypeMap.TryGetValue(eventTypeName, out var handlerType))
+                        {
+                            // Find the corresponding DTO type
+                            var handlerInterface = handlerType.GetInterfaces()
+                                .First(i => i.IsGenericType && 
+                                           i.GetGenericTypeDefinition() == typeof(IMqttEventHandler<>));
+                            
+                            var dtoType = handlerInterface.GetGenericArguments()[0];
+                            
+                            // Deserialize to the specific DTO type
+                            var mqttEvent = JsonSerializer.Deserialize(payload, dtoType, 
+                                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) as IMqttEventDto;
+                            
+                            if (mqttEvent != null)
+                            {
+                                await InvokeHandlerAsync(handlerType, mqttEvent);
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No handler found for eventType: {EventType}", eventTypeName);
+                        }
+                    }
+                }
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Failed to parse JSON message");
             }
 
-            var mqttEvent = JsonSerializer.Deserialize(payload, eventType, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            }) as IMqttEventDto;
-
-            if (mqttEvent == null)
-            {
-                _logger.LogError("Failed to deserialize payload to type: {EventType}", eventType.Name);
-                return;
-            }
-
-            await InvokeHandlerAsync(eventType, mqttEvent);
+            _logger.LogWarning("Could not find a suitable handler for message on topic: {Topic}", topic);
         }
         catch (Exception ex)
         {
@@ -261,16 +335,14 @@ public class MqttClientService : IMqttClientService, IDisposable
         }
     }
 
-    private async Task InvokeHandlerAsync(Type eventType, IMqttEventDto mqttEvent)
+    private async Task InvokeHandlerAsync(Type handlerType, IMqttEventDto mqttEvent)
     {
-        var handlerType = typeof(IMqttEventHandler<>).MakeGenericType(eventType);
-
         using var scope = _serviceProvider.CreateScope();
         var handler = scope.ServiceProvider.GetService(handlerType);
-
+        
         if (handler == null)
         {
-            _logger.LogWarning("No handler registered for event type: {EventType}", eventType.Name);
+            _logger.LogWarning("Could not resolve handler for type: {HandlerType}", handlerType.Name);
             return;
         }
 

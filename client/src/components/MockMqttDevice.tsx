@@ -1,35 +1,29 @@
 import mqtt from "mqtt";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import {MetricEventDto} from "../generated-client.ts";
+import {
+    AdminWantsToChangePreferencesForDeviceDto,
+    IoTDeviceSendsMetricEventDto,
+    StringConstants
+} from "../generated-client.ts";
 
 export interface MqttCredentials {
     username: string;
     password: string;
 }
 
-export interface TopicAndMessages {
-    topic: string;
-    messages: string[]
-}
-
 interface Param {
     id: string;
 }
-
-interface DevicePreferences {
-    interval: number,
-    unit: string
-}
-
 
 export default function MockMqttDevice({id: id}: Param) {
     const [credentials, setCredentials] = useState<MqttCredentials>({
         username: '',
         password: ''
     });
-    const [preferences, setPreferences] = useState<DevicePreferences>({
-        interval: 10000,
+    const [preferences, setPreferences] = useState<AdminWantsToChangePreferencesForDeviceDto>({
+        intervalMilliseconds: 10000,
+        deviceId: id,
         unit: "Celcius",
     });
     const [client, setClient] = useState<mqtt.MqttClient | null>(null);
@@ -49,7 +43,7 @@ export default function MockMqttDevice({id: id}: Param) {
             mqttClient.on('connect', () => {
                 setStatus('Connected');
                 console.log('Connected to MQTT broker');
-                mqttClient.subscribe('device/' + id + '/#', (err) => {
+                mqttClient.subscribe('device/' + id + '/' + StringConstants.AdminWantsToChangePreferencesForDeviceDto, (err) => {
                     if (err) {
                         console.error('Subscribe error:', err);
                     }
@@ -58,9 +52,9 @@ export default function MockMqttDevice({id: id}: Param) {
 
             mqttClient.on('message', (topic, message) => {
                 const command = topic.substring(topic.lastIndexOf('/') + 1);
-                if (command === "changePreferences") {
+                if (command === StringConstants.AdminWantsToChangePreferencesForDeviceDto) {
                     console.log(command, message.toString());
-                    const pref: DevicePreferences = JSON.parse(message.toString()) as DevicePreferences;
+                    const pref: AdminWantsToChangePreferencesForDeviceDto = JSON.parse(message.toString()) as AdminWantsToChangePreferencesForDeviceDto;
                     setPreferences(pref);
                 }
             });
@@ -99,14 +93,13 @@ export default function MockMqttDevice({id: id}: Param) {
 
     const publishMetric = () => {
         if (!client?.connected) return;
-
-        const topic = "device/" + id + "/metric";
-        const metric: MetricEventDto = {
+        const topic = "device/" + id + "/"+StringConstants.IoTDeviceSendsMetricEventDto;
+        const metric: IoTDeviceSendsMetricEventDto = {
+            eventType: StringConstants.IoTDeviceSendsMetricEventDto,
             value: Math.random() * 100,
             unit: preferences.unit,
             deviceId: id
         };
-        console.log(metric)
         client.publish(topic, JSON.stringify(metric), (err) => {
             if (err) {
                 console.error('Publish error:', err);
@@ -127,13 +120,13 @@ export default function MockMqttDevice({id: id}: Param) {
         publishMetric();
 
         // Set up interval
-        const interval = setInterval(publishMetric, preferences.interval);
+        const interval = setInterval(publishMetric, preferences.intervalMilliseconds);
 
         // Cleanup
         return () => clearInterval(interval);
     }, [
         client?.connected,
-        preferences.interval,
+        preferences.intervalMilliseconds,
         preferences.unit,
         id
     ]);

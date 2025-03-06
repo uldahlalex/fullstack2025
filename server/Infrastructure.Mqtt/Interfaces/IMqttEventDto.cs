@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Infrastructure.Mqtt.Interfaces;
 
 /// <summary>
@@ -5,7 +7,10 @@ namespace Infrastructure.Mqtt.Interfaces;
 /// </summary>
 public abstract class IMqttEventDto
 {
+    [Required]
     private string Topic { get; set; }
-    private DateTime Timestamp { get; set; }
+    [Required]
     public string DeviceId { get; set; }
+    [Required]
+    public string eventType { get; set; }
 }

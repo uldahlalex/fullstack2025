@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.Options;
 
 namespace Api.Rest.Controllers;
 
+
+
 [ApiController]
 public class DeviceController(
     IServiceLogic service,
@@ -16,15 +19,12 @@ public class DeviceController(
     IConnectionManager connectionManager,
     IMqttClientService mqttClientService) : ControllerBase
 {
-    [Route(nameof(ChangePreferencesForDevice))]
-    public ActionResult ChangePreferencesForDevice(string deviceId, int milliseconds)
+    [Route(nameof(AdminWantsToChangePreferencesForDevice))]
+    public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        mqttClientService.PublishAsync("device/" + deviceId + "/changePreferences", JsonSerializer.Serialize(new
-        {
-            unit = "Celcius",
-            interval = milliseconds
-        }));
+        var serialized = JsonSerializer.Serialize(dto);
+        mqttClientService.PublishAsync("device/" + dto.DeviceId + "/changePreferences", serialized);
         return Ok();
     }
 }

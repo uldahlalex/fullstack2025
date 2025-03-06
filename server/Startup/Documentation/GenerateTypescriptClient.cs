@@ -20,9 +20,12 @@ public static class GenerateTypescriptClient
                 DateTimeType = TypeScriptDateTimeType.Date,
                 NullValue = TypeScriptNullValue.Undefined,
                 TypeScriptVersion = 5.2m,
-                GenerateCloneMethod = false
+                GenerateCloneMethod = false,
+                MarkOptionalProperties = true
             }
         };
+        
+        
 
         var generator = new TypeScriptClientGenerator(document, settings);
         var code = generator.GenerateFile();

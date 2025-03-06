@@ -9,7 +9,12 @@ public static class Extensions
 {
     public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
     {
-        services.AddScoped<IMqttEventHandler<MetricEventDto>, MetricEventHandler>();
+        services.Scan(scan => scan
+            .FromAssemblyOf<IMqttEventHandler<IMqttEventDto>>() 
+            .AddClasses(classes => classes.AssignableTo(typeof(IMqttEventHandler<>)))
+            .AsImplementedInterfaces()
+            .WithTransientLifetime());
+        
         services.AddSingleton<IMqttClientService, MqttClientService>();
         return services;
     }

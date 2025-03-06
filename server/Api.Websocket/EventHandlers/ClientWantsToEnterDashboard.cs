@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Entities;
@@ -12,6 +13,7 @@ public class ClientWantsToEnterDashboardDto : BaseDto
 
 public class ServerAddsAdminToDashboard : BaseDto
 {
+    [Required]
     public List<Devicelog> Devicelogs { get; set; }
 }
 

@@ -142,31 +142,27 @@ export class DeviceClient {
         this.baseUrl = baseUrl ?? "";
     }
 
-    changePreferencesForDevice(deviceId: string | undefined, milliseconds: number | undefined): Promise<FileResponse> {
-        let url_ = this.baseUrl + "/ChangePreferencesForDevice?";
-        if (deviceId === null)
-            throw new Error("The parameter 'deviceId' cannot be null.");
-        else if (deviceId !== undefined)
-            url_ += "deviceId=" + encodeURIComponent("" + deviceId) + "&";
-        if (milliseconds === null)
-            throw new Error("The parameter 'milliseconds' cannot be null.");
-        else if (milliseconds !== undefined)
-            url_ += "milliseconds=" + encodeURIComponent("" + milliseconds) + "&";
+    adminWantsToChangePreferencesForDevice(dto: AdminWantsToChangePreferencesForDeviceDto): Promise<FileResponse> {
+        let url_ = this.baseUrl + "/AdminWantsToChangePreferencesForDevice";
         url_ = url_.replace(/[?&]$/, "");
 
+        const content_ = JSON.stringify(dto);
+
         let options_: RequestInit = {
-            method: "GET",
+            body: content_,
+            method: "POST",
             headers: {
+                "Content-Type": "application/json",
                 "Accept": "application/octet-stream"
             }
         };
 
         return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processChangePreferencesForDevice(_response);
+            return this.processAdminWantsToChangePreferencesForDevice(_response);
         });
     }
 
-    protected processChangePreferencesForDevice(response: Response): Promise<FileResponse> {
+    protected processAdminWantsToChangePreferencesForDevice(response: Response): Promise<FileResponse> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200 || status === 206) {
@@ -190,12 +186,18 @@ export class DeviceClient {
 }
 
 export interface AuthResponseDto {
-    jwt?: string;
+    jwt: string;
 }
 
 export interface AuthRequestDto {
-    email?: string;
-    password?: string;
+    email: string;
+    password: string;
+}
+
+export interface AdminWantsToChangePreferencesForDeviceDto {
+    deviceId: string;
+    intervalMilliseconds: number;
+    unit: string;
 }
 
 
@@ -205,7 +207,7 @@ export interface MemberLeftNotification extends BaseDto {
 }
 
 export interface ApplicationBaseDto {
-    eventType?: string;
+    eventType: string;
 }
 
 export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
@@ -222,12 +224,13 @@ export interface Devicelog {
 }
 
 export interface IMqttEventDto {
-    deviceId?: string;
+    deviceId: string;
+    eventType: string;
 }
 
-export interface MetricEventDto extends IMqttEventDto {
-    value?: number;
-    unit?: string;
+export interface IoTDeviceSendsMetricEventDto extends IMqttEventDto {
+    value: number;
+    unit: string;
 }
 
 export interface MockMqttObject extends IMqttEventDto {
@@ -237,26 +240,24 @@ export interface ClientWantsToEnterDashboardDto extends BaseDto {
 }
 
 export interface ServerAddsAdminToDashboard extends BaseDto {
-    devicelogs?: Devicelog[];
+    devicelogs: Devicelog[];
 }
 
 export interface ServerSendsErrorMessage extends BaseDto {
-    error?: string;
-    requestId?: string;
-}
-
-export interface ClientWantsToChangePreferencesDto extends BaseDto {
-    temperatureThreshold?: number;
+    error: string;
+    requestId: string;
 }
 
 /** Available eventType constants */
 export enum StringConstants {
+    AdminWantsToChangePreferencesForDeviceDto = "AdminWantsToChangePreferencesForDeviceDto",
     MemberLeftNotification = "MemberLeftNotification",
     ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
+    IoTDeviceSendsMetricEventDto = "IoTDeviceSendsMetricEventDto",
+    MockMqttObject = "MockMqttObject",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
-    ClientWantsToChangePreferencesDto = "ClientWantsToChangePreferencesDto",
 }
 
 export interface FileResponse {
