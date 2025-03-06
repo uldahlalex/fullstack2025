@@ -29,15 +29,15 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
                 }
             })
             .Where(t =>
-                t != typeof(BaseDto) &&
-                !t.IsAbstract &&
-                typeof(BaseDto).IsAssignableFrom(t) ||
-                t != typeof(ApplicationBaseDto) &&
-                !t.IsAbstract &&
-                typeof(ApplicationBaseDto).IsAssignableFrom(t) ||
-                t != typeof(IMqttEventDto) &&
-                !t.IsAbstract &&
-                typeof(IMqttEventDto).IsAssignableFrom(t)
+                (t != typeof(BaseDto) &&
+                 !t.IsAbstract &&
+                 typeof(BaseDto).IsAssignableFrom(t)) ||
+                (t != typeof(ApplicationBaseDto) &&
+                 !t.IsAbstract &&
+                 typeof(ApplicationBaseDto).IsAssignableFrom(t)) ||
+                (t != typeof(IMqttEventDto) &&
+                 !t.IsAbstract &&
+                 typeof(IMqttEventDto).IsAssignableFrom(t))
             )
             .ToList();
 

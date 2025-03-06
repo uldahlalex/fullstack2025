@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace Application.Models.Entities;
 
-namespace Application.Models.Entities;
-
-public partial class Device
+public class Device
 {
     public string Id { get; set; } = null!;
 

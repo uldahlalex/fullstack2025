@@ -26,7 +26,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         {
             Jwt = GenerateJwt(new JwtClaims
             {
-                Id = player.Id.ToString(),
+                Id = player.Id,
                 Role = player.Role,
                 Exp = DateTimeOffset.UtcNow.AddHours(1000)
                     .ToUnixTimeSeconds()
@@ -42,7 +42,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         if (player is not null) throw new ValidationException("User already exists");
         var salt = GenerateSalt();
         var hash = HashPassword(dto.Password + salt);
-        var insertedPlayer = repository.AddUser(new User()
+        var insertedPlayer = repository.AddUser(new User
         {
             Id = Guid.NewGuid().ToString(),
             Email = dto.Email,
@@ -54,7 +54,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
         {
             Jwt = GenerateJwt(new JwtClaims
             {
-                Id = insertedPlayer.Id.ToString(),
+                Id = insertedPlayer.Id,
                 Role = insertedPlayer.Role,
                 Exp = DateTimeOffset.UtcNow.AddHours(1000).ToUnixTimeSeconds().ToString(),
                 Email = insertedPlayer.Email
@@ -63,7 +63,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     }
 
     /// <summary>
-    /// Gives hex representation of SHA512 hash
+    ///     Gives hex representation of SHA512 hash
     /// </summary>
     /// <param name="password"></param>
     /// <returns></returns>

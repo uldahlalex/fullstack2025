@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Application.Models.Entities;
+﻿using Application.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Scaffolding;

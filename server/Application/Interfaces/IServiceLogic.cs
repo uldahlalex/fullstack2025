@@ -1,10 +1,5 @@
-﻿using Application.Models;
-using Application.Models.Entities;
-
-namespace Application.Interfaces;
+﻿namespace Application.Interfaces;
 
 public interface IServiceLogic
 {
-
-
 }

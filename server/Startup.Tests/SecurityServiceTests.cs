@@ -1,21 +1,12 @@
 using Application.Interfaces;
-using Application.Interfaces.Infrastructure.Postgres;
-using Application.Models;
-using Application.Services;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Moq;
 using NUnit.Framework;
-using Startup;
 using Startup.Tests.TestUtils;
 
-namespace Application.Tests;
+namespace Startup.Tests;
 
 public class SecurityServiceTests : ApiTestBase
 {
-    
-
     [Test]
     public async Task Hash_Can_Correctly_Hash_A_String()
     {
@@ -26,8 +17,8 @@ public class SecurityServiceTests : ApiTestBase
             var securityService = scope.ServiceProvider.GetRequiredService<ISecurityService>();
             var hash = securityService.HashPassword("password");
             if (hash != expected)
-                throw new Exception("Did not create the expected SHA512 hash. Got: " + hash+ " and expected: "+expected);
+                throw new Exception("Did not create the expected SHA512 hash. Got: " + hash + " and expected: " +
+                                    expected);
         }
-     
     }
 }

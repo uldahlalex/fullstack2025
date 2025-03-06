@@ -11,23 +11,19 @@ namespace Infrastructure.Mqtt;
 
 public class MqttClientService : IMqttClientService, IDisposable
 {
-    private readonly IMqttClient _client;
-    private readonly ILogger<MqttClientService> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly MqttClientOptions _options;
-    private readonly HashSet<string> _topicSubscriptions;
-    private bool _isDisposed;
     private const string DevicePrefix = "device/";
 
     private static readonly Dictionary<string, Type> TopicActionMap = new()
     {
-        { "metric", typeof(MetricEventDto) },
+        { "metric", typeof(MetricEventDto) }
     };
-    
-    public IEnumerable<string> GetSubscriptionTopics()
-    {
-        return TopicActionMap.Keys.Select(action => $"{DevicePrefix}+/{action}");
-    }
+
+    private readonly IMqttClient _client;
+    private readonly ILogger<MqttClientService> _logger;
+    private readonly MqttClientOptions _options;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly HashSet<string> _topicSubscriptions;
+    private bool _isDisposed;
 
 
     public MqttClientService(
@@ -41,9 +37,9 @@ public class MqttClientService : IMqttClientService, IDisposable
 
         var tlsOptions = new MqttClientTlsOptions
         {
-            UseTls = true,
+            UseTls = true
         };
-        
+
         _client = new MqttClientFactory().CreateMqttClient();
         _options = new MqttClientOptionsBuilder()
             .WithTcpServer(optionsMonitor.CurrentValue.MQTT_BROKER_HOST, 8883)
@@ -54,13 +50,17 @@ public class MqttClientService : IMqttClientService, IDisposable
 
         _client.DisconnectedAsync += HandleDisconnection;
         _client.ApplicationMessageReceivedAsync += HandleMessage;
-
     }
 
     public void Dispose()
     {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public IEnumerable<string> GetSubscriptionTopics()
+    {
+        return TopicActionMap.Keys.Select(action => $"{DevicePrefix}+/{action}");
     }
 
     public async Task PublishAsync(string topic, string payload, bool retain = false, int qos = 1)
@@ -199,7 +199,6 @@ public class MqttClientService : IMqttClientService, IDisposable
 
         try
         {
-
             await Task.Delay(TimeSpan.FromSeconds(5));
             await ConnectAsync();
         }
@@ -231,7 +230,6 @@ public class MqttClientService : IMqttClientService, IDisposable
     {
         try
         {
-
             if (!ParseTopic(topic, out var deviceId, out var action))
             {
                 _logger.LogWarning("Received message with unsupported topic format: {Topic}", topic);
@@ -265,7 +263,6 @@ public class MqttClientService : IMqttClientService, IDisposable
 
     private async Task InvokeHandlerAsync(Type eventType, IMqttEventDto mqttEvent)
     {
-
         var handlerType = typeof(IMqttEventHandler<>).MakeGenericType(eventType);
 
         using var scope = _serviceProvider.CreateScope();

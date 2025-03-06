@@ -5,7 +5,7 @@ using Startup.Tests.TestUtils;
 
 namespace Startup.Tests.ObjectValidationTests;
 
-public class AppOptionsValidator() : ApiTestBase( new ApiTestBaseConfig
+public class AppOptionsValidator() : ApiTestBase(new ApiTestBaseConfig
 {
     UseTestContainer = false,
     MockWebSocketService = true,

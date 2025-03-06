@@ -1,5 +1,4 @@
 using Application.Models.Dtos;
-using Infrastructure.Mqtt.Interfaces;
 using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -28,14 +27,14 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
                 }
             })
             .Where(t =>
-                t != typeof(BaseDto) &&
-                !t.IsAbstract &&
-                typeof(BaseDto).IsAssignableFrom(t) ||
-                t != typeof(ApplicationBaseDto) &&
-                !t.IsAbstract &&
-                typeof(ApplicationBaseDto).IsAssignableFrom(t)
-    )
-    .Select(t => t.Name)
+                (t != typeof(BaseDto) &&
+                 !t.IsAbstract &&
+                 typeof(BaseDto).IsAssignableFrom(t)) ||
+                (t != typeof(ApplicationBaseDto) &&
+                 !t.IsAbstract &&
+                 typeof(ApplicationBaseDto).IsAssignableFrom(t))
+            )
+            .Select(t => t.Name)
             .ToArray();
 
         var schema = new JsonSchema

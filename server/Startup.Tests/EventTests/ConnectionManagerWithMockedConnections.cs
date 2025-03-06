@@ -1,25 +1,15 @@
-using Api;
-using Api.WebSockets;
 using Fleck;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Startup;
 using Startup.Tests.TestUtils;
-using WebSocketBoilerplate;
 
-namespace NUnit;
+namespace Startup.Tests.EventTests;
 
-public class ConnectionManagerWithMockedConnections() : ApiTestBase
+public class ConnectionManagerWithMockedConnections : ApiTestBase
 {
-
     [Test]
     public async Task OnConnect_Can_Add_Socket_And_Client_To_Storage()
     {
-
-
         var connectionId = Guid.NewGuid().ToString();
         var socketId = Guid.NewGuid();
         var wsMock = new Mock<IWebSocketConnection>();
@@ -30,7 +20,8 @@ public class ConnectionManagerWithMockedConnections() : ApiTestBase
         await _connectionManager.OnOpen(ws, connectionId);
 
         // assert
-        if (!_connectionManager.GetAllConnectionIdsWithSocketId().Result.Values.Contains(ws.ConnectionInfo.Id.ToString()))
+        if (!_connectionManager.GetAllConnectionIdsWithSocketId().Result.Values
+                .Contains(ws.ConnectionInfo.Id.ToString()))
             throw new Exception("The dictionary should contain the websocket with guid " + ws.ConnectionInfo.Id +
                                 " as the first value");
         if (!_connectionManager.GetAllSocketIdsWithConnectionId().Result.Values.Contains(connectionId))
@@ -42,7 +33,6 @@ public class ConnectionManagerWithMockedConnections() : ApiTestBase
     [Test]
     public async Task OnClose_Can_Remove_Socket_And_Client_From_Storage()
     {
-
         var connectionId = Guid.NewGuid().ToString();
         var socketId = Guid.NewGuid();
         var wsMock = new Mock<IWebSocketConnection>();
@@ -54,7 +44,8 @@ public class ConnectionManagerWithMockedConnections() : ApiTestBase
         await _connectionManager.OnClose(ws, connectionId);
 
         // assert
-        if (_connectionManager.GetAllConnectionIdsWithSocketId().Result.Values.Contains(ws.ConnectionInfo.Id.ToString()))
+        if (_connectionManager.GetAllConnectionIdsWithSocketId().Result.Values
+            .Contains(ws.ConnectionInfo.Id.ToString()))
             throw new Exception("The dictionary should not contain the websocket with guid " + ws.ConnectionInfo.Id);
         if (_connectionManager.GetAllSocketIdsWithConnectionId().Result.Values.Contains(connectionId))
             throw new Exception("The dictionary should not contain the connectionId with guid " + connectionId);

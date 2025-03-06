@@ -9,7 +9,7 @@ using Startup.Tests.TestUtils;
 
 namespace Startup.Tests.Auth;
 
-public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
+public class AuthTests() : ApiTestBase(new ApiTestBaseConfig
 {
     MockMqtt = true,
     MockWebSocketService = false
@@ -30,7 +30,7 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         var response = await client.GetAsync("/acceptance");
         if (await response.Content.ReadAsStringAsync() != "Accepted")
             throw new Exception("Expected 'Accepted'");
-        if(HttpStatusCode.OK != response.StatusCode)
+        if (HttpStatusCode.OK != response.StatusCode)
             throw new Exception("Expected OK status code");
     }
 
@@ -38,24 +38,23 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     public async Task SecuredRouteIsBlockedWitoutJwt()
     {
         var response = await CreateClient().GetAsync(AuthController.SecuredRoute);
-        if(HttpStatusCode.Unauthorized != response.StatusCode)
+        if (HttpStatusCode.Unauthorized != response.StatusCode)
             throw new Exception("Expected Unauthorized status code");
     }
 
     [Test]
     public async Task Register_Can_Register_And_Return_Jwt()
     {
-
         var user = MockObjects.GetUser();
         var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
-            new AuthRequestDto() 
+            new AuthRequestDto
             {
                 Email = user.Email,
                 Password = "pass"
             });
-        if(HttpStatusCode.OK !=response.HttpResponseMessage.StatusCode)
+        if (HttpStatusCode.OK != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected OK status code");
-        if(response.Object.Jwt.Length < 10)
+        if (response.Object.Jwt.Length < 10)
             throw new Exception("Expected jwt to be longer than 10 characters");
     }
 
@@ -69,7 +68,7 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
                 Email = "bob@bob.dk",
                 Password = "a"
             });
-        if(HttpStatusCode.BadRequest !=response.HttpResponseMessage.StatusCode)
+        if (HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected BadRequest status code");
     }
 
@@ -83,12 +82,12 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         await ctx.SaveChangesAsync();
 
         var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(
-            AuthController.LoginRoute, new AuthRequestDto()
+            AuthController.LoginRoute, new AuthRequestDto
             {
                 Email = user.Email,
                 Password = "pass"
             });
-        if(HttpStatusCode.OK != response.HttpResponseMessage.StatusCode)
+        if (HttpStatusCode.OK != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected OK status code");
     }
 
@@ -100,14 +99,14 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         var user = MockObjects.GetUser();
         ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
-        
+
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
-            new AuthRequestDto()
+            new AuthRequestDto
             {
                 Email = user.Email,
                 Password = "invalid password"
             });
-        if(HttpStatusCode.Unauthorized !=response.HttpResponseMessage.StatusCode)
+        if (HttpStatusCode.Unauthorized != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected Unauthorized status code");
     }
 
@@ -115,8 +114,8 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
     public async Task Login_For_Non_Existing_User_Is_Unauthorized()
     {
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.LoginRoute,
-            new AuthRequestDto() {Email = "bob@bob.dk", Password = "password"});
-        if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode)
+            new AuthRequestDto { Email = "bob@bob.dk", Password = "password" });
+        if (HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode)
             throw new Exception("Expected BadRequest status code");
     }
 
@@ -130,11 +129,11 @@ public class AuthTests() : ApiTestBase( new ApiTestBaseConfig
         await ctx.SaveChangesAsync();
 
         var response = await CreateClient().PostAsJsonAsync<ProblemDetails>(AuthController.RegisterRoute,
-            new AuthRequestDto()
+            new AuthRequestDto
             {
                 Email = user.Email,
                 Password = "password"
             });
-        if(HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode);
+        if (HttpStatusCode.BadRequest != response.HttpResponseMessage.StatusCode) ;
     }
 }

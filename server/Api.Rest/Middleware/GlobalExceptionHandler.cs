@@ -13,7 +13,7 @@ internal sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> log
         CancellationToken cancellationToken)
     {
         logger.LogInformation(exception, exception.Message);
-        
+
         var status = exception switch
         {
             ValidationException => StatusCodes.Status400BadRequest,

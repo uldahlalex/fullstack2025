@@ -1,23 +1,18 @@
-﻿using Api;
-using Api.Websocket.EventHandlers;
-using Api.Websocket.EventHandlers.ClientEventDtos;
+﻿using Api.Websocket.EventHandlers;
 using Application.Interfaces.Infrastructure.Mqtt;
-using Fleck;
+using Application.Interfaces.Infrastructure.Websocket;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NUnit;
 using NUnit.Framework;
 using PgCtx;
 using Startup.Proxy;
 using WebSocketBoilerplate;
-
 
 namespace Startup.Tests.TestUtils;
 
@@ -26,23 +21,20 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 {
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
     private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
-
-    
-    public ILogger<ApiTestBase> _logger;
-    public HttpClient _httpClient;
-    public MyDbContext _dbContext;
     public IConnectionManager _connectionManager;
-    public string _wsClientId;
-    public WsRequestClient _wsClient;
+    public MyDbContext _dbContext;
+    public HttpClient _httpClient;
+
+
+    public ILogger<ApiTestBase> _logger;
     public IServiceScope _scope;
-    
+    public WsRequestClient _wsClient;
+    public string _wsClientId;
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(ConfigureTestServices);
-        
-        
     }
 
 
@@ -92,7 +84,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
         if (descriptor != null)
             services.Remove(descriptor);
     }
-    
+
     [SetUp]
     public async Task Setup()
     {
@@ -100,7 +92,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         //Singletons
         _logger = Services.GetRequiredService<ILogger<ApiTestBase>>();
-        _connectionManager =  Services.GetRequiredService<IConnectionManager>();
+        _connectionManager = Services.GetRequiredService<IConnectionManager>();
 
         //Scoped services
         using var scope = Services.CreateScope();
@@ -108,7 +100,7 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
             _scope = Services.CreateScope();
             _dbContext = _scope.ServiceProvider.GetRequiredService<MyDbContext>();
         }
-        
+
         var wsPort = Environment.GetEnvironmentVariable("PORT");
         if (string.IsNullOrEmpty(wsPort)) throw new Exception("Environment variable PORT is not set");
         _wsClientId = Guid.NewGuid().ToString();

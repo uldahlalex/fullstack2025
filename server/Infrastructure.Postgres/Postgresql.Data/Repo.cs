@@ -8,7 +8,7 @@ public class Repo(MyDbContext ctx) : IDataRepository
 {
     public User? GetUserOrNull(string email)
     {
-         return ctx.Users.FirstOrDefault(u => u.Email == email);
+        return ctx.Users.FirstOrDefault(u => u.Email == email);
     }
 
     public User AddUser(User user)

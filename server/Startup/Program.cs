@@ -1,9 +1,7 @@
 using Api.Rest;
-using Api.Utilities;
 using Api.Websocket;
 using Application;
 using Application.Models;
-using Fleck;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
@@ -11,10 +9,8 @@ using Microsoft.Extensions.Options;
 using NLog;
 using NLog.Web;
 using Scalar.AspNetCore;
-
 using Startup.Documentation;
 using Startup.Proxy;
-using WebSocketBoilerplate;
 
 namespace Startup;
 
@@ -22,15 +18,14 @@ public class Program
 {
     public static async Task Main()
     {
-       
         var logger = LogManager.Setup()
             .LoadConfigurationFromAppSettings()
             .GetCurrentClassLogger();
-         var builder = WebApplication.CreateBuilder();
+        var builder = WebApplication.CreateBuilder();
 
-        
-            builder.Logging.ClearProviders();
-            builder.Host.UseNLog();
+
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
         ConfigureServices(builder.Services, builder.Configuration);
         var app = builder.Build();
         await ConfigureMiddleware(app);
@@ -39,8 +34,6 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-
-
         services.AddAppOptions(configuration);
 
         services.RegisterApplicationServices();

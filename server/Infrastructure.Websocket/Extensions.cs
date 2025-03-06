@@ -1,5 +1,4 @@
-using Api;
-using Api.WebSockets;
+using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Fleck;
 using Microsoft.Extensions.DependencyInjection;

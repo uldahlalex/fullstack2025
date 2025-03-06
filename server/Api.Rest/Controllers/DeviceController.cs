@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Api.Rest.Extensions;
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -17,10 +17,10 @@ public class DeviceController(
     IMqttClientService mqttClientService) : ControllerBase
 {
     [Route(nameof(ChangePreferencesForDevice))]
-    public ActionResult ChangePreferencesForDevice(string  deviceId, int milliseconds)
+    public ActionResult ChangePreferencesForDevice(string deviceId, int milliseconds)
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        mqttClientService.PublishAsync("device/"+deviceId+"/changePreferences", JsonSerializer.Serialize(new
+        mqttClientService.PublishAsync("device/" + deviceId + "/changePreferences", JsonSerializer.Serialize(new
         {
             unit = "Celcius",
             interval = milliseconds

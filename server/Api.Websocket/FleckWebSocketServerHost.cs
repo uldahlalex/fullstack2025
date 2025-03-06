@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Web;
 using Api.Websocket.EventHandlers.ServerEventDtos;
 using Api.Websocket.Interfaces;
+using Application.Interfaces.Infrastructure.Websocket;
 using Fleck;
 using WebSocketBoilerplate;
 
@@ -31,7 +32,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
             using var scope = app.Services.CreateScope();
             var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager>();
 
-            ws.OnOpen = () => manager.OnOpen(ws, id ); //todo
+            ws.OnOpen = () => manager.OnOpen(ws, id); //todo
             ws.OnClose = () => manager.OnClose(ws, id);
             ws.OnError = ex =>
             {

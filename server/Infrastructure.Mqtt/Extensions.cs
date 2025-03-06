@@ -21,11 +21,7 @@ public static class Extensions
             using var scope = app.Services.CreateScope();
             var mqttService = scope.ServiceProvider.GetRequiredService<IMqttClientService>();
             await mqttService.ConnectAsync();
-            foreach (var topic in mqttService.GetSubscriptionTopics())
-            {
-                await mqttService.SubscribeAsync(topic);
-            }
-
+            foreach (var topic in mqttService.GetSubscriptionTopics()) await mqttService.SubscribeAsync(topic);
         });
 
         return app;
