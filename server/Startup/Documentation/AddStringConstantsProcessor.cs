@@ -1,4 +1,5 @@
 using Application.Models.Dtos;
+using Infrastructure.Mqtt;
 using NJsonSchema;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -32,7 +33,9 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
                  typeof(BaseDto).IsAssignableFrom(t)) ||
                 (t != typeof(ApplicationBaseDto) &&
                  !t.IsAbstract &&
-                 typeof(ApplicationBaseDto).IsAssignableFrom(t))
+                 typeof(ApplicationBaseDto).IsAssignableFrom(t)) ||
+                t == typeof(AdminWantsToChangePreferencesForDeviceDto) ||
+                t == typeof(DeviceSendsMetricToServerDto)
             )
             .Select(t => t.Name)
             .ToArray();

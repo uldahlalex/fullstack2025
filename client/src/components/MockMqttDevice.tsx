@@ -2,8 +2,7 @@ import mqtt from "mqtt";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import {
-    AdminWantsToChangePreferencesForDeviceDto,
-    IoTDeviceSendsMetricEventDto,
+    AdminWantsToChangePreferencesForDeviceDto, DeviceSendsMetricToServerDto, ServerSendsMetricToAdmin,
     StringConstants
 } from "../generated-client.ts";
 
@@ -51,10 +50,12 @@ export default function MockMqttDevice({id: id}: Param) {
             });
 
             mqttClient.on('message', (topic, message) => {
+                console.log(topic,  message)
                 const command = topic.substring(topic.lastIndexOf('/') + 1);
                 if (command === StringConstants.AdminWantsToChangePreferencesForDeviceDto) {
                     console.log(command, message.toString());
                     const pref: AdminWantsToChangePreferencesForDeviceDto = JSON.parse(message.toString()) as AdminWantsToChangePreferencesForDeviceDto;
+                    console.log(pref);
                     setPreferences(pref);
                 }
             });
@@ -93,9 +94,9 @@ export default function MockMqttDevice({id: id}: Param) {
 
     const publishMetric = () => {
         if (!client?.connected) return;
-        const topic = "device/" + id + "/"+StringConstants.IoTDeviceSendsMetricEventDto;
-        const metric: IoTDeviceSendsMetricEventDto = {
-            eventType: StringConstants.IoTDeviceSendsMetricEventDto,
+        const topic = "device/" + id + "/"+StringConstants.DeviceSendsMetricToServerDto;
+        const metric: DeviceSendsMetricToServerDto = {
+            
             value: Math.random() * 100,
             unit: preferences.unit,
             deviceId: id

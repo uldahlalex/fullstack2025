@@ -53,8 +53,8 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         if (_apiTestBaseConfig.MockMqtt)
         {
-            RemoveExistingService<IMqttClientService>(services);
-            var mockMqttClientService = new Mock<IMqttClientService>();
+            RemoveExistingService<IMqttPublisher>(services);
+            var mockMqttClientService = new Mock<IMqttPublisher>();
             services.AddSingleton(mockMqttClientService.Object);
         }
 

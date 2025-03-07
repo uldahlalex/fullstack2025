@@ -36,7 +36,7 @@ public static class Extensions
             })
             .Build());
 
-        await eventBus.SubscribeAsync("device/+/metric", async (evt) =>
+        await eventBus.SubscribeAsync("device/+/DeviceSendsMetricToServerDto", async (evt) =>
         {
             serviceProvider.GetRequiredService<ILogger<MqttEventBus>>().LogInformation($"Received event: {evt.Topic} {evt.Payload} {JsonSerializer.Serialize(evt.Parameters)}");
             var metric = JsonSerializer.Deserialize<DeviceSendsMetricToServerDto>(evt.Payload, new JsonSerializerOptions() {PropertyNameCaseInsensitive = true})?.ToDeviceLog() ?? throw new Exception("Could not parse as "+nameof(Devicelog));
@@ -65,7 +65,7 @@ public class MqttPublisher(IMqttClient mqttClient) : IMqttPublisher
     public async Task Publish(string topic, string payload)
     {
         var message = new MqttApplicationMessageBuilder()
-            .WithTopic($"device/{""}/command")
+            .WithTopic(topic)
             .WithPayload(payload)
             .Build();
 
@@ -77,7 +77,7 @@ public class DeviceSendsMetricToServerDto
 {
     public string Unit { get; set; }
     public string DeviceId { get; set; }
-    public int Value { get; set; }
+    public double Value { get; set; }
 
     public Devicelog ToDeviceLog()
     {

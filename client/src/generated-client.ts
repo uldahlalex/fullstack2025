@@ -247,6 +247,12 @@ export interface MemberLeftNotification extends BaseDto {
     topic?: string;
 }
 
+export interface DeviceSendsMetricToServerDto {
+    unit?: string;
+    deviceId?: string;
+    value?: number;
+}
+
 export interface ApplicationBaseDto {
     eventType: string;
 }
@@ -269,7 +275,9 @@ export interface ServerSendsErrorMessage extends BaseDto {
 
 /** Available eventType constants */
 export enum StringConstants {
+    AdminWantsToChangePreferencesForDeviceDto = "AdminWantsToChangePreferencesForDeviceDto",
     MemberLeftNotification = "MemberLeftNotification",
+    DeviceSendsMetricToServerDto = "DeviceSendsMetricToServerDto",
     ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",

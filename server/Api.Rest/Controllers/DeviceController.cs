@@ -26,7 +26,10 @@ public class DeviceController(
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        var serialized = JsonSerializer.Serialize(dto);
+        var serialized = JsonSerializer.Serialize(dto, new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
         publisher.Publish("device/" + dto.DeviceId + "/"+nameof(AdminWantsToChangePreferencesForDeviceDto), serialized);
         return Ok();
     }
