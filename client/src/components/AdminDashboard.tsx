@@ -27,6 +27,7 @@ export default function AdminDashboard() {
         });
 
         const unsub = onMessage<ServerSendsMetricToAdmin>(StringConstants.ServerSendsMetricToAdmin, (dto) =>  {
+            console.log(dto)
             setMetrics(dto.metrics || []);
         })
 

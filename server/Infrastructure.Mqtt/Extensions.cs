@@ -1,6 +1,9 @@
 using System.Text.Json;
-using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Interfaces.Infrastructure.Postgres;
+using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
+using Application.Models.Dtos;
+using Application.Models.Entities;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 
@@ -17,11 +20,13 @@ public static class Extensions
 
     public static async Task<WebApplication> ConfigureMqtt(this WebApplication app)
     {
+        var serviceProvider = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider;
+
         var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
         var mqttClient = app.Services.GetRequiredService<IMqttClient>();
         var eventBus =  app.Services.GetRequiredService<MqttEventBus>();
         await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
-            .WithTcpServer(appOptions.MQTT_BROKER_HOST, 1883)
+            .WithTcpServer(appOptions.MQTT_BROKER_HOST, 8883)
             .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
             .WithTlsOptions(new MqttClientTlsOptions
             {
@@ -29,22 +34,56 @@ public static class Extensions
             })
             .Build());
 
-        await eventBus.SubscribeAsync("device/+/status", async (evt) =>
+        await eventBus.SubscribeAsync("device/+/metric", async (evt) =>
         {
-            var payload = JsonSerializer.Serialize(new {});
-            var message = new MqttApplicationMessageBuilder()
-                .WithTopic($"device/{""}/command")
-                .WithPayload(payload)
-                .Build();
-
-            await mqttClient.PublishAsync(message);
+            serviceProvider.GetRequiredService<ILogger<MqttEventBus>>().LogInformation($"Received event: {evt.Topic} {evt.Payload} {JsonSerializer.Serialize(evt.Parameters)}");
+            var metric = JsonSerializer.Deserialize<DeviceSendsMetricToServerDto>(evt.Payload, new JsonSerializerOptions() {PropertyNameCaseInsensitive = true})?.ToDeviceLog() ?? throw new Exception("Could not parse as "+nameof(Devicelog));
+            serviceProvider.GetRequiredService<IDataRepository>().AddMetric(metric);
+            var allLogs = serviceProvider.GetRequiredService<IDataRepository>().GetAllMetrics();
+            var broadcast = new ServerSendsMetricToAdmin()
+            {
+                Metrics = allLogs,
+                eventType = nameof(ServerSendsMetricToAdmin)
+            };
+          
+            await serviceProvider.GetRequiredService<IConnectionManager>().BroadcastToTopic("dashboard", broadcast);
         });
 
-        await eventBus.SubscribeAsync("device/+/telemetry", (evt) =>
+        await eventBus.SubscribeAsync("device/+/telemetry", async (evt) =>
         {
-            // Handle telemetry
+            // var message = new MqttApplicationMessageBuilder()
+            //     .WithTopic($"device/{""}/command")
+            //     .WithPayload(payload)
+            //     .Build();
+
+            // await mqttClient.PublishAsync(message);
         });
 
         return app;
     }
+}
+
+public class DeviceSendsMetricToServerDto
+{
+    public string Unit { get; set; }
+    public string DeviceId { get; set; }
+    public int Value { get; set; }
+
+    public Devicelog ToDeviceLog()
+    {
+        var result = new Devicelog()
+        {
+Unit =  Unit,
+Value = Value,
+Id = Guid.NewGuid().ToString(),
+Timestamp = DateTime.UtcNow,
+Deviceid = DeviceId
+        };
+        return result;
+    }
+}
+
+public class ServerSendsMetricToAdmin : ApplicationBaseDto
+{
+    public List<Devicelog> Metrics { get; set; } = new List<Devicelog>();
 }

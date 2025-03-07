@@ -212,7 +212,6 @@ export interface ApplicationBaseDto {
 
 export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
     metrics?: Devicelog[];
-    eventType?: string;
 }
 
 export interface Devicelog {
@@ -221,19 +220,6 @@ export interface Devicelog {
     value?: number;
     timestamp?: Date;
     unit?: string;
-}
-
-export interface IMqttEventDto {
-    deviceId: string;
-    eventType: string;
-}
-
-export interface IoTDeviceSendsMetricEventDto extends IMqttEventDto {
-    value: number;
-    unit: string;
-}
-
-export interface MockMqttObject extends IMqttEventDto {
 }
 
 export interface ClientWantsToEnterDashboardDto extends BaseDto {
@@ -250,11 +236,8 @@ export interface ServerSendsErrorMessage extends BaseDto {
 
 /** Available eventType constants */
 export enum StringConstants {
-    AdminWantsToChangePreferencesForDeviceDto = "AdminWantsToChangePreferencesForDeviceDto",
     MemberLeftNotification = "MemberLeftNotification",
     ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
-    IoTDeviceSendsMetricEventDto = "IoTDeviceSendsMetricEventDto",
-    MockMqttObject = "MockMqttObject",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",

@@ -11,8 +11,7 @@ namespace Application.Services;
 /// <param name="mqtt"></param>
 /// <param name="redisRepo"></param>
 public class ServiceLogic(
-    IDataRepository repo,
-    IMqttClientService mqtt
+    IDataRepository repo
     //  IConnectionManager<IAppConnection> connectionManager
 ) : IServiceLogic
 {
