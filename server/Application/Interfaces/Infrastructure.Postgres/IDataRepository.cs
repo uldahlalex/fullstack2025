@@ -8,4 +8,5 @@ public interface IDataRepository
     User AddUser(User user);
     Devicelog AddMetric(Devicelog eventDtoData);
     List<Devicelog> GetAllMetrics();
+    void ClearMetrics();
 }

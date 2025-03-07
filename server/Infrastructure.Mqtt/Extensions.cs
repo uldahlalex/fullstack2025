@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
@@ -15,6 +16,7 @@ public static class Extensions
     {
         services.AddSingleton<IMqttClient>(new MqttClientFactory().CreateMqttClient());
         services.AddSingleton<MqttEventBus>();
+        services.AddSingleton<IMqttPublisher, MqttPublisher>();
         return services;
     }
 
@@ -51,15 +53,23 @@ public static class Extensions
 
         await eventBus.SubscribeAsync("device/+/telemetry", async (evt) =>
         {
-            // var message = new MqttApplicationMessageBuilder()
-            //     .WithTopic($"device/{""}/command")
-            //     .WithPayload(payload)
-            //     .Build();
-
-            // await mqttClient.PublishAsync(message);
+ 
         });
 
         return app;
+    }
+}
+
+public class MqttPublisher(IMqttClient mqttClient) : IMqttPublisher
+{
+    public async Task Publish(string topic, string payload)
+    {
+        var message = new MqttApplicationMessageBuilder()
+            .WithTopic($"device/{""}/command")
+            .WithPayload(payload)
+            .Build();
+
+        await mqttClient.PublishAsync(message);
     }
 }
 
