@@ -1,6 +1,4 @@
-aktuelt:
-- fjern web fake mqtt og lav i stedet py mqtt client
-    - er appbasedto stadig relevant i stringconstants?
+- kahoot som rest + connectionmanager
 
 - lav øvelser
     - structuring the onion

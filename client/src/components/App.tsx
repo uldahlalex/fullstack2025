@@ -1,6 +1,7 @@
 import {WsClientProvider} from 'ws-request-hook';
 import AdminDashboard from "./AdminDashboard.tsx";
 import {useEffect, useState} from "react";
+import SuperSimpleKahootCloneGui from "./SuperSimpleKahootCloneGui.tsx";
 const baseUrl = import.meta.env.VITE_API_BASE_URL
 const prod = import.meta.env.PROD
 
@@ -23,6 +24,7 @@ setUrl(finalUrl);
             </h1>
                 <div>
                     <AdminDashboard />
+                    <SuperSimpleKahootCloneGui />
                 </div>
 
             </div>
