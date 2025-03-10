@@ -1,10 +1,5 @@
-using Application.Interfaces;
-using Application.Interfaces.Infrastructure.Mqtt;
-using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
-using Application.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace Api.Rest.Controllers;
 
@@ -89,7 +84,7 @@ public class VerySimplyKahootWithInMemoryDb (
         await connectionManager.BroadcastToTopic("games/" + gameId, new
         {
             Result = Round.Rounds,
-            eventType = "game"
+            eventType = "round"
         });
     }
 
@@ -98,20 +93,20 @@ public class VerySimplyKahootWithInMemoryDb (
         await connectionManager.BroadcastToTopic("games/" + gameId, new
         {
             Q = nextRound.QuestionId == 1 ? "What is the capital of france?" : "What is 2+2?",
-            eventType = "question"
+            questionId = nextRound.QuestionId,
+            eventType = "round"
         });
         await Task.Delay(20_000); //This is the timeframe where users can submit answers using the "SubmitAnswer" controller method
+        nextRound.IsDone = true;
         await connectionManager.BroadcastToTopic("games/" + gameId, new
         {
             Result = Round.Rounds,
             eventType = "round"
         });
 
-        nextRound.IsDone = true;
     }
 
     [HttpPost(nameof(SubmitAnswer))]
-
     public async Task<ActionResult> SubmitAnswer(
         [FromQuery]string player,  
         [FromQuery] string answer, 

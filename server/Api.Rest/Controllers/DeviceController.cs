@@ -25,7 +25,7 @@ public class DeviceController(
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
-        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
+        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt()); //this is an example of jwt authentication for REST using the same SecurityService as WebSocket API 
         publisher.Publish(dto);
         return Ok();
     }
@@ -33,7 +33,6 @@ public class DeviceController(
     [Route(nameof(AdminWantsToClearData))]
     public ActionResult<List<Devicelog>> AdminWantsToClearData()
     {
-        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
         repository.ClearMetrics();
         var allMetrics = repository.GetAllMetrics();
         return Ok(allMetrics);

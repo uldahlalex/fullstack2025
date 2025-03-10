@@ -1,16 +1,5 @@
-- kahoot som rest + connectionmanager
 
-- lav øvelser
+- exercises for wednesday
     - structuring the onion
-
-email
-
-
-- test med auth hvor uid identificerer de andre ID'er
-- test der bruger REST til at mutate ws state
-- mqttclient tests 
-
-_____
-
-- README.md
-    - grafisk overblik
+- presentation for kahoot walkthrough + onion introduction
+- graphical overview in readme.md
