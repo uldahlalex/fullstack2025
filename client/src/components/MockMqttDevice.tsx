@@ -98,7 +98,7 @@ export default function MockMqttDevice({id: id}: Param) {
         const metric: DeviceSendsMetricToServerDto = {
             
             value: Math.random() * 100,
-            unit: preferences.unit,
+            unit: preferences.unit ?? "A",
             deviceId: id
         };
         client.publish(topic, JSON.stringify(metric), (err) => {

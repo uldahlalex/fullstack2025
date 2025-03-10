@@ -1,7 +1,9 @@
 aktuelt:
-- admin dashboard controls
-    - bug: change prefernces no unit present
-        - forslag: typesafety mellem mqtt og andre API'er
+- fjern web fake mqtt og lav i stedet py mqtt client
+
+- lav øvelser
+    - structuring the onion
+        
 
 
 - test med auth hvor uid identificerer de andre ID'er
