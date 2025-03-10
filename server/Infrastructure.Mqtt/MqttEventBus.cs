@@ -1,89 +1,85 @@
-using MQTTnet;
 using System.Text;
-using System.Text.Json;
+using MQTTnet;
 
-public class TopicPattern
-{
-    private readonly string _pattern;
-    private readonly string[] _segments;
-
-    public TopicPattern(string pattern)
-    {
-        _pattern = pattern;
-        _segments = pattern.Split('/');
-    }
-
-    public bool Matches(string topic, out Dictionary<string, string> parameters)
-    {
-        parameters = new Dictionary<string, string>();
-        var topicSegments = topic.Split('/');
-
-        if (topicSegments.Length != _segments.Length)
-            return false;
-
-        for (int i = 0; i < _segments.Length; i++)
-        {
-            if (_segments[i] == "+")
-            {
-                parameters[i.ToString()] = topicSegments[i];
-                continue;
-            }
-
-            if (_segments[i] != topicSegments[i])
-                return false;
-        }
-
-        return true;
-    }
-}
-
-public class MqttEvent
-{
-    public string Topic { get; set; }
-    public string Payload { get; set; }
-    public Dictionary<string, string> Parameters { get; set; }
-}
+namespace Infrastructure.Mqtt;
 
 public class MqttEventBus
 {
-    private readonly List<(TopicPattern Pattern, Action<MqttEvent> Handler)> _subscribers 
-        = new List<(TopicPattern, Action<MqttEvent>)>();
-    private readonly IMqttClient _client;
+    private readonly IMqttClient _mqttClient;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<MqttEventBus> _logger;
 
-    public MqttEventBus(IMqttClient client)
+    public MqttEventBus(IMqttClient mqttClient, IServiceProvider serviceProvider, ILogger<MqttEventBus> logger)
     {
-        _client = client;
-        _client.ApplicationMessageReceivedAsync += HandleMessageAsync;
+        _mqttClient = mqttClient;
+        _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
-    public async Task SubscribeAsync(string topicPattern, Action<MqttEvent> handler)
-    {
-        await _client.SubscribeAsync(new MqttTopicFilterBuilder()
-            .WithTopic(topicPattern)
-            .Build());
-        _subscribers.Add((new TopicPattern(topicPattern), handler));
-    }
 
-    private Task HandleMessageAsync(MqttApplicationMessageReceivedEventArgs e)
+
+    public async Task SubscribeWithHandlerAsync( IEnumerable<IMqttEventHandler> handlers)
     {
-        var topic = e.ApplicationMessage.Topic;
-        
-        foreach (var (pattern, handler) in _subscribers)
+        foreach(var handler in handlers)
         {
-            if (pattern.Matches(topic, out var parameters))
+            await _mqttClient.SubscribeAsync(handler.TopicPattern);
+
+        _mqttClient.ApplicationMessageReceivedAsync += async (e) =>
+        {
+            if (TopicMatchesPattern(e.ApplicationMessage.Topic, handler.TopicPattern))
             {
+                var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                var parameters = ExtractTopicParameters(e.ApplicationMessage.Topic, handler.TopicPattern);
+                
                 var mqttEvent = new MqttEvent
                 {
-                    Topic = topic,
-                    Payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload),
+                    Topic = e.ApplicationMessage.Topic,
+                    Payload = payload,
                     Parameters = parameters
                 };
 
-                handler(mqttEvent);
+                using var scope = _serviceProvider.CreateScope();
+                var scopedHandler = scope.ServiceProvider.GetRequiredService(handler.GetType()) as IMqttEventHandler;
+                await scopedHandler.HandleAsync(mqttEvent);
+            }
+        };
+        }
+        
+    }
+
+    // Utility methods for topic matching
+    private bool TopicMatchesPattern(string topic, string pattern) 
+    {
+        // Implementation for MQTT topic pattern matching
+        // Simple implementation - can be enhanced for more complex patterns
+        var patternParts = pattern.Split('/');
+        var topicParts = topic.Split('/');
+        
+        if (patternParts.Length != topicParts.Length) return false;
+        
+        for (int i = 0; i < patternParts.Length; i++)
+        {
+            if (patternParts[i] == "+" || patternParts[i] == "#") continue;
+            if (patternParts[i] != topicParts[i]) return false;
+        }
+        
+        return true;
+    }
+
+    private Dictionary<string, string> ExtractTopicParameters(string topic, string pattern)
+    {
+        var parameters = new Dictionary<string, string>();
+        var patternParts = pattern.Split('/');
+        var topicParts = topic.Split('/');
+        
+        for (int i = 0; i < patternParts.Length; i++)
+        {
+            if (patternParts[i] == "+")
+            {
+                parameters["param" + i] = topicParts[i];
             }
         }
-
-        return Task.CompletedTask;
+        
+        return parameters;
     }
 }
-

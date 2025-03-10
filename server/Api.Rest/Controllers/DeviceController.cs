@@ -19,18 +19,14 @@ public class DeviceController(
     ISecurityService securityService,
     IDataRepository repository,
     IOptionsMonitor<AppOptions> optionsMonitor,
-    IMqttPublisher publisher,
+    IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto> publisher,
     IConnectionManager connectionManager) : ControllerBase
 {
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
         //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        var serialized = JsonSerializer.Serialize(dto, new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        publisher.Publish("device/" + dto.DeviceId + "/"+nameof(AdminWantsToChangePreferencesForDeviceDto), serialized);
+        publisher.Publish(dto);
         return Ok();
     }
     

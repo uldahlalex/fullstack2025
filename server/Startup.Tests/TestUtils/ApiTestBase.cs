@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
+using MQTTnet;
 using NUnit.Framework;
 using PgCtx;
 using Startup.Proxy;
@@ -53,9 +54,9 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 
         if (_apiTestBaseConfig.MockMqtt)
         {
-            RemoveExistingService<IMqttPublisher>(services);
-            var mockMqttClientService = new Mock<IMqttPublisher>();
-            services.AddSingleton(mockMqttClientService.Object);
+            RemoveExistingService<IMqttClient>(services);
+            var mockMqttClient = new Mock<IMqttClient>();
+            services.AddSingleton(mockMqttClient.Object);
         }
 
         if (_apiTestBaseConfig.MockProxyConfig)

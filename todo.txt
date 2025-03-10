@@ -1,9 +1,11 @@
 aktuelt:
 - fjern web fake mqtt og lav i stedet py mqtt client
+    - er appbasedto stadig relevant i stringconstants?
 
 - lav øvelser
     - structuring the onion
-        
+
+email
 
 
 - test med auth hvor uid identificerer de andre ID'er

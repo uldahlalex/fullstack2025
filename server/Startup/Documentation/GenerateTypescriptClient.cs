@@ -10,7 +10,6 @@ public static class GenerateTypescriptClient
     {
         var document = await app.Services.GetRequiredService<IOpenApiDocumentGenerator>()
             .GenerateAsync("v1");
-
         var settings = new TypeScriptClientGeneratorSettings
         {
             Template = TypeScriptTemplate.Fetch,

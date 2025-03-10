@@ -27,15 +27,16 @@ public sealed class AddStringConstantsProcessor : IDocumentProcessor
                     return Array.Empty<Type>();
                 }
             })
+             //Here I'm actively looking for types used by the Websocket API
+             //(ApplicationBaseDto is also relevant because Mqtt Infrastructure doesn't have websocket dependencies,
+             // but I still want the inheritors to be documented by openapi)
             .Where(t =>
                 (t != typeof(BaseDto) &&
                  !t.IsAbstract &&
                  typeof(BaseDto).IsAssignableFrom(t)) ||
                 (t != typeof(ApplicationBaseDto) &&
                  !t.IsAbstract &&
-                 typeof(ApplicationBaseDto).IsAssignableFrom(t)) ||
-                t == typeof(AdminWantsToChangePreferencesForDeviceDto) ||
-                t == typeof(DeviceSendsMetricToServerDto)
+                 typeof(ApplicationBaseDto).IsAssignableFrom(t))
             )
             .Select(t => t.Name)
             .ToArray();
