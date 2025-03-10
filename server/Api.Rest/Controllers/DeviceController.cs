@@ -5,6 +5,7 @@ using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
+using Application.Models.Dtos;
 using Application.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

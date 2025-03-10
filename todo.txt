@@ -1,5 +1,10 @@
+scalar path
 
 - exercises for wednesday
     - structuring the onion
 - presentation for kahoot walkthrough + onion introduction
-- graphical overview in readme.md
+    kahoot clone
+        - 
+     sclar
+        
+- graphical overview in readme.md + readme in general

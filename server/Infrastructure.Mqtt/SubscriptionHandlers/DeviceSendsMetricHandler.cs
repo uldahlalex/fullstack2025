@@ -5,7 +5,7 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models.Entities;
 
-namespace Infrastructure.Mqtt.Handlers;
+namespace Infrastructure.Mqtt.SubscriptionHandlers;
 
 public class DeviceMetricsHandler : IMqttEventHandler
 {

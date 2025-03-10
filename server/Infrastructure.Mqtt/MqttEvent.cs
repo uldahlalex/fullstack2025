@@ -1,3 +1,5 @@
+namespace Infrastructure.Mqtt;
+
 public class MqttEvent
 {
     public string Topic { get; set; }

@@ -42,6 +42,6 @@ public static class GenerateTypescriptClient
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
         await File.WriteAllTextAsync(outputPath, modifiedCode);
-        Console.WriteLine("TypeScript client generated at: " + outputPath);
+        app.Services.GetRequiredService<ILogger<Program>>().LogInformation("TypeScript client generated at: " + outputPath);
     }
 }

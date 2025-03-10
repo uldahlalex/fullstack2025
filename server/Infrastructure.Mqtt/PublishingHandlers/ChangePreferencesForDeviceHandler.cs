@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Models.Dtos;
 using MQTTnet;
 
 namespace Infrastructure.Mqtt.PublishingHandlers;

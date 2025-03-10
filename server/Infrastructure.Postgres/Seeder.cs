@@ -14,6 +14,7 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
         var outputPath = Path.Combine(Directory.GetCurrentDirectory() +
                                       "/../Infrastructure.Postgres.Scaffolding/current_schema.sql");
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-        await File.WriteAllTextAsync(outputPath, context.Database.GenerateCreateScript());
+        await File.WriteAllTextAsync(outputPath, "-- This schema is generated based on the current DBContext. Please check the class "+nameof(Seeder)+" to see.\n" +
+                                                 ""+context.Database.GenerateCreateScript());
     }
 }

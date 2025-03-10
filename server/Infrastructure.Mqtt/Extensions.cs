@@ -5,8 +5,8 @@ using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Application.Models.Dtos;
 using Application.Models.Entities;
-using Infrastructure.Mqtt.Handlers;
 using Infrastructure.Mqtt.PublishingHandlers;
+using Infrastructure.Mqtt.SubscriptionHandlers;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 

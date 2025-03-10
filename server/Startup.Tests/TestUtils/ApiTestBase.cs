@@ -25,8 +25,6 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     public IConnectionManager _connectionManager;
     public MyDbContext _dbContext;
     public HttpClient _httpClient;
-
-
     public ILogger<ApiTestBase> _logger;
     public IServiceScope _scope;
     public WsRequestClient _wsClient;

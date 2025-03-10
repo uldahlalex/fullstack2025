@@ -1,3 +1,4 @@
+-- This schema is generated based on the current DBContext. Please check the class Seeder to see.
 DO $EF$
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM pg_namespace WHERE nspname = 'surveillance') THEN

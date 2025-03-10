@@ -1,6 +1,6 @@
 using Application.Models.Entities;
 
-namespace Infrastructure.Mqtt;
+namespace Infrastructure.Mqtt.SubscriptionHandlers;
 
 public class DeviceSendsMetricToServerDto
 {
