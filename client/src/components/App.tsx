@@ -5,11 +5,13 @@ import SuperSimpleKahootCloneGui from "./SuperSimpleKahootCloneGui.tsx";
 const baseUrl = import.meta.env.VITE_API_BASE_URL
 const prod = import.meta.env.PROD
 
+export const randomUid = crypto.randomUUID()
+
 export default function App() {
     
     const [url, setUrl] = useState<string | undefined>(undefined)
     useEffect(() => {
-        const finalUrl = prod ? 'wss://' + baseUrl + '?id=' + crypto.randomUUID() : 'ws://' + baseUrl + '?id=' + crypto.randomUUID();
+        const finalUrl = prod ? 'wss://' + baseUrl + '?id=' + randomUid : 'ws://' + baseUrl + '?id=' + randomUid;
 setUrl(finalUrl);
     }, []);
     

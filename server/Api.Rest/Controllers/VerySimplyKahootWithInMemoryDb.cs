@@ -20,7 +20,12 @@ public class VerySimplyKahootWithInMemoryDb (
         await connectionManager.AddToTopic("lobby", clientId);
         var allClients = await connectionManager.GetMembersFromTopicId("lobby");
         await connectionManager.BroadcastToTopic("lobby",
-            new { AllClientIds = allClients });
+            new
+            {
+                Message = "This broadcast indicates someone has joined the lobby and is broadcast to everyone in the lobby",
+                eventType = "lobby",
+                AllClientIds = allClients
+            });
         return Ok();
     }
 
@@ -40,9 +45,9 @@ public class VerySimplyKahootWithInMemoryDb (
         }
         var serverAddsClientToGameDto = new
         {
-            Message = "This broadcast indicates someone has joined the lobby and is broadcast to everyone in the lobby",
+            Message = "This indicates that a user has been moved from lobby to game (first round not stated yet...)",
             GameId = game.gameId,
-            eventType = "lobby"
+            eventType = "game"
         };
         await connectionManager.BroadcastToTopic("games/" + game.gameId, serverAddsClientToGameDto);
         return Ok();
