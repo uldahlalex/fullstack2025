@@ -443,7 +443,7 @@ export interface ApplicationBaseDto {
 }
 
 export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
-    metrics?: Devicelog[];
+    metrics: Devicelog[];
 }
 
 /** Available eventType constants */
