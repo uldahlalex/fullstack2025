@@ -8,6 +8,7 @@
 
 Can be found in server/Startup/openapi.json or running and going to localhost:8080/openapi/v1.json
 Scalar page can be opened at localhost:8080/scalar
+Example from running deployment on google cloud run:
 
 ![alt text](assets/scalar-view.png)
 
@@ -52,3 +53,11 @@ Start backend with docker Docker by building image using `docker build -t fs25 .
 ### Client app with Vite
 
 Start client app with `npm install` & `npm run dev` in client/Startup
+
+## Connection
+
+Connect to the apy through the proxy on 8080 (no matter the protocol, http(s), ws(s), etc.). Examples from Postman:
+
+![alt text](assets/connect-cloud.png)
+
+![alt text](assets/connect-local.png)
