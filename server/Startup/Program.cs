@@ -3,6 +3,7 @@ using Api.Websocket;
 using Application;
 using Application.Models;
 using Core.Domain;
+using Docker.DotNet;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
@@ -22,32 +23,8 @@ public class Program
 {
     public static async Task Main()
     {
-        Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-            .Enrich.FromLogContext()
-            .Enrich.WithThreadId()
-            .Enrich.WithMachineName()
-            .Enrich.With<CallerEnricher>()
-            .WriteTo.Console(new ExpressionTemplate(
-                "\n" + // Line break before each log entry
-                "[{@t:HH:mm:ss}] " + // Time
-                "{#if SourceFile is not null}{#if SourceFile <> ''}" +
-                "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" + // Filename and line number in blue
-                "{#else}" +
-                "No source information" + // Alternative text when no source info
-                "{#end}{#end}" +
-                "\n" + // Line break after the header
-                "{@l:u3} {@m}" + // Level and message on the next line
-                "\n" + // Extra line break after the message
-                "{@x:l}", // Exception details
-                theme: TemplateTheme.Literate)).CreateLogger();
         var builder = WebApplication.CreateBuilder();
-        builder.Host.UseSerilog();
-
-        builder.Logging.ClearProviders();
-
-
+        builder.AddSuperAwesomeLoggingConfig();
         ConfigureServices(builder.Services, builder.Configuration);
         var app = builder.Build();
         await ConfigureMiddleware(app);
@@ -56,14 +33,19 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAppOptions(configuration);
+       var appOptions = services.AddAppOptions(configuration);
 
         services.RegisterApplicationServices();
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure();
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {services.RegisterMqttInfrastructure();}
+        else
+        {
+            var logger = services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
 
+        }
 
         services.RegisterWebsocketApiServices();
         services.RegisterRestApiServices();
@@ -93,11 +75,18 @@ public class Program
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        await app.ConfigureMqtt();
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt();}
+        else
+        {
+            app.Logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
+        }
 
         app.MapGet("Acceptance", () => "Accepted");
 
-        app.UseOpenApi();
+        app.UseOpenApi(conf =>
+        {
+            conf.Path = "openapi/v1.json";
+        });
         app.MapScalarApiReference();
 
         var document = await app.Services.GetRequiredService<IOpenApiDocumentGenerator>().GenerateAsync("v1");

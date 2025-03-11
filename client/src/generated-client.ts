@@ -426,14 +426,6 @@ export interface MemberLeftNotification extends BaseDto {
     topic?: string;
 }
 
-export interface ApplicationBaseDto {
-    eventType: string;
-}
-
-export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
-    metrics?: Devicelog[];
-}
-
 export interface ClientWantsToEnterDashboardDto extends BaseDto {
 }
 
@@ -446,13 +438,21 @@ export interface ServerSendsErrorMessage extends BaseDto {
     requestId: string;
 }
 
+export interface ApplicationBaseDto {
+    eventType: string;
+}
+
+export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
+    metrics?: Devicelog[];
+}
+
 /** Available eventType constants */
 export enum StringConstants {
     MemberLeftNotification = "MemberLeftNotification",
-    ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
+    ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
 }
 
 export interface FileResponse {
