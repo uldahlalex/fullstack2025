@@ -71,11 +71,11 @@ public class Program
         app.Urls.Clear();
         app.Urls.Add($"http://0.0.0.0:{appOptions.REST_PORT}");
         app.Services.GetRequiredService<IProxyConfig>()
-            .StartProxyServer(appOptions.PORT, appOptions.REST_PORT, appOptions.WS_PORT);
+            .StartProxyServer(appOptions.PORT, appOptions.REST_PORT, appOptions.WS_PORT, appOptions.MQTT_PORT);
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt();}
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt(appOptions.MQTT_PORT);}
         else
         {
             app.Logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");

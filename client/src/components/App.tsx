@@ -13,7 +13,7 @@ export default function App() {
     useEffect(() => {
         const finalUrl = prod ? 'wss://' + baseUrl + '?id=' + randomUid : 'ws://' + baseUrl + '?id=' + randomUid;
 setUrl(finalUrl);
-    }, []);
+    }, [prod, baseUrl]);
     
     return (<>
 
@@ -26,7 +26,7 @@ setUrl(finalUrl);
             </h1>
                 <div>
                     <AdminDashboard />
-                    <SuperSimpleKahootCloneGui />
+                    { !prod && <SuperSimpleKahootCloneGui /> }
                 </div>
 
             </div>

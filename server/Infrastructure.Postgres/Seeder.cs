@@ -11,7 +11,6 @@ public class Seeder(MyDbContext context, IOptionsMonitor<AppOptions> optionsMoni
     public async Task Seed()
     {
         await context.Database.EnsureCreatedAsync();
-        //Write to relative directory
         var outputPath = Path.Combine(Directory.GetCurrentDirectory() +
                                       "/../Infrastructure.Postgres.Scaffolding/current_schema.sql");
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);

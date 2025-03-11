@@ -26,7 +26,7 @@ public static class Extensions
         return services;
     }
 
-    public static async Task<WebApplication> ConfigureMqtt(this WebApplication app)
+    public static async Task<WebApplication> ConfigureMqtt(this WebApplication app, int mqttPort)
     {
         var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
         var mqttClient = app.Services.GetRequiredService<IMqttClient>();
@@ -34,12 +34,15 @@ public static class Extensions
         
         // Connect to MQTT broker
         await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
-            .WithTcpServer(appOptions.MQTT_BROKER_HOST, 8883)
+            .WithTcpServer(appOptions.MQTT_BROKER_HOST, mqttPort) 
             .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
             .WithTlsOptions(new MqttClientTlsOptions
             {
-                UseTls = true
+                UseTls = true,
+                // Consider adding ServerCertificateValidationCallback if needed
             })
+            .WithCleanSession()
+            .WithTimeout(TimeSpan.FromSeconds(10))
             .Build());
 
         // Get all handlers from the service provider
