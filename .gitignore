@@ -10,3 +10,4 @@ appsettings.Production.json
 appsettings.json
 mosquitto.commands.with.secrets.sh
 scripts/mosquitto-commands.with.secrets.sh
+.env
