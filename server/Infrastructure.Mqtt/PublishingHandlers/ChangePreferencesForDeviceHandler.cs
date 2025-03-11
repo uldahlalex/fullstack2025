@@ -10,13 +10,13 @@ public class ChangePreferencesForDeviceHandler(IMqttClient mqttClient)
 {
     public async Task Publish(AdminWantsToChangePreferencesForDeviceDto dto)
     {
-        var serialized = JsonSerializer.Serialize(dto, new JsonSerializerOptions()
+        var serialized = JsonSerializer.Serialize(dto, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
-        
-        string topic = $"device/{dto.DeviceId}/{nameof(AdminWantsToChangePreferencesForDeviceDto)}";
-        
+
+        var topic = $"device/{dto.DeviceId}/{nameof(AdminWantsToChangePreferencesForDeviceDto)}";
+
         var message = new MqttApplicationMessageBuilder()
             .WithTopic(topic)
             .WithPayload(serialized)

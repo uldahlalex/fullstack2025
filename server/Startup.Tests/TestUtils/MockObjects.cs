@@ -1,5 +1,5 @@
-using Application.Models.Entities;
 using Application.Models.Enums;
+using Core.Domain.Entities;
 
 namespace Startup.Tests.TestUtils;
 

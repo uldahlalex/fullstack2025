@@ -10,7 +10,6 @@ using NSwag.Generation;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 using Serilog.Templates;
 using Serilog.Templates.Themes;
 using Startup.Documentation;
@@ -22,8 +21,6 @@ public class Program
 {
     public static async Task Main()
     {
-        
-        
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -32,20 +29,20 @@ public class Program
             .Enrich.WithMachineName()
             .Enrich.With<CallerEnricher>()
             .WriteTo.Console(new ExpressionTemplate(
-                "\n" +  // Line break before each log entry
-                "[{@t:HH:mm:ss}] " +  // Time
+                "\n" + // Line break before each log entry
+                "[{@t:HH:mm:ss}] " + // Time
                 "{#if SourceFile is not null}{#if SourceFile <> ''}" +
-                "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" +  // Filename and line number in blue
+                "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" + // Filename and line number in blue
                 "{#else}" +
-                "No source information" +  // Alternative text when no source info
+                "No source information" + // Alternative text when no source info
                 "{#end}{#end}" +
-                "\n" +  // Line break after the header
-                "{@l:u3} {@m}" +  // Level and message on the next line
-                "\n" +  // Extra line break after the message
-                "{@x:l}",  // Exception details
+                "\n" + // Line break after the header
+                "{@l:u3} {@m}" + // Level and message on the next line
+                "\n" + // Extra line break after the message
+                "{@x:l}", // Exception details
                 theme: TemplateTheme.Literate)).CreateLogger();
-                var builder = WebApplication.CreateBuilder();
-                builder.Host.UseSerilog();
+        var builder = WebApplication.CreateBuilder();
+        builder.Host.UseSerilog();
 
         builder.Logging.ClearProviders();
 

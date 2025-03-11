@@ -4,6 +4,5 @@ namespace Application.Models.Dtos;
 
 public abstract class ApplicationBaseDto
 {
-    [Required]
-    public string eventType { get; set; }
+    [Required] public string eventType { get; set; }
 }

@@ -1,18 +1,14 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Application.Models.Dtos;
-using Application.Models.Entities;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Api.Rest.Controllers;
-
-
 
 [ApiController]
 public class DeviceController(
@@ -30,7 +26,7 @@ public class DeviceController(
         publisher.Publish(dto);
         return Ok();
     }
-    
+
     [Route(nameof(AdminWantsToClearData))]
     public ActionResult<List<Devicelog>> AdminWantsToClearData()
     {

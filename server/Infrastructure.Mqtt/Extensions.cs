@@ -1,10 +1,7 @@
-using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
-using Application.Interfaces.Infrastructure.Postgres;
-using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Application.Models.Dtos;
-using Application.Models.Entities;
+using Core.Domain.Entities;
 using Infrastructure.Mqtt.PublishingHandlers;
 using Infrastructure.Mqtt.SubscriptionHandlers;
 using Microsoft.Extensions.Options;
@@ -18,14 +15,16 @@ public static class Extensions
     {
         services.AddSingleton<IMqttClient>(new MqttClientFactory().CreateMqttClient());
         services.AddSingleton<MqttEventBus>();
-        services.AddSingleton<IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto>, ChangePreferencesForDeviceHandler>();
-        services.AddSingleton<IEnumerable<IMqttEventHandler>>(sp => 
+        services
+            .AddSingleton<IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto>,
+                ChangePreferencesForDeviceHandler>();
+        services.AddSingleton<IEnumerable<IMqttEventHandler>>(sp =>
         {
             var handlerTypes = new[]
             {
-                typeof(DeviceMetricsHandler),
+                typeof(DeviceMetricsHandler)
             };
-            
+
             return handlerTypes.Select(t => (IMqttEventHandler)sp.GetRequiredService(t)).ToList();
         });
         return services;
@@ -37,7 +36,7 @@ public static class Extensions
 
         var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
         var mqttClient = app.Services.GetRequiredService<IMqttClient>();
-        var eventBus =  app.Services.GetRequiredService<MqttEventBus>();
+        var eventBus = app.Services.GetRequiredService<MqttEventBus>();
         await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
             .WithTcpServer(appOptions.MQTT_BROKER_HOST, 8883)
             .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
@@ -56,5 +55,5 @@ public static class Extensions
 
 public class ServerSendsMetricToAdmin : ApplicationBaseDto
 {
-    public List<Devicelog> Metrics { get; set; } = new List<Devicelog>();
+    public List<Devicelog> Metrics { get; set; } = new();
 }

@@ -1,5 +1,4 @@
 using Application.Models.Dtos;
-using Infrastructure.Mqtt;
 using Namotion.Reflection;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;

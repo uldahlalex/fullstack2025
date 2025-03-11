@@ -1,4 +1,4 @@
-using Application.Models.Entities;
+using Core.Domain.Entities;
 
 namespace Application.Interfaces.Infrastructure.Postgres;
 

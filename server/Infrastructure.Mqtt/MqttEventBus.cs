@@ -5,9 +5,9 @@ namespace Infrastructure.Mqtt;
 
 public class MqttEventBus
 {
+    private readonly ILogger<MqttEventBus> _logger;
     private readonly IMqttClient _mqttClient;
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<MqttEventBus> _logger;
 
     public MqttEventBus(IMqttClient mqttClient, IServiceProvider serviceProvider, ILogger<MqttEventBus> logger)
     {
@@ -17,52 +17,51 @@ public class MqttEventBus
     }
 
 
-
-    public async Task SubscribeWithHandlerAsync( IEnumerable<IMqttEventHandler> handlers)
+    public async Task SubscribeWithHandlerAsync(IEnumerable<IMqttEventHandler> handlers)
     {
-        foreach(var handler in handlers)
+        foreach (var handler in handlers)
         {
             await _mqttClient.SubscribeAsync(handler.TopicPattern);
 
-        _mqttClient.ApplicationMessageReceivedAsync += async (e) =>
-        {
-            if (TopicMatchesPattern(e.ApplicationMessage.Topic, handler.TopicPattern))
+            _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
-                var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                var parameters = ExtractTopicParameters(e.ApplicationMessage.Topic, handler.TopicPattern);
-                
-                var mqttEvent = new MqttEvent
+                if (TopicMatchesPattern(e.ApplicationMessage.Topic, handler.TopicPattern))
                 {
-                    Topic = e.ApplicationMessage.Topic,
-                    Payload = payload,
-                    Parameters = parameters
-                };
+                    var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                    var parameters = ExtractTopicParameters(e.ApplicationMessage.Topic, handler.TopicPattern);
 
-                using var scope = _serviceProvider.CreateScope();
-                var scopedHandler = scope.ServiceProvider.GetRequiredService(handler.GetType()) as IMqttEventHandler;
-                await scopedHandler.HandleAsync(mqttEvent);
-            }
-        };
+                    var mqttEvent = new MqttEvent
+                    {
+                        Topic = e.ApplicationMessage.Topic,
+                        Payload = payload,
+                        Parameters = parameters
+                    };
+
+                    using var scope = _serviceProvider.CreateScope();
+                    var scopedHandler =
+                        scope.ServiceProvider.GetRequiredService(handler.GetType()) as IMqttEventHandler;
+                    await scopedHandler.HandleAsync(mqttEvent);
+                }
+            };
         }
-        
     }
 
     // Utility methods for topic matching
-    private bool TopicMatchesPattern(string topic, string pattern) 
+    private bool TopicMatchesPattern(string topic, string pattern)
     {
         // Implementation for MQTT topic pattern matching
         // Simple implementation - can be enhanced for more complex patterns
         var patternParts = pattern.Split('/');
         var topicParts = topic.Split('/');
-        
+
         if (patternParts.Length != topicParts.Length) return false;
-        
-        for (int i = 0; i < patternParts.Length; i++)
+
+        for (var i = 0; i < patternParts.Length; i++)
         {
             if (patternParts[i] == "+" || patternParts[i] == "#") continue;
             if (patternParts[i] != topicParts[i]) return false;
         }
-        
+
         return true;
     }
 
@@ -71,15 +70,11 @@ public class MqttEventBus
         var parameters = new Dictionary<string, string>();
         var patternParts = pattern.Split('/');
         var topicParts = topic.Split('/');
-        
-        for (int i = 0; i < patternParts.Length; i++)
-        {
+
+        for (var i = 0; i < patternParts.Length; i++)
             if (patternParts[i] == "+")
-            {
                 parameters["param" + i] = topicParts[i];
-            }
-        }
-        
+
         return parameters;
     }
 }

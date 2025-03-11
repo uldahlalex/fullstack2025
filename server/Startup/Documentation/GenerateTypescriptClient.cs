@@ -23,8 +23,7 @@ public static class GenerateTypescriptClient
                 MarkOptionalProperties = true
             }
         };
-        
-        
+
 
         var generator = new TypeScriptClientGenerator(document, settings);
         var code = generator.GenerateFile();
@@ -42,6 +41,7 @@ public static class GenerateTypescriptClient
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
         await File.WriteAllTextAsync(outputPath, modifiedCode);
-        app.Services.GetRequiredService<ILogger<Program>>().LogInformation("TypeScript client generated at: " + outputPath);
+        app.Services.GetRequiredService<ILogger<Program>>()
+            .LogInformation("TypeScript client generated at: " + outputPath);
     }
 }

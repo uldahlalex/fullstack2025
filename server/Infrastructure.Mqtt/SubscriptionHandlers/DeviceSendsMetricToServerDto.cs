@@ -1,4 +1,4 @@
-using Application.Models.Entities;
+using Core.Domain.Entities;
 
 namespace Infrastructure.Mqtt.SubscriptionHandlers;
 
@@ -10,9 +10,9 @@ public class DeviceSendsMetricToServerDto
 
     public Devicelog ToDeviceLog()
     {
-        var result = new Devicelog()
+        var result = new Devicelog
         {
-            Unit =  Unit,
+            Unit = Unit,
             Value = Value,
             Id = Guid.NewGuid().ToString(),
             Timestamp = DateTime.UtcNow,

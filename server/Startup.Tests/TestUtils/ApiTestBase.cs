@@ -1,5 +1,4 @@
 ﻿using Api.Websocket.EventHandlers;
-using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Interfaces.Infrastructure.Websocket;
 using Infrastructure.Postgres;
 using Infrastructure.Postgres.Scaffolding;
