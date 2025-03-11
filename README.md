@@ -13,7 +13,6 @@ Example from running deployment on google cloud run:
 ![alt text](assets/scalar-view.png)
 
 
-
 ## Configuring AppOptions
 
 For connectivity to services, please provide the following environment variables in appsettings.json or appsettings.Development.json in /server/Startup/
@@ -58,6 +57,5 @@ Start client app with `npm install` & `npm run dev` in client/Startup
 
 Connect to the apy through the proxy on 8080 (no matter the protocol, http(s), ws(s), etc.). Examples from Postman:
 
-![alt text](assets/connect-cloud.png)
 
 ![alt text](assets/connect-local.png)
