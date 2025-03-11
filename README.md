@@ -30,7 +30,7 @@ For connectivity to services, please provide the following environment variables
 //    "WS_PORT": 8181,
 //    "REST_PORT": 5000
   },
-
+```
 
 ## Features
 
@@ -45,7 +45,7 @@ Start backend can be started with `dotnet run` in server/Startup (make sure noth
 
 ### Backend with Docker
 
-Start backend with docker Docker by building image using `docker build -t fs25 .` from the root project directory and then running with `docker run fs25`
+Start backend with docker Docker by building image using `docker build -t fs25 .` from the root project directory and then running with `docker run -p 8080:8080 fs25`
 
 *Make sure to either configure appsettings.json or environment variables using naming APPOPTIONS__(keyname)=value before running.*
 

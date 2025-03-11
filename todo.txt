@@ -1,4 +1,5 @@
 
+fix deployment and startup
 
 - exercises for wednesday
     - structuring the onion
