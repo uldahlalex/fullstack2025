@@ -1,6 +1,7 @@
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using Application.Models.Dtos;
+using Core.Domain;
 using Core.Domain.Entities;
 using Infrastructure.Mqtt.PublishingHandlers;
 using Infrastructure.Mqtt.SubscriptionHandlers;
@@ -15,28 +16,23 @@ public static class Extensions
     {
         services.AddSingleton<IMqttClient>(new MqttClientFactory().CreateMqttClient());
         services.AddSingleton<MqttEventBus>();
-        services
-            .AddSingleton<IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto>,
-                ChangePreferencesForDeviceHandler>();
-        services.AddSingleton<IEnumerable<IMqttEventHandler>>(sp =>
-        {
-            var handlerTypes = new[]
-            {
-                typeof(DeviceMetricsHandler)
-            };
-
-            return handlerTypes.Select(t => (IMqttEventHandler)sp.GetRequiredService(t)).ToList();
-        });
+        
+        services.AddSingleton<IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto>, 
+            ChangePreferencesForDeviceHandler>();
+        
+        services.AddScoped<DeviceMetricsHandler>();
+        services.AddScoped<IMqttEventHandler, DeviceMetricsHandler>();
+        
         return services;
     }
 
     public static async Task<WebApplication> ConfigureMqtt(this WebApplication app)
     {
-        var serviceProvider = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope().ServiceProvider;
-
         var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
         var mqttClient = app.Services.GetRequiredService<IMqttClient>();
         var eventBus = app.Services.GetRequiredService<MqttEventBus>();
+        
+        // Connect to MQTT broker
         await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
             .WithTcpServer(appOptions.MQTT_BROKER_HOST, 8883)
             .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
@@ -46,14 +42,13 @@ public static class Extensions
             })
             .Build());
 
-        var handlers = app.Services.GetRequiredService<IEnumerable<IMqttEventHandler>>();
-        await eventBus.SubscribeWithHandlerAsync(handlers);
+        // Get all handlers from the service provider
+        using var scope = app.Services.CreateScope();
+        var handlers = scope.ServiceProvider.GetServices<IMqttEventHandler>();
+        
+        // Set up subscriptions
+        await eventBus.RegisterHandlersAsync(handlers);
 
         return app;
     }
-}
-
-public class ServerSendsMetricToAdmin : ApplicationBaseDto
-{
-    public List<Devicelog> Metrics { get; set; } = new();
 }

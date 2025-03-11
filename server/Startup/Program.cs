@@ -2,6 +2,7 @@ using Api.Rest;
 using Api.Websocket;
 using Application;
 using Application.Models;
+using Core.Domain;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
@@ -92,7 +93,7 @@ public class Program
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        app.ConfigureMqtt();
+        await app.ConfigureMqtt();
 
         app.MapGet("Acceptance", () => "Accepted");
 

@@ -16,41 +16,57 @@ public class MqttEventBus
         _logger = logger;
     }
 
-
-    public async Task SubscribeWithHandlerAsync(IEnumerable<IMqttEventHandler> handlers)
+    public async Task RegisterHandlersAsync(IEnumerable<IMqttEventHandler> handlers)
     {
+        var topicHandlerMap = new Dictionary<string, Type>();
+        
         foreach (var handler in handlers)
         {
-            await _mqttClient.SubscribeAsync(handler.TopicPattern);
-
-            _mqttClient.ApplicationMessageReceivedAsync += async e =>
-            {
-                if (TopicMatchesPattern(e.ApplicationMessage.Topic, handler.TopicPattern))
-                {
-                    var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-                    var parameters = ExtractTopicParameters(e.ApplicationMessage.Topic, handler.TopicPattern);
-
-                    var mqttEvent = new MqttEvent
-                    {
-                        Topic = e.ApplicationMessage.Topic,
-                        Payload = payload,
-                        Parameters = parameters
-                    };
-
-                    using var scope = _serviceProvider.CreateScope();
-                    var scopedHandler =
-                        scope.ServiceProvider.GetRequiredService(handler.GetType()) as IMqttEventHandler;
-                    await scopedHandler.HandleAsync(mqttEvent);
-                }
-            };
+            var handlerType = handler.GetType();
+            var topicPattern = handler.TopicPattern;
+            
+            topicHandlerMap[topicPattern] = handlerType;
+            await _mqttClient.SubscribeAsync(topicPattern);
+            _logger.LogInformation($"Subscribed to topic pattern: {topicPattern} with handler {handlerType.Name}");
         }
+        
+        _mqttClient.ApplicationMessageReceivedAsync += async e =>
+        {
+            var topic = e.ApplicationMessage.Topic;
+            
+            foreach (var (pattern, handlerType) in topicHandlerMap)
+            {
+                if (!TopicMatchesPattern(topic, pattern)) continue;
+                
+                var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
+                var parameters = ExtractTopicParameters(topic, pattern);
+
+                var mqttEvent = new MqttEvent
+                {
+                    Topic = topic,
+                    Payload = payload,
+                    Parameters = parameters
+                };
+
+                using var scope = _serviceProvider.CreateScope();
+                var handler = scope.ServiceProvider.GetRequiredService(handlerType) as IMqttEventHandler;
+                
+                if (handler == null)
+                {
+                    _logger.LogError($"Failed to resolve handler of type {handlerType.Name}");
+                    continue;
+                }
+                
+                _logger.LogInformation($"Processing message on topic {topic} with handler {handlerType.Name}");
+                await handler.HandleAsync(mqttEvent);
+                
+                break;
+            }
+        };
     }
 
-    // Utility methods for topic matching
     private bool TopicMatchesPattern(string topic, string pattern)
     {
-        // Implementation for MQTT topic pattern matching
-        // Simple implementation - can be enhanced for more complex patterns
         var patternParts = pattern.Split('/');
         var topicParts = topic.Split('/');
 

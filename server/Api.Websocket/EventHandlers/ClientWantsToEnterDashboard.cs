@@ -13,7 +13,7 @@ public class ClientWantsToEnterDashboardDto : BaseDto
 
 public class ServerAddsAdminToDashboard : BaseDto
 {
-    [Required] public List<Devicelog> Devicelogs { get; set; }
+    [Required] public List<Devicelog> Devicelogs { get; set; } = null!;
 }
 
 public class ClientWantsToEnterDashboard(IConnectionManager connectionManager, IDataRepository repo)

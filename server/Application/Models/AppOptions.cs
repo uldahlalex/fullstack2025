@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+// ReSharper disable InconsistentNaming
 
 namespace Application.Models;
 

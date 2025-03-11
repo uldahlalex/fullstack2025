@@ -24,7 +24,7 @@ public static class HttpClientExtensions
         };
     }
 
-    public static async Task<HttpResponseWithObject<T>> PostAsJsonAsync<T>(this HttpClient httpClient,
+    public static async Task<HttpResponseWithObject<T?>> PostAsJsonAsync<T>(this HttpClient httpClient,
         string requestUri, object content)
     {
         var httpResponse = await httpClient.PostAsJsonAsync(requestUri, content);
@@ -36,14 +36,14 @@ public static class HttpClientExtensions
 
         var obj = await httpResponse.Content.ReadFromJsonAsync<T>(options);
 
-        return new HttpResponseWithObject<T>
+        return new HttpResponseWithObject<T?>
         {
             HttpResponseMessage = httpResponse,
             Object = obj
         };
     }
 
-    public static async Task<HttpResponseWithObject<T>> PutAsJsonAsync<T>(this HttpClient httpClient, string requestUri,
+    public static async Task<HttpResponseWithObject<T?>> PutAsJsonAsync<T>(this HttpClient httpClient, string requestUri,
         object content)
     {
         var httpResponse = await httpClient.PutAsJsonAsync(requestUri, content);
@@ -55,14 +55,14 @@ public static class HttpClientExtensions
 
         var obj = await httpResponse.Content.ReadFromJsonAsync<T>(options);
 
-        return new HttpResponseWithObject<T>
+        return new HttpResponseWithObject<T?>
         {
             HttpResponseMessage = httpResponse,
             Object = obj
         };
     }
 
-    public static async Task<HttpResponseWithObject<T>> PatchAsJsonAsync<T>(this HttpClient httpClient,
+    public static async Task<HttpResponseWithObject<T?>> PatchAsJsonAsync<T>(this HttpClient httpClient,
         string requestUri, object content)
     {
         var httpResponse = await httpClient.PatchAsync(requestUri, JsonContent.Create(content));
@@ -74,7 +74,7 @@ public static class HttpClientExtensions
 
         var obj = await httpResponse.Content.ReadFromJsonAsync<T>(options);
 
-        return new HttpResponseWithObject<T>
+        return new HttpResponseWithObject<T?>
         {
             HttpResponseMessage = httpResponse,
             Object = obj

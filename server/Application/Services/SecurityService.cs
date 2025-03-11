@@ -7,6 +7,7 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Models;
 using Application.Models.Dtos;
 using Application.Models.Enums;
+using Core.Domain;
 using Core.Domain.Entities;
 using JWT;
 using JWT.Algorithms;

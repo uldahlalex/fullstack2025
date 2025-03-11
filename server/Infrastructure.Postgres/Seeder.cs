@@ -1,4 +1,5 @@
 using Application.Models;
+using Core.Domain;
 using Infrastructure.Postgres.Scaffolding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;

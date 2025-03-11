@@ -1,6 +1,7 @@
 // Infrastructure/Mqtt/Handlers/DeviceMetricsHandler.cs
 
 using System.Text.Json;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Core.Domain.Entities;
@@ -16,6 +17,7 @@ public class DeviceMetricsHandler : IMqttEventHandler
     public DeviceMetricsHandler(
         IDataRepository dataRepository,
         IConnectionManager connectionManager,
+        IServiceLogic serviceLogic,
         ILogger<DeviceMetricsHandler> logger)
     {
         _dataRepository = dataRepository;
@@ -40,7 +42,7 @@ public class DeviceMetricsHandler : IMqttEventHandler
         var broadcast = new ServerSendsMetricToAdmin
         {
             Metrics = allLogs,
-            eventType = nameof(ServerSendsMetricToAdmin)
+            EventType = nameof(ServerSendsMetricToAdmin)
         };
 
         await _connectionManager.BroadcastToTopic("dashboard", broadcast);

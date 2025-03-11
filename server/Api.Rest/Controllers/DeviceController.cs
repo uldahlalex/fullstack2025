@@ -4,6 +4,7 @@ using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
 using Application.Models.Dtos;
+using Core.Domain;
 using Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -12,12 +13,8 @@ namespace Api.Rest.Controllers;
 
 [ApiController]
 public class DeviceController(
-    IServiceLogic service,
-    ISecurityService securityService,
     IDataRepository repository,
-    IOptionsMonitor<AppOptions> optionsMonitor,
-    IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto> publisher,
-    IConnectionManager connectionManager) : ControllerBase
+    IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto> publisher) : ControllerBase
 {
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)

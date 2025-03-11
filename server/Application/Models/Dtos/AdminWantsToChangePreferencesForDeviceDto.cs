@@ -4,9 +4,9 @@ namespace Application.Models.Dtos;
 
 public class AdminWantsToChangePreferencesForDeviceDto
 {
-    [Required] public string DeviceId { get; set; }
+    [Required] public string DeviceId { get; set; } = null!;
 
     [Required] public int IntervalMilliseconds { get; set; }
 
-    [Required] public string Unit { get; set; }
+    [Required] public string Unit { get; set; } = null!;
 }

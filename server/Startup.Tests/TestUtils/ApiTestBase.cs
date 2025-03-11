@@ -21,13 +21,13 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
 {
     private readonly ApiTestBaseConfig _apiTestBaseConfig = apiTestBaseConfig ?? new ApiTestBaseConfig();
     private readonly PgCtxSetup<MyDbContext> _pgCtxSetup = new();
-    public IConnectionManager _connectionManager;
-    public MyDbContext _dbContext;
-    public HttpClient _httpClient;
-    public ILogger<ApiTestBase> _logger;
-    public IServiceScope _scope;
-    public WsRequestClient _wsClient;
-    public string _wsClientId;
+    public IConnectionManager ConnectionManager;
+    public MyDbContext DbContext;
+    public HttpClient HttpClient;
+    public ILogger<ApiTestBase> Logger;
+    public IServiceScope Scope;
+    public WsRequestClient WsClient;
+    public string WsClientId;
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -86,28 +86,28 @@ public class ApiTestBase(ApiTestBaseConfig? apiTestBaseConfig = null)
     [SetUp]
     public async Task Setup()
     {
-        _httpClient = CreateClient();
+        HttpClient = CreateClient();
 
         //Singletons
-        _logger = Services.GetRequiredService<ILogger<ApiTestBase>>();
-        _connectionManager = Services.GetRequiredService<IConnectionManager>();
+        Logger = Services.GetRequiredService<ILogger<ApiTestBase>>();
+        ConnectionManager = Services.GetRequiredService<IConnectionManager>();
 
         //Scoped services
         using var scope = Services.CreateScope();
         {
-            _scope = Services.CreateScope();
-            _dbContext = _scope.ServiceProvider.GetRequiredService<MyDbContext>();
+            Scope = Services.CreateScope();
+            DbContext = Scope.ServiceProvider.GetRequiredService<MyDbContext>();
         }
 
         var wsPort = Environment.GetEnvironmentVariable("PORT");
         if (string.IsNullOrEmpty(wsPort)) throw new Exception("Environment variable PORT is not set");
-        _wsClientId = Guid.NewGuid().ToString();
-        var url = "ws://localhost:" + wsPort + "?id=" + _wsClientId;
-        _wsClient = new WsRequestClient(
+        WsClientId = Guid.NewGuid().ToString();
+        var url = "ws://localhost:" + wsPort + "?id=" + WsClientId;
+        WsClient = new WsRequestClient(
             new[] { typeof(ClientWantsToEnterDashboardDto).Assembly },
             url
         );
-        await _wsClient.ConnectAsync();
+        await WsClient.ConnectAsync();
         await Task.Delay(1000);
     }
 }

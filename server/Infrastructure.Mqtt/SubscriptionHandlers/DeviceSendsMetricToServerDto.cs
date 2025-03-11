@@ -4,8 +4,8 @@ namespace Infrastructure.Mqtt.SubscriptionHandlers;
 
 public class DeviceSendsMetricToServerDto
 {
-    public string Unit { get; set; }
-    public string DeviceId { get; set; }
+    public string Unit { get; set; } = null!;
+    public string DeviceId { get; set; } = null!;
     public double Value { get; set; }
 
     public Devicelog ToDeviceLog()

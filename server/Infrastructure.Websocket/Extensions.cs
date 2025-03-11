@@ -1,5 +1,6 @@
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
+using Core.Domain;
 using Fleck;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

@@ -71,7 +71,7 @@ public class VerySimplyKahootWithInMemoryDb(
         }
 
         //notice: this runs only if there is a nextRound object since the scope above does "return Ok();" 
-        PlayNextRound(nextRound, game.gameId);
+        await PlayNextRound(nextRound, game.gameId);
 
         return Ok();
     }
@@ -85,7 +85,7 @@ public class VerySimplyKahootWithInMemoryDb(
         });
     }
 
-    private async void PlayNextRound(Round nextRound, int gameId)
+    private async  Task PlayNextRound(Round nextRound, int gameId)
     {
         await connectionManager.BroadcastToTopic("games/" + gameId, new
         {
@@ -103,7 +103,7 @@ public class VerySimplyKahootWithInMemoryDb(
     }
 
     [HttpPost(nameof(SubmitAnswer))]
-    public async Task<ActionResult> SubmitAnswer(
+    public Task<ActionResult> SubmitAnswer(
         [FromQuery] string player,
         [FromQuery] string answer,
         [FromQuery] int questionId)
@@ -111,7 +111,7 @@ public class VerySimplyKahootWithInMemoryDb(
         var pa = new PlayerAnswers { Player = player, Answer = answer };
         var round = Round.Rounds.First(r => r.QuestionId == questionId);
         round.PlayerAnswersList.Add(new PlayerAnswers { Answer = answer, Player = player });
-        return Ok(pa);
+        return Task.FromResult<ActionResult>(Ok(pa));
     }
 }
 
@@ -135,11 +135,12 @@ public class Round
 
     public int QuestionId { get; set; }
     public bool IsDone { get; set; }
+    // ReSharper disable once CollectionNeverQueried.Global
     public List<PlayerAnswers> PlayerAnswersList { get; set; } = new();
 }
 
 public class PlayerAnswers
 {
-    public string Player { get; set; }
-    public string Answer { get; set; }
+    public string Player { get; set; } = null!;
+    public string Answer { get; set; } = null!;
 }
