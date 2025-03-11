@@ -445,6 +445,9 @@
           {
             "type": "object",
             "additionalProperties": false,
+            "required": [
+              "metrics"
+            ],
             "properties": {
               "metrics": {
                 "type": "array",

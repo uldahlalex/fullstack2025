@@ -29,6 +29,7 @@ export default function SuperSimpleKahootCloneGui() {
         <>
             <hr/>
             <div className="flex flex-col">
+                <h1>The kahoot implementation in this repo is only meant for local execution (has a hardcoded game with finite rounds)</h1>
 
                 <div>lobby users:</div>
                 {JSON.stringify(lobby)}
