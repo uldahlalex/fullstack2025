@@ -31,7 +31,6 @@ For connectivity to services, please provide the following environment variables
 //    "REST_PORT": 5000
   },
 
-```
 
 ## Features
 
