@@ -1,5 +1,4 @@
 using Application.Models.Dtos;
-using Infrastructure.Mqtt.Interfaces;
 using Namotion.Reflection;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
@@ -28,16 +27,16 @@ public sealed class AddAllDerivedTypesProcessor : IDocumentProcessor
                     return Array.Empty<Type>();
                 }
             })
+            //Here I'm actively looking for types used by the Websocket API
+            //(ApplicationBaseDto is also relevant because Mqtt Infrastructure doesn't have websocket dependencies,
+            // but I still want the inheritors to be documented by openapi)
             .Where(t =>
                 (t != typeof(BaseDto) &&
                  !t.IsAbstract &&
                  typeof(BaseDto).IsAssignableFrom(t)) ||
                 (t != typeof(ApplicationBaseDto) &&
                  !t.IsAbstract &&
-                 typeof(ApplicationBaseDto).IsAssignableFrom(t)) ||
-                (t != typeof(IMqttEventDto) &&
-                 !t.IsAbstract &&
-                 typeof(IMqttEventDto).IsAssignableFrom(t))
+                 typeof(ApplicationBaseDto).IsAssignableFrom(t))
             )
             .ToList();
 

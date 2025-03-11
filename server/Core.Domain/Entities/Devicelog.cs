@@ -1,4 +1,4 @@
-﻿namespace Application.Models.Entities;
+﻿namespace Core.Domain.Entities;
 
 public class Devicelog
 {

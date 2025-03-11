@@ -10,7 +10,6 @@ public static class GenerateTypescriptClient
     {
         var document = await app.Services.GetRequiredService<IOpenApiDocumentGenerator>()
             .GenerateAsync("v1");
-
         var settings = new TypeScriptClientGeneratorSettings
         {
             Template = TypeScriptTemplate.Fetch,
@@ -24,8 +23,7 @@ public static class GenerateTypescriptClient
                 MarkOptionalProperties = true
             }
         };
-        
-        
+
 
         var generator = new TypeScriptClientGenerator(document, settings);
         var code = generator.GenerateFile();
@@ -43,6 +41,7 @@ public static class GenerateTypescriptClient
         Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
 
         await File.WriteAllTextAsync(outputPath, modifiedCode);
-        Console.WriteLine("TypeScript client generated at: " + outputPath);
+        app.Services.GetRequiredService<ILogger<Program>>()
+            .LogInformation("TypeScript client generated at: " + outputPath);
     }
 }

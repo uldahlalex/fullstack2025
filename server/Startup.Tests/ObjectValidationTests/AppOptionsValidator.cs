@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Models;
+using Core.Domain;
 using NUnit.Framework;
 using Startup.Tests.TestUtils;
 
@@ -13,15 +14,16 @@ public class AppOptionsValidator() : ApiTestBase(new ApiTestBaseConfig
 })
 {
     [Test]
-    public async Task AppOptionsValidatorThrowsException()
+    public Task AppOptionsValidatorThrowsException()
     {
         var opts = new AppOptions();
         var context = new ValidationContext(opts, null, null);
         Assert.Throws<ValidationException>(() => Validator.ValidateObject(opts, context));
+        return Task.CompletedTask;
     }
 
     [Test]
-    public async Task AppOptionsValidatorAcceptsValidAppOptions()
+    public Task AppOptionsValidatorAcceptsValidAppOptions()
     {
         var opts = new AppOptions
         {
@@ -34,5 +36,6 @@ public class AppOptionsValidator() : ApiTestBase(new ApiTestBaseConfig
         };
         var context = new ValidationContext(opts, null, null);
         Validator.ValidateObject(opts, context); //Does not throw
+        return Task.CompletedTask;
     }
 }

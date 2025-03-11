@@ -2,13 +2,18 @@ using Api.Rest;
 using Api.Websocket;
 using Application;
 using Application.Models;
+using Core.Domain;
+using Docker.DotNet;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
-using NLog;
-using NLog.Web;
+using NSwag.Generation;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Events;
+using Serilog.Templates;
+using Serilog.Templates.Themes;
 using Startup.Documentation;
 using Startup.Proxy;
 
@@ -18,14 +23,8 @@ public class Program
 {
     public static async Task Main()
     {
-        var logger = LogManager.Setup()
-            .LoadConfigurationFromAppSettings()
-            .GetCurrentClassLogger();
         var builder = WebApplication.CreateBuilder();
-
-
-        builder.Logging.ClearProviders();
-        builder.Host.UseNLog();
+        builder.AddSuperAwesomeLoggingConfig();
         ConfigureServices(builder.Services, builder.Configuration);
         var app = builder.Build();
         await ConfigureMiddleware(app);
@@ -34,14 +33,19 @@ public class Program
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAppOptions(configuration);
+       var appOptions = services.AddAppOptions(configuration);
 
         services.RegisterApplicationServices();
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure();
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {services.RegisterMqttInfrastructure();}
+        else
+        {
+            var logger = services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
+            logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
 
+        }
 
         services.RegisterWebsocketApiServices();
         services.RegisterRestApiServices();
@@ -71,12 +75,24 @@ public class Program
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        app.ConfigureMqtt();
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt();}
+        else
+        {
+            app.Logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
+        }
 
         app.MapGet("Acceptance", () => "Accepted");
 
-        app.UseOpenApi();
+        app.UseOpenApi(conf =>
+        {
+            conf.Path = "openapi/v1.json";
+        });
         app.MapScalarApiReference();
+
+        var document = await app.Services.GetRequiredService<IOpenApiDocumentGenerator>().GenerateAsync("v1");
+        var json = document.ToJson();
+        await File.WriteAllTextAsync("openapi.json", json);
+
         app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
     }
 }

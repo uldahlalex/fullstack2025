@@ -1,30 +1,34 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Mqtt;
+using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Application.Models;
+using Application.Models.Dtos;
+using Core.Domain;
+using Core.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
 namespace Api.Rest.Controllers;
 
-
-
 [ApiController]
 public class DeviceController(
-    IServiceLogic service,
-    ISecurityService securityService,
-    IOptionsMonitor<AppOptions> optionsMonitor,
-    IConnectionManager connectionManager,
-    IMqttClientService mqttClientService) : ControllerBase
+    IDataRepository repository,
+    IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto> publisher) : ControllerBase
 {
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
-        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt());
-        var serialized = JsonSerializer.Serialize(dto);
-        mqttClientService.PublishAsync("device/" + dto.DeviceId + "/"+nameof(AdminWantsToChangePreferencesForDeviceDto), serialized);
+        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt()); //this is an example of jwt authentication for REST using the same SecurityService as WebSocket API 
+        publisher.Publish(dto);
         return Ok();
+    }
+
+    [Route(nameof(AdminWantsToClearData))]
+    public ActionResult<List<Devicelog>> AdminWantsToClearData()
+    {
+        repository.ClearMetrics();
+        var allMetrics = repository.GetAllMetrics();
+        return Ok(allMetrics);
     }
 }

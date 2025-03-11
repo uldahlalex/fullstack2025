@@ -46,7 +46,7 @@ public class AuthTests() : ApiTestBase(new ApiTestBaseConfig
     public async Task Register_Can_Register_And_Return_Jwt()
     {
         var user = MockObjects.GetUser();
-        var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
+        var response = await HttpClient.PostAsJsonAsync<AuthResponseDto>(AuthController.RegisterRoute,
             new AuthRequestDto
             {
                 Email = user.Email,
@@ -81,7 +81,7 @@ public class AuthTests() : ApiTestBase(new ApiTestBaseConfig
         ctx.Users.Add(user);
         await ctx.SaveChangesAsync();
 
-        var response = await _httpClient.PostAsJsonAsync<AuthResponseDto>(
+        var response = await HttpClient.PostAsJsonAsync<AuthResponseDto>(
             AuthController.LoginRoute, new AuthRequestDto
             {
                 Email = user.Email,

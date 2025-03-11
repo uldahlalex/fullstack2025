@@ -19,7 +19,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
     {
         port = GetAvailablePort(port);
         Environment.SetEnvironmentVariable("PORT", port.ToString());
-        var url = $"ws://0.0.0.0:{port}/ws";
+        var url = $"ws://0.0.0.0:{port}";
         logger.LogInformation("WS running on url: " + url);
         _server = new WebSocketServer(url);
         Action<IWebSocketConnection> config = ws =>
@@ -28,7 +28,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
                 ? ws.ConnectionInfo.Path.Split('?')[1]
                 : "";
 
-            var id = HttpUtility.ParseQueryString(queryString)["id"];
+            var id = HttpUtility.ParseQueryString(queryString)["id"] ?? throw new Exception("Please specify ID query param for websocket connection");
             using var scope = app.Services.CreateScope();
             var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager>();
 
@@ -53,7 +53,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
                     catch (Exception e)
                     {
                         var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
-                        ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto.requestId });
+                        ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto?.requestId ?? string.Empty });
                     }
                 });
             };

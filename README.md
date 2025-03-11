@@ -1,105 +1,54 @@
+# Fullstack 2025
+
+## Diagram overview
+![alt text](assets/fs25.drawio.png)
 
 
-### program startup:
+## API Documentation
 
-```cs
-// ./server/Startup/Program.cs
+Can be found in server/Startup/openapi.json or running and going to localhost:8080/openapi/v1.json
+Scalar page can be opened at localhost:8080/scalar
 
-using Api.Rest;
-using Api.Websocket;
-using Application;
-using Application.Models;
-using Infrastructure.Mqtt;
-using Infrastructure.Postgres;
-using Infrastructure.Websocket;
-using Microsoft.Extensions.Options;
-using NLog;
-using NLog.Web;
-using Scalar.AspNetCore;
-using Startup.Documentation;
-using Startup.Proxy;
-
-namespace Startup;
-
-public class Program
-{
-    public static async Task Main()
-    {
-        var logger = LogManager.Setup()
-            .LoadConfigurationFromAppSettings()
-            .GetCurrentClassLogger();
-        var builder = WebApplication.CreateBuilder();
+![alt text](assets/scalar-view.png)
 
 
-        builder.Logging.ClearProviders();
-        builder.Host.UseNLog();
-        ConfigureServices(builder.Services, builder.Configuration);
-        var app = builder.Build();
-        await ConfigureMiddleware(app);
-        await app.RunAsync();
-    }
 
-    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddAppOptions(configuration);
+## Configuring AppOptions
 
-        services.RegisterApplicationServices();
-
-        services.AddDataSourceAndRepositories();
-        services.AddWebsocketInfrastructure();
-        services.RegisterMqttInfrastructure();
-
-
-        services.RegisterWebsocketApiServices();
-        services.RegisterRestApiServices();
-        services.AddOpenApiDocument(conf =>
-        {
-            conf.DocumentProcessors.Add(new AddAllDerivedTypesProcessor());
-            conf.DocumentProcessors.Add(new AddStringConstantsProcessor());
-        });
-        services.AddSingleton<IProxyConfig, ProxyConfig>();
-    }
-
-    public static async Task ConfigureMiddleware(WebApplication app)
-    {
-        var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
-
-        using (var scope = app.Services.CreateScope())
-        {
-            if (appOptions.Seed)
-                await scope.ServiceProvider.GetRequiredService<Seeder>().Seed();
-        }
-
-
-        app.Urls.Clear();
-        app.Urls.Add($"http://0.0.0.0:{appOptions.REST_PORT}");
-        app.Services.GetRequiredService<IProxyConfig>()
-            .StartProxyServer(appOptions.PORT, appOptions.REST_PORT, appOptions.WS_PORT);
-
-        app.ConfigureRestApi();
-        await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        app.ConfigureMqtt();
-
-        app.MapGet("Acceptance", () => "Accepted");
-
-        app.UseOpenApi();
-        app.MapScalarApiReference();
-        app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
-    }
-}
-```
-
-### Scaffolding:
-
-```bash
-# ./server/Infrastructure.Postgres.Scaffolding/scaffold.sh
-
-!/bin/bash
-#the below will read the the CONN_STR from .env file - you may change this to your connection string
-set -a
-source .env
-set +a
-
-dotnet ef dbcontext scaffold $CONN_STR   Npgsql.EntityFrameworkCore.PostgreSQL  --output-dir ../Application/Models/Entities   --context-dir .   --context MyDbContext --no-onconfiguring  --namespace Application.Models.Entities --context-namespace  Infrastructure.Postgres.Scaffolding --schema surveillance --force 
+For connectivity to services, please provide the following environment variables in appsettings.json or appsettings.Development.json in /server/Startup/
 
 ```
+  "AppOptions": {
+//optionally override the things from appsettings.json
+//    "JwtSecret": "", //some random long string
+//    "DbConnectionString": "", //MUST BE ENTITY FRAMEWORK FORMAT
+//    "Seed": true,
+//    "MQTT_BROKER_HOST": "", //optional only for IoT
+//    "MQTT_USERNAME": "", //optional only for IoT
+//    "MQTT_PASSWORD": "", //optional only for IoT
+//    "PORT": 8080,
+//    "WS_PORT": 8181,
+//    "REST_PORT": 5000
+  },
+
+
+## Features
+
+1. Metrics dashboard (IoT stuff)
+2. The simplified kahoot clone (no DB variant of the original solution: This one demonstrating REST + Websockets)
+
+## Execution
+
+### Backend with .NET CLI
+
+Start backend can be started with `dotnet run` in server/Startup (make sure nothing is occupying port 8080 first)
+
+### Backend with Docker
+
+Start backend with docker Docker by building image using `docker build -t fs25 .` from the root project directory and then running with `docker run fs25`
+
+*Make sure to either configure appsettings.json or environment variables using naming APPOPTIONS__(keyname)=value before running.*
+
+### Client app with Vite
+
+Start client app with `npm install` & `npm run dev` in client/Startup

@@ -27,6 +27,7 @@ export default function AdminDashboard() {
         });
 
         const unsub = onMessage<ServerSendsMetricToAdmin>(StringConstants.ServerSendsMetricToAdmin, (dto) =>  {
+            console.log(dto)
             setMetrics(dto.metrics || []);
         })
 
@@ -36,8 +37,25 @@ export default function AdminDashboard() {
     }, [readyState]);
 
 
+    
 
     return(<>
+        <button className="btn" onClick={() => {
+            const dto: AdminWantsToChangePreferencesForDeviceDto =
+                {
+                    intervalMilliseconds: millis,
+                    unit: "Celcius", // yes this is hardcoded
+                    deviceId: "A" //yes, this is hardcoded
+                }
+            httpClient.adminWantsToChangePreferencesForDevice(dto).then(resp => {
+                toast('API sent preference change to edge devices')
+            })
+        }}>Change preferences to send every {millis} milliseconds</button>
+        <button className="btn btn-warning" onClick={() => {
+            httpClient.adminWantsToClearData().then(result => {
+                setMetrics(result);
+            })
+        }}>Clear all data</button>
         <ResponsiveContainer width="100%" height={400}>
             <BarChart
                 width={500}
@@ -60,16 +78,6 @@ export default function AdminDashboard() {
         </ResponsiveContainer>
         <input value={millis} onChange={event => setMillis(Number.parseInt(event.target.value))}/>
         
-        <button className="btn" onClick={() => {
-            const dto: AdminWantsToChangePreferencesForDeviceDto = 
-            {
-                intervalMilliseconds: millis,
-                unit: "Celcius", // yes this is hardcoded
-                deviceId: "A" //yes, this is hardcoded
-            }
-            httpClient.adminWantsToChangePreferencesForDevice(dto).then(resp => {
-                toast('API sent preference change to edge devices')
-            })
-        }}>Change preferences to send every {millis} milliseconds</button>
+
     </>)
 }

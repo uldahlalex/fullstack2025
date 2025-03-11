@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces.Infrastructure.Postgres;
-using Application.Models.Entities;
+using Core.Domain.Entities;
 using Infrastructure.Postgres.Scaffolding;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Postgres.Postgresql.Data;
 
@@ -28,5 +29,10 @@ public class Repo(MyDbContext ctx) : IDataRepository
     public List<Devicelog> GetAllMetrics()
     {
         return ctx.Devicelogs.ToList();
+    }
+
+    public void ClearMetrics()
+    {
+        ctx.Devicelogs.Where(d => true).ExecuteDelete();
     }
 }

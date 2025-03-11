@@ -302,9 +302,3 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
         await BroadcastToTopic(topic, dto);
     }
 }
-
-public class MemberLeftNotification : BaseDto
-{
-    public string ClientId { get; set; }
-    public string Topic { get; set; }
-}

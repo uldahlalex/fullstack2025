@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Models;
+using Core.Domain;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
