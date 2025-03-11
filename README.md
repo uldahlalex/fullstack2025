@@ -5,104 +5,86 @@
 ```cs
 // ./server/Startup/Program.cs
 
-using System.Text.Json;
 using Api.Rest;
 using Api.Websocket;
-using Api.Websocket.Documentation;
 using Application;
 using Application.Models;
-using Fleck;
 using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
+using NLog;
+using NLog.Web;
 using Scalar.AspNetCore;
-using Startup.Extensions;
+using Startup.Documentation;
+using Startup.Proxy;
 
 namespace Startup;
 
-// public class D;
-//
-// public class Mock : IWebSocketService<D>
-// {
-//     public D RegisterConnection(D connection)
-//     {
-//         return connection;
-//     }
-//
-//     public D OnClose(D ws)
-//     {
-//         return ws;
-//     }
-// }
-
 public class Program
 {
-    public static void Main()
+    public static async Task Main()
     {
+        var logger = LogManager.Setup()
+            .LoadConfigurationFromAppSettings()
+            .GetCurrentClassLogger();
         var builder = WebApplication.CreateBuilder();
 
-        ConfigureServices(builder.Services, builder.Configuration, builder.Environment);
 
+        builder.Logging.ClearProviders();
+        builder.Host.UseNLog();
+        ConfigureServices(builder.Services, builder.Configuration);
         var app = builder.Build();
-
-        ConfigureMiddleware(app);
-
-        app.Run();
+        await ConfigureMiddleware(app);
+        await app.RunAsync();
     }
 
-    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration,
-        IWebHostEnvironment environment)
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAppOptions(configuration, environment);
-        services.AddSingleton<IProxyConfig, ProxyConfig>();
+        services.AddAppOptions(configuration);
 
-        services.RegisterApplicationServices<IWebSocketConnection>();
+        services.RegisterApplicationServices();
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
         services.RegisterMqttInfrastructure();
+
+
         services.RegisterWebsocketApiServices();
-
         services.RegisterRestApiServices();
-
         services.AddOpenApiDocument(conf =>
         {
             conf.DocumentProcessors.Add(new AddAllDerivedTypesProcessor());
             conf.DocumentProcessors.Add(new AddStringConstantsProcessor());
         });
+        services.AddSingleton<IProxyConfig, ProxyConfig>();
     }
 
-    public static void ConfigureMiddleware(WebApplication app)
+    public static async Task ConfigureMiddleware(WebApplication app)
     {
+        var appOptions = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
+
         using (var scope = app.Services.CreateScope())
         {
-            var options = scope.ServiceProvider.GetRequiredService<IOptionsMonitor<AppOptions>>();
-            Console.WriteLine(JsonSerializer.Serialize(options.CurrentValue));
-            if (options.CurrentValue.Seed)
-            {
-                var seeder = scope.ServiceProvider.GetRequiredService<Seeder>();
-                seeder.Seed().Wait();
-            }
+            if (appOptions.Seed)
+                await scope.ServiceProvider.GetRequiredService<Seeder>().Seed();
         }
 
+
         app.Urls.Clear();
-        const int restPort = 5000;
-        const int wsPort = 8181;
-        var publicPort = int.Parse(Environment.GetEnvironmentVariable("PORT") ?? "8080");
-        app.Urls.Add($"http://0.0.0.0:{restPort}");
-        app.Services.GetRequiredService<IProxyConfig>().StartProxyServer(publicPort, restPort, wsPort);
+        app.Urls.Add($"http://0.0.0.0:{appOptions.REST_PORT}");
+        app.Services.GetRequiredService<IProxyConfig>()
+            .StartProxyServer(appOptions.PORT, appOptions.REST_PORT, appOptions.WS_PORT);
 
         app.ConfigureRestApi();
-        app.ConfigureWebsocketApi();
+        await app.ConfigureWebsocketApi(appOptions.WS_PORT);
         app.ConfigureMqtt();
-
 
         app.MapGet("Acceptance", () => "Accepted");
 
         app.UseOpenApi();
         app.MapScalarApiReference();
-        app.GenerateTypeScriptClient("v1").GetAwaiter().GetResult();
+        app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
     }
 }
 ```
@@ -113,16 +95,11 @@ public class Program
 # ./server/Infrastructure.Postgres.Scaffolding/scaffold.sh
 
 !/bin/bash
+#the below will read the the CONN_STR from .env file - you may change this to your connection string
+set -a
+source .env
+set +a
 
-dotnet ef dbcontext scaffold \
-  "Server=localhost;Database=testdb;User Id=testuser;Password=testpass;" \
-  Npgsql.EntityFrameworkCore.PostgreSQL \
-  --output-dir ../Application/Models/Entities  \
-  --context-dir . \
-  --context MyDbContext  \
-  --no-onconfiguring \
-  --namespace Application.Models.Entities \
-  --context-namespace  Infrastructure.Postgres.Scaffolding \
-  --force
-  
+dotnet ef dbcontext scaffold $CONN_STR   Npgsql.EntityFrameworkCore.PostgreSQL  --output-dir ../Application/Models/Entities   --context-dir .   --context MyDbContext --no-onconfiguring  --namespace Application.Models.Entities --context-namespace  Infrastructure.Postgres.Scaffolding --schema surveillance --force 
+
 ```
