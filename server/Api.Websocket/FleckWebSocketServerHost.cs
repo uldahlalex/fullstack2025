@@ -32,7 +32,7 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
             using var scope = app.Services.CreateScope();
             var manager = scope.ServiceProvider.GetRequiredService<IConnectionManager>();
 
-            ws.OnOpen = () => manager.OnOpen(ws, id); //todo
+            ws.OnOpen = () => manager.OnOpen(ws, id); 
             ws.OnClose = () => manager.OnClose(ws, id);
             ws.OnError = ex =>
             {

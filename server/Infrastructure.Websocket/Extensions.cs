@@ -12,10 +12,6 @@ public static class Extensions
 {
     public static IServiceCollection AddWebsocketInfrastructure(this IServiceCollection services)
     {
-        var appOptions = services
-            .BuildServiceProvider()
-            .GetRequiredService<IOptionsMonitor<AppOptions>>()
-            .CurrentValue;
         services.AddSingleton<IConnectionManager, WebSocketConnectionManager<IWebSocketConnection, BaseDto>>();
         return services;
     }
