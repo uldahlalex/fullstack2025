@@ -42,20 +42,23 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
                 };
                 ws.Send(JsonSerializer.Serialize(problemDetails));
             };
-            ws.OnMessage = message =>
+            ws.OnMessage = async message => 
             {
-                Task.Run(async () =>
+                try
                 {
-                    try
+                    await app.CallEventHandler(ws, message);
+                }
+                catch (Exception e)
+                {              
+                    logger.LogError(e, "Error in handling message: {message}", message);
+                    var baseDto = JsonSerializer.Deserialize<BaseDto>(message, new JsonSerializerOptions()
                     {
-                        await app.CallEventHandler(ws, message);
-                    }
-                    catch (Exception e)
-                    {
-                        var baseDto = JsonSerializer.Deserialize<BaseDto>(message);
-                        ws.SendDto(new ServerSendsErrorMessage { Error = e.Message, RequestId = baseDto?.requestId ?? string.Empty });
-                    }
-                });
+                        PropertyNameCaseInsensitive = true
+                    }) ?? throw new Exception("Could not deserialize message");
+                    var resp = (new ServerSendsErrorMessage
+                        { Error = e.Message, RequestId = baseDto.requestId});
+                    await ws.Send(JsonSerializer.Serialize(resp));
+                }
             };
         };
 

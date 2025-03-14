@@ -90,7 +90,7 @@ public class SecurityService(IOptionsMonitor<AppOptions> optionsMonitor, IDataRe
     public string GenerateJwt(JwtClaims claims)
     {
         var tokenBuilder = new JwtBuilder()
-            .WithAlgorithm(new HMACSHA256Algorithm())
+            .WithAlgorithm(new HMACSHA512Algorithm())
             .WithSecret(optionsMonitor.CurrentValue.JwtSecret)
             .WithUrlEncoder(new JwtBase64UrlEncoder())
             .WithJsonSerializer(new JsonNetSerializer());

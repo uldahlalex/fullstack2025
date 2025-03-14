@@ -427,15 +427,21 @@ export interface MemberLeftNotification extends BaseDto {
 }
 
 export interface ClientWantsToEnterDashboardDto extends BaseDto {
+    jwt?: string;
 }
 
 export interface ServerAddsAdminToDashboard extends BaseDto {
     devicelogs: Devicelog[];
 }
 
+export interface ServerConfirmsAdditionToDashboard extends BaseDto {
+    message?: string;
+}
+
 export interface ServerSendsErrorMessage extends BaseDto {
-    error: string;
-    requestId: string;
+    error?: string;
+    requestId?: string;
+    message?: string;
 }
 
 export interface ApplicationBaseDto {
@@ -451,6 +457,7 @@ export enum StringConstants {
     MemberLeftNotification = "MemberLeftNotification",
     ClientWantsToEnterDashboardDto = "ClientWantsToEnterDashboardDto",
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
+    ServerConfirmsAdditionToDashboard = "ServerConfirmsAdditionToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
     ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
 }

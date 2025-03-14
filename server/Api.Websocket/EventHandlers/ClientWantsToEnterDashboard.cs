@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Application.Interfaces;
 using Application.Interfaces.Infrastructure.Postgres;
 using Application.Interfaces.Infrastructure.Websocket;
 using Core.Domain.Entities;
@@ -16,7 +17,9 @@ public class ServerAddsAdminToDashboard : BaseDto
     [Required] public List<Devicelog> Devicelogs { get; set; } = null!;
 }
 
-public class ClientWantsToEnterDashboard(IConnectionManager connectionManager, IDataRepository repo)
+public class ClientWantsToEnterDashboard(
+    IConnectionManager connectionManager, 
+    IDataRepository repo)
     : BaseEventHandler<ClientWantsToEnterDashboardDto>
 {
     public override async Task Handle(ClientWantsToEnterDashboardDto dto, IWebSocketConnection socket)
@@ -29,5 +32,11 @@ public class ClientWantsToEnterDashboard(IConnectionManager connectionManager, I
             Devicelogs = allMetrics,
             requestId = dto.requestId
         });
+        socket.SendDto(new ServerConfirmsAdditionToDashboard());
     }
+}
+
+public class ServerConfirmsAdditionToDashboard : BaseDto
+{
+    public string Message { get; set; } = "You have been added to the dashboard";
 }

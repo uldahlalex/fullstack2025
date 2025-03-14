@@ -386,7 +386,12 @@
           },
           {
             "type": "object",
-            "additionalProperties": false
+            "additionalProperties": false,
+            "properties": {
+              "jwt": {
+                "type": "string"
+              }
+            }
           }
         ]
       },
@@ -412,6 +417,22 @@
           }
         ]
       },
+      "ServerConfirmsAdditionToDashboard": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseDto"
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
       "ServerSendsErrorMessage": {
         "allOf": [
           {
@@ -420,18 +441,15 @@
           {
             "type": "object",
             "additionalProperties": false,
-            "required": [
-              "error",
-              "requestId"
-            ],
             "properties": {
               "error": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               },
               "requestId": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
               }
             }
           }
@@ -480,6 +498,7 @@
           "MemberLeftNotification",
           "ClientWantsToEnterDashboardDto",
           "ServerAddsAdminToDashboard",
+          "ServerConfirmsAdditionToDashboard",
           "ServerSendsErrorMessage",
           "ServerSendsMetricToAdmin"
         ]
