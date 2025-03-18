@@ -49,15 +49,18 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
                     await app.CallEventHandler(ws, message);
                 }
                 catch (Exception e)
-                {              
+                {
                     logger.LogError(e, "Error in handling message: {message}", message);
-                    var baseDto = JsonSerializer.Deserialize<BaseDto>(message, new JsonSerializerOptions()
+                    var baseDto = JsonSerializer.Deserialize<BaseDto>(message, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
-                    }) ?? throw new Exception("Could not deserialize message");
-                    var resp = (new ServerSendsErrorMessage
-                        { Error = e.Message, RequestId = baseDto.requestId});
-                    await ws.Send(JsonSerializer.Serialize(resp));
+                    }) ?? new BaseDto
+                    {
+                        eventType = nameof(ServerSendsErrorMessage)
+                    };
+                    var resp = new ServerSendsErrorMessage
+                        { Message = e.Message, requestId = baseDto.requestId ?? "" };
+                    ws.SendDto(resp);
                 }
             };
         };

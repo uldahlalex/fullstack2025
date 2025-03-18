@@ -10,6 +10,7 @@ namespace Api.Websocket.EventHandlers;
 
 public class ClientWantsToEnterDashboardDto : BaseDto
 {
+    public string Jwt { get; set; }   
 }
 
 public class ServerAddsAdminToDashboard : BaseDto
@@ -19,11 +20,13 @@ public class ServerAddsAdminToDashboard : BaseDto
 
 public class ClientWantsToEnterDashboard(
     IConnectionManager connectionManager, 
+    ISecurityService securityService,
     IDataRepository repo)
     : BaseEventHandler<ClientWantsToEnterDashboardDto>
 {
     public override async Task Handle(ClientWantsToEnterDashboardDto dto, IWebSocketConnection socket)
     {
+        securityService.VerifyJwtOrThrow(dto.Jwt);
         var clientId = await connectionManager.GetClientIdFromSocketId(socket.ConnectionInfo.Id.ToString());
         await connectionManager.AddToTopic("dashboard", clientId);
         var allMetrics = repo.GetAllMetrics();

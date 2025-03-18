@@ -48,60 +48,65 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
     {
         return Task.FromResult(SocketToConnectionId.ToDictionary(k => k.Key, v => v.Value));
     }
-
-    public async Task AddToTopic(string topic, string memberId, TimeSpan? expiry = null)
+    public async Task AddToTopic(string topic, string memberId)
     {
         TopicMembers.AddOrUpdate(
             topic,
-            _ => new HashSet<string> { memberId },
+            new HashSet<string> { memberId },
             (_, existing) =>
             {
-                lock (existing)
-                {
-                    existing.Add(memberId);
-                    return existing;
-                }
+                var newSet = new HashSet<string>(existing); 
+                newSet.Add(memberId);
+                return newSet;
             });
 
         MemberTopics.AddOrUpdate(
             memberId,
-            _ => new HashSet<string> { topic },
+            new HashSet<string> { topic },
             (_, existing) =>
             {
-                lock (existing)
-                {
-                    existing.Add(topic);
-                    return existing;
-                }
+                var newSet = new HashSet<string>(existing); 
+                newSet.Add(topic);
+                return newSet;
             });
 
         await LogCurrentState();
-
-        if (expiry.HasValue)
-            _ = Task.Delay(expiry.Value).ContinueWith(async _ =>
-            {
-                await RemoveFromTopic(topic, memberId);
-                _logger.LogInformation($"Removed member {memberId} from topic {topic} due to expiry");
-            });
     }
 
     public async Task RemoveFromTopic(string topic, string memberId)
     {
-        if (TopicMembers.TryGetValue(topic, out var members))
-            lock (members)
+        TopicMembers.AddOrUpdate(
+            topic,
+            new HashSet<string>(), 
+            (_, existing) =>
             {
-                members.Remove(memberId);
+                var newSet = new HashSet<string>(existing);
+                newSet.Remove(memberId);
+                return newSet;
+            });
 
-                if (members.Count == 0) TopicMembers.TryRemove(topic, out _);
-            }
+ 
+        if (TopicMembers.TryGetValue(topic, out var members) && !members.Any())
+        {
+            TopicMembers.TryRemove(topic, out _);
+        }
 
-        if (MemberTopics.TryGetValue(memberId, out var topics))
-            lock (topics)
+
+        MemberTopics.AddOrUpdate(
+            memberId,
+            new HashSet<string>(),
+            (_, existing) =>
             {
-                topics.Remove(topic);
+                var newSet = new HashSet<string>(existing);
+                newSet.Remove(topic);
+                return newSet;
+            });
 
-                if (topics.Count == 0) MemberTopics.TryRemove(memberId, out _);
-            }
+        // Clean up empty member
+        if (MemberTopics.TryGetValue(memberId, out var topics) && !topics.Any())
+        {
+            MemberTopics.TryRemove(memberId, out _);
+        }
 
         await LogCurrentState();
     }
@@ -171,7 +176,6 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
             foreach (var topic in new List<string>(topics))
             {
                 await RemoveFromTopic(topic, clientId);
-
                 if (TopicMembers.TryGetValue(topic, out var members) && members.Count > 0)
                     await NotifyMemberLeft(topic, clientId);
             }
@@ -199,7 +203,7 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
     {
         try
         {
-            _logger.LogDebug(JsonSerializer.Serialize(new
+            _logger.LogInformation(JsonSerializer.Serialize(new
             {
                 ConnectionIdToSocket = await GetAllConnectionIdsWithSocketId(),
                 SocketToConnectionId = await GetAllSocketIdsWithConnectionId(),
@@ -214,6 +218,17 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
         {
             _logger.LogError(ex, "Error logging current state");
         }
+    }
+
+    protected virtual async Task NotifyMemberLeft(string topic, string memberId)
+    {
+        var dto = new MemberLeftNotification
+        {
+            ClientId = memberId,
+            Topic = topic
+        };
+
+        await BroadcastToTopic(topic, dto);
     }
 
     private async Task BroadcastToMember<TMessage>(string topic, string memberId, TMessage message)
@@ -289,16 +304,5 @@ public class WebSocketConnectionManager<TConnection, TMessageBase> : IConnection
             _logger.LogError(ex, $"Error sending message to socket {GetSocketId(socket)}");
             throw;
         }
-    }
-
-    protected virtual async Task NotifyMemberLeft(string topic, string memberId)
-    {
-        var dto = new MemberLeftNotification
-        {
-            ClientId = memberId,
-            Topic = topic
-        };
-
-        await BroadcastToTopic(topic, dto);
     }
 }
