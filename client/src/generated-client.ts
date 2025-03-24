@@ -189,7 +189,7 @@ export class DeviceClient {
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: RequestInit = {
-            method: "GET",
+            method: "DELETE",
             headers: {
                 "Accept": "application/json"
             }
@@ -448,8 +448,9 @@ export interface ApplicationBaseDto {
     eventType: string;
 }
 
-export interface ServerSendsMetricToAdmin extends ApplicationBaseDto {
+export interface ServerSendsMetricToAdminDto extends ApplicationBaseDto {
     metrics: Devicelog[];
+    eventType?: string;
 }
 
 /** Available eventType constants */
@@ -459,7 +460,7 @@ export enum StringConstants {
     ServerAddsAdminToDashboard = "ServerAddsAdminToDashboard",
     ServerConfirmsAdditionToDashboard = "ServerConfirmsAdditionToDashboard",
     ServerSendsErrorMessage = "ServerSendsErrorMessage",
-    ServerSendsMetricToAdmin = "ServerSendsMetricToAdmin",
+    ServerSendsMetricToAdminDto = "ServerSendsMetricToAdminDto",
 }
 
 export interface FileResponse {

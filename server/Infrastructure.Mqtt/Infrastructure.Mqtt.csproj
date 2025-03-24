@@ -8,12 +8,15 @@
 
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MQTTnet" Version="5.0.1.1416"/>
-        <PackageReference Include="Scrutor" Version="6.0.1"/>
+        <PackageReference Include="HiveMQtt" Version="0.26.0" />
 
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Application\Application.csproj"/>
+        <ProjectReference Include="..\Application\Application.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="mosquitto\config\" />
+      <Folder Include="PublishingHandlers\Dtos\" />
     </ItemGroup>
 
 </Project>

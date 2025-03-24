@@ -14,16 +14,17 @@ namespace Api.Rest.Controllers;
 [ApiController]
 public class DeviceController(
     IDataRepository repository,
-    IMqttPublisher<AdminWantsToChangePreferencesForDeviceDto> publisher) : ControllerBase
+    IMqttPublisher publisher) : ControllerBase
 {
+    [HttpPost]
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
     public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
     {
-        //securityService.VerifyJwtOrThrow(HttpContext.GetJwt()); //this is an example of jwt authentication for REST using the same SecurityService as WebSocket API 
-        publisher.Publish(dto);
+        publisher.Publish(dto, "device/" + dto.DeviceId + "/adminWantsToChangePreferencesForDevice");
         return Ok();
     }
 
+    [HttpDelete]
     [Route(nameof(AdminWantsToClearData))]
     public ActionResult<List<Devicelog>> AdminWantsToClearData()
     {

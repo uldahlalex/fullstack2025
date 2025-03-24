@@ -125,7 +125,7 @@
       }
     },
     "/AdminWantsToClearData": {
-      "get": {
+      "delete": {
         "tags": [
           "Device"
         ],
@@ -455,7 +455,7 @@
           }
         ]
       },
-      "ServerSendsMetricToAdmin": {
+      "ServerSendsMetricToAdminDto": {
         "allOf": [
           {
             "$ref": "#/components/schemas/ApplicationBaseDto"
@@ -472,6 +472,9 @@
                 "items": {
                   "$ref": "#/components/schemas/Devicelog"
                 }
+              },
+              "eventType": {
+                "type": "string"
               }
             }
           }
@@ -500,7 +503,7 @@
           "ServerAddsAdminToDashboard",
           "ServerConfirmsAdditionToDashboard",
           "ServerSendsErrorMessage",
-          "ServerSendsMetricToAdmin"
+          "ServerSendsMetricToAdminDto"
         ]
       }
     }

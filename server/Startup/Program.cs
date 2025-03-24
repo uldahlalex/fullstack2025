@@ -75,7 +75,7 @@ public class Program
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt(appOptions.MQTT_PORT);}
+        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt();}
         else
         {
             app.Logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
