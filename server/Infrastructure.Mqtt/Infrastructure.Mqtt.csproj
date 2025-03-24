@@ -9,6 +9,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="HiveMQtt" Version="0.26.0" />
+        <PackageReference Include="MQTTnet" Version="5.0.1.1416" />
 
     </ItemGroup>
     <ItemGroup>

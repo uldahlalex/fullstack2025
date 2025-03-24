@@ -41,7 +41,10 @@ public class Program
 
         services.AddDataSourceAndRepositories();
         services.AddWebsocketInfrastructure();
-        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {services.RegisterMqttInfrastructure();}
+        if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))
+        {
+            //services.RegisterMqttInfrastructure();
+        }
         else
         {
             var logger = services.BuildServiceProvider().GetRequiredService<ILogger<Program>>();
@@ -79,7 +82,11 @@ public class Program
 
         app.ConfigureRestApi();
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
-        if(!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST)) {await app.ConfigureMqtt();}
+        if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))
+        {
+            await app.SetupMqttClient();
+            //await app.ConfigureMqtt();
+        }
         else
         {
             app.Logger.LogInformation("No MQTT_BROKER_HOST provided, skipping MQTT configuration (you're probably not doing IoT stuff)");
