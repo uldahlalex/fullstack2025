@@ -10,8 +10,7 @@ public static class LoggerSetup
     public static WebApplicationBuilder AddSuperAwesomeLoggingConfig(this WebApplicationBuilder builder)
     {
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .ReadFrom.Configuration(builder.Configuration) 
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithMachineName()
@@ -19,6 +18,7 @@ public static class LoggerSetup
             .WriteTo.Console(new ExpressionTemplate(
                 "\n" + // Line break before each log entry
                 "[{@t:HH:mm:ss}] " + // Time
+                "{SourceContext}[0] " + // Add namespace and class name with [0]
                 "{#if SourceFile is not null}{#if SourceFile <> ''}" +
                 "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" + // Filename and line number in blue
                 "{#else}" +
