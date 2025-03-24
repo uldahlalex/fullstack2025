@@ -100,54 +100,6 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
     return services;
 }
 
-public static async Task<WebApplication> SetupMqttClient(this WebApplication app)
-{
-    var _options = app.Services.GetRequiredService<IOptionsMonitor<AppOptions>>().CurrentValue;
-    var _logger = app.Services.GetRequiredService<ILogger<string>>();
-    var mqttFactory = new MqttClientFactory();
-    var client = mqttFactory.CreateMqttClient();
-
-    var options = new MqttClientOptionsBuilder()
-        .WithTcpServer(_options.MQTT_BROKER_HOST, 8883)
-        .WithCredentials(_options.MQTT_USERNAME, _options.MQTT_PASSWORD)
-        .WithClientId($"cloudrun_{Environment.GetEnvironmentVariable("K_SERVICE")}_{Guid.NewGuid()}")
-        .WithTlsOptions(new MqttClientTlsOptions
-        {
-            UseTls = true,
-            AllowUntrustedCertificates = true,
-            IgnoreCertificateChainErrors = true,
-            IgnoreCertificateRevocationErrors = true,
-        })
-        .WithCleanSession()
-        .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
-        .WithTimeout(TimeSpan.FromSeconds(30))
-        .WithProtocolVersion(MqttProtocolVersion.V311) 
-        .Build();
-
-    var connectTimeout = TimeSpan.FromSeconds(30);
-    var connectCancellation = new CancellationTokenSource(connectTimeout);
-
-    try 
-    {
-        var connection = await client.ConnectAsync(options, connectCancellation.Token);
-        _logger.LogInformation(connection.ResponseInformation);
-        _logger.LogInformation(connection.ReasonString);
-    }
-    catch (OperationCanceledException)
-    {
-        _logger.LogError("Connection attempt timed out after {Timeout} seconds", connectTimeout.TotalSeconds);
-        throw;
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Failed to connect to MQTT broker");
-        throw;
-    }
-
-    await client.SubscribeAsync("/helloworld");
-    //log when message
-    return app;
-}
 
 public static async Task<WebApplication> ConfigureMqtt(this WebApplication app)
 {

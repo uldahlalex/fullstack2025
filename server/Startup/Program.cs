@@ -43,7 +43,7 @@ public class Program
         services.AddWebsocketInfrastructure();
         if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))
         {
-            //services.RegisterMqttInfrastructure();
+            services.RegisterMqttInfrastructure();
         }
         else
         {
@@ -84,8 +84,7 @@ public class Program
         await app.ConfigureWebsocketApi(appOptions.WS_PORT);
         if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))
         {
-            await app.SetupMqttClient();
-            //await app.ConfigureMqtt();
+            await app.ConfigureMqtt();
         }
         else
         {
