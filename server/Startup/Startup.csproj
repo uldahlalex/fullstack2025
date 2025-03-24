@@ -16,6 +16,7 @@
         <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0"/>
         <PackageReference Include="Serilog.Expressions" Version="5.0.0"/>
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+        <PackageReference Include="Serilog.Sinks.GoogleCloudLogging" Version="5.0.0" />
         <ProjectReference Include="..\Api.Rest\Api.Rest.csproj"/>
         <ProjectReference Include="..\Api.Websocket\Api.Websocket.csproj"/>
         <ProjectReference Include="..\Infrastructure.Mqtt\Infrastructure.Mqtt.csproj"/>

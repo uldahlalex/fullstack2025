@@ -7,6 +7,7 @@ using Infrastructure.Mqtt.PublishingHandlers;
 using Infrastructure.Mqtt.SubscriptionHandlers;
 using Microsoft.Extensions.Options;
 using MQTTnet;
+using MQTTnet.Formatter;
 
 namespace Infrastructure.Mqtt;
 
@@ -33,23 +34,26 @@ public static class Extensions
         var eventBus = app.Services.GetRequiredService<MqttEventBus>();
         
         // Connect to MQTT broker
-        await mqttClient.ConnectAsync(new MqttClientOptionsBuilder()
-            .WithTcpServer(appOptions.MQTT_BROKER_HOST, mqttPort) 
+        var options = new MqttClientOptionsBuilder()
+            .WithTcpServer(appOptions.MQTT_BROKER_HOST, 8883)
             .WithCredentials(appOptions.MQTT_USERNAME, appOptions.MQTT_PASSWORD)
+            .WithClientId($"cloudrun_{Environment.GetEnvironmentVariable("K_SERVICE")}_{Guid.NewGuid()}")
             .WithTlsOptions(new MqttClientTlsOptions
             {
                 UseTls = true,
-                // Consider adding ServerCertificateValidationCallback if needed
+                AllowUntrustedCertificates = true,
+                IgnoreCertificateChainErrors = true,
+                IgnoreCertificateRevocationErrors = true,
             })
             .WithCleanSession()
-            .WithTimeout(TimeSpan.FromSeconds(10))
-            .Build());
+            .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
+            .WithTimeout(TimeSpan.FromSeconds(30))
+            .WithProtocolVersion(MqttProtocolVersion.V311) 
+            .Build();
 
-        // Get all handlers from the service provider
         using var scope = app.Services.CreateScope();
         var handlers = scope.ServiceProvider.GetServices<IMqttEventHandler>();
         
-        // Set up subscriptions
         await eventBus.RegisterHandlersAsync(handlers);
 
         return app;
