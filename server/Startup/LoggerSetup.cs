@@ -10,43 +10,52 @@ public static class LoggerSetup
     public static WebApplicationBuilder AddSuperAwesomeLoggingConfig(this WebApplicationBuilder builder)
     {
         var expression = new ExpressionTemplate(
-            "\n" + // Line break before each log entry
-            "[{@t:HH:mm:ss}] " + // Time
-            "{SourceContext}[0] " + // Add namespace and class name with [0]
+            "\n" +
+            "[{@t:HH:mm:ss}] " +
+            "{SourceContext}[0] " +
             "{#if SourceFile is not null}{#if SourceFile <> ''}" +
-            "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" + // Filename and line number in blue
+            "\u001b[34mFile: {SourceFile}, Line: {LineNumber}\u001b[0m" +
             "{#else}" +
-            "No source information" + // Alternative text when no source info
+            "No source information" +
             "{#end}{#end}" +
-            "\n" + // Line break after the header
-            "{@l:u3} {@m}" + // Level and message on the next line
-            "\n" + // Extra line break after the message
-            "{@x:l}", // Exception details
+            "\n" +
+            "{@l:u3} {@m}" +
+            "\n" +
+            "{@x:l}",
             theme: TemplateTheme.Literate);
 
-        GoogleCloudLoggingSinkOptions config = null;
-        if (builder.Environment.IsProduction())
-            config = new GoogleCloudLoggingSinkOptions();
+        var isGoogleCloud = IsRunningOnGoogleCloud();
         var loggerConf = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithMachineName()
             .Enrich.With<CallerEnricher>();
-        if (!builder.Environment.IsProduction())
-            loggerConf.WriteTo.Console(expression);
+
+        if (isGoogleCloud)
+        {
+            loggerConf.WriteTo.GoogleCloudLogging();
+        }
         else
         {
-            loggerConf.WriteTo.GoogleCloudLogging( );
+            loggerConf.WriteTo.Console(expression);
         }
 
         var logger = loggerConf.CreateLogger();
-
-
         Log.Logger = logger;
         builder.Host.UseSerilog();
-
         builder.Logging.ClearProviders();
+        
         return builder;
     }
+
+    private static bool IsRunningOnGoogleCloud()
+    {
+        return Environment.GetEnvironmentVariable("K_SERVICE") != null || // Cloud Run
+               Environment.GetEnvironmentVariable("GAE_SERVICE") != null || // App Engine
+               Environment.GetEnvironmentVariable("KUBERNETES_SERVICE_HOST") != null || // GKE
+               File.Exists("/proc/self/cgroup") && File.ReadAllText("/proc/self/cgroup").Contains("kubepods"); // Additional GKE check
+    }
+
+
 }
