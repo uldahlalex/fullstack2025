@@ -1,5 +1,6 @@
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.GoogleCloudLogging;
 using Serilog.Templates;
 using Serilog.Templates.Themes;
 
@@ -9,12 +10,14 @@ public static class LoggerSetup
 {
     public static WebApplicationBuilder AddSuperAwesomeLoggingConfig(this WebApplicationBuilder builder)
     {
+        var config = new GoogleCloudLoggingSinkOptions(); 
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration) 
             .Enrich.FromLogContext()
             .Enrich.WithThreadId()
             .Enrich.WithMachineName()
             .Enrich.With<CallerEnricher>()
+            .WriteTo.GoogleCloudLogging(config)
             .WriteTo.Console(new ExpressionTemplate(
                 "\n" + // Line break before each log entry
                 "[{@t:HH:mm:ss}] " + // Time
