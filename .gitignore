@@ -11,3 +11,6 @@ appsettings.json
 mosquitto.commands.with.secrets.sh
 scripts/mosquitto-commands.with.secrets.sh
 .env
+server/Infrastructure.Mqtt/mosquitto/config/mosquitto.conf
+server/Infrastructure.Mqtt/mosquitto/data/mosquitto.db
+server/Infrastructure.Mqtt/mosquitto/log/mosquitto.log
