@@ -23,14 +23,11 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
     var logger = sp.GetRequiredService<ILogger<HiveMQClient>>();
     
     var options = new HiveMQClientOptionsBuilder()
-        .WithBroker(optionsMonitor.CurrentValue.MQTT_BROKER_HOST)
-        .WithPort(8883)
-        .WithClientId($"myClientId_{Guid.NewGuid()}") 
-        .WithUseTls(true)
-        .WithAllowInvalidBrokerCertificates(true) 
+        .WithWebSocketServer($"wss://{optionsMonitor.CurrentValue.MQTT_BROKER_HOST}:8884/mqtt")  // Using WSS (secure WebSocket)
+        .WithClientId($"myClientId_{Guid.NewGuid()}")
         .WithCleanStart(true)
-        .WithKeepAlive(30) 
-        .WithAutomaticReconnect(true) 
+        .WithKeepAlive(30)
+        .WithAutomaticReconnect(true)
         .WithMaximumPacketSize(1024)
         .WithReceiveMaximum(100)
         .WithSessionExpiryInterval(3600)
@@ -38,6 +35,7 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
         .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
         .WithRequestProblemInformation(true)
         .WithRequestResponseInformation(true)
+        .WithAllowInvalidBrokerCertificates(true)
         .Build();
 
     var client = new HiveMQClient(options);
