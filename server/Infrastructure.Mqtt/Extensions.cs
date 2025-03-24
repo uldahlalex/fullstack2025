@@ -119,7 +119,6 @@ public static async Task<WebApplication> SetupMqttClient(this WebApplication app
             AllowUntrustedCertificates = true,
             IgnoreCertificateChainErrors = true,
             IgnoreCertificateRevocationErrors = true,
-            CertificateValidationHandler = _ => true 
         })
         .WithCleanSession()
         .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
