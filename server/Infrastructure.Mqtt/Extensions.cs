@@ -15,61 +15,77 @@ public static class MqttExtensions
 public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollection services)
 {
     services.AddSingleton<HiveMQClient>(sp =>
-    {
-        var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<AppOptions>>();
-        var logger = sp.GetRequiredService<ILogger<HiveMQClient>>();
-        var options = new HiveMQClientOptionsBuilder()
-            .WithBroker(optionsMonitor.CurrentValue.MQTT_BROKER_HOST)
-            .WithPort(8883)
-            .WithClientId("myClientId")
-            .WithAllowInvalidBrokerCertificates(true)
-            .WithUseTls(true)
-            .WithCleanStart(true)
-            .WithKeepAlive(60)
-      
-            .WithMaximumPacketSize(1024)
-            .WithReceiveMaximum(100)
-            .WithSessionExpiryInterval(3600)
-            .WithUserName(optionsMonitor.CurrentValue.MQTT_USERNAME)
-            .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
-            .WithPreferIPv6(true)
-            .WithTopicAliasMaximum(10)
-            .WithRequestProblemInformation(true)
-            .WithRequestResponseInformation(true)
-            .Build();
-        
-        var client = new HiveMQClient(options);
-
-client.OnDisconnectReceived += (sender, args) =>
 {
-    logger.LogInformation("Disconnect received: {reason}", args.DisconnectPacket.DisconnectReasonCode);
-};
+    var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<AppOptions>>();
+    var logger = sp.GetRequiredService<ILogger<HiveMQClient>>();
+    
+    var options = new HiveMQClientOptionsBuilder()
+        .WithBroker(optionsMonitor.CurrentValue.MQTT_BROKER_HOST)
+        .WithPort(8883)
+        .WithClientId($"myClientId_{Guid.NewGuid()}") 
+        .WithUseTls(true)
+        .WithAllowInvalidBrokerCertificates(true) 
+        .WithCleanStart(true)
+        .WithKeepAlive(30) 
+        .WithAutomaticReconnect(true) 
+        .WithMaximumPacketSize(1024)
+        .WithReceiveMaximum(100)
+        .WithSessionExpiryInterval(3600)
+        .WithUserName(optionsMonitor.CurrentValue.MQTT_USERNAME)
+        .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
+        .WithRequestProblemInformation(true)
+        .WithRequestResponseInformation(true)
+        .Build();
 
-        client.OnMessageReceived += (eventObject, args) =>
-        {
-            logger.LogInformation("Global handler - Message Received: {sender}", 
-                JsonSerializer.Serialize(eventObject));
-            logger.LogInformation("Global handler - Message Received: {payload}", 
-                args.PublishMessage.PayloadAsString);
-        };
+    var client = new HiveMQClient(options);
+
+    client.OnDisconnectReceived += (sender, args) =>
+    {
+        logger.LogWarning("MQTT client disconnected");
+    };
+
+    client.OnMessageReceived += (eventObject, args) =>
+    {
+        logger.LogInformation("Global handler - Message Received: {sender}", 
+            JsonSerializer.Serialize(eventObject));
+        logger.LogInformation("Global handler - Message Received: {payload}", 
+            args.PublishMessage.PayloadAsString);
+    };
+
+    const int maxRetries = 5;
+    for (int attempt = 1; attempt <= maxRetries; attempt++)
+    {
         try
         {
+            logger.LogInformation("Attempting to connect to MQTT broker (attempt {attempt}/{maxRetries})", 
+                attempt, maxRetries);
+
             var connectResult = client.ConnectAsync().GetAwaiter().GetResult();
-            logger.LogInformation("Connection result: {result}", JsonSerializer.Serialize(new
-            {
-                connectResult.ResponseInformation,
-                connectResult.ReasonString
-            }));
+            
+            logger.LogInformation("Connection successful on attempt {attempt}. Result: {result}", 
+                attempt, 
+                JsonSerializer.Serialize(new
+                {
+                    connectResult.ResponseInformation,
+                    connectResult.ReasonString
+                }));
+                
+            break; // Connection successful
         }
         catch (HiveMQttClientException ex)
         {
-            logger.LogError(ex, "Error connecting to MQTT broker");
+            logger.LogError(ex, "Error connecting to MQTT broker on attempt {attempt}", attempt);
+            
+            if (attempt == maxRetries)
+                throw;
+                
+            // Exponential backoff
+            Thread.Sleep(TimeSpan.FromSeconds(Math.Pow(2, attempt)));
         }
+    }
 
-
-        return client;
-    });
-
+    return client;
+});
     //here we're adding the handlers to the DI
     var subscribeHandlers = typeof(IMqttMessageHandler).Assembly
         .GetTypes()
