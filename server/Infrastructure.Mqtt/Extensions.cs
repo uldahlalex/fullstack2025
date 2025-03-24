@@ -44,6 +44,7 @@ public static class Extensions
                 AllowUntrustedCertificates = true,
                 IgnoreCertificateChainErrors = true,
                 IgnoreCertificateRevocationErrors = true,
+                CertificateValidationHandler = _ => true 
             })
             .WithCleanSession()
             .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
