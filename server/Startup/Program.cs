@@ -69,6 +69,8 @@ public class Program
                 await scope.ServiceProvider.GetRequiredService<Seeder>().Seed();
         }
 
+        app.Services.GetRequiredService<ILogger<string>>()
+            .LogInformation("App starting with app options: " + JsonSerializer.Serialize(appOptions));
 
         app.Urls.Clear();
         app.Urls.Add($"http://0.0.0.0:{appOptions.REST_PORT}");
@@ -96,7 +98,6 @@ public class Program
         await File.WriteAllTextAsync("openapi.json", json);
 
         app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
-        app.Services.GetRequiredService<ILogger<string>>()
-            .LogInformation("App starting with app options: " + JsonSerializer.Serialize(appOptions));
+
     }
 }
