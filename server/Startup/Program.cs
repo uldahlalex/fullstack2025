@@ -8,6 +8,7 @@ using Infrastructure.Mqtt;
 using Infrastructure.Postgres;
 using Infrastructure.Websocket;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using NSwag.Generation;
 using Scalar.AspNetCore;
 using Serilog;
@@ -16,6 +17,7 @@ using Serilog.Templates;
 using Serilog.Templates.Themes;
 using Startup.Documentation;
 using Startup.Proxy;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Startup;
 
@@ -94,5 +96,7 @@ public class Program
         await File.WriteAllTextAsync("openapi.json", json);
 
         app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
+        app.Services.GetRequiredService<ILogger<string>>()
+            .LogInformation("App starting with app options: " + JsonSerializer.Serialize(appOptions));
     }
 }

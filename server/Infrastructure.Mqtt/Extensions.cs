@@ -23,7 +23,10 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
             .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
             .WithPort(8883)
             .WithUseTls(true)
+            .WithKeepAlive(60) 
+            .WithCleanStart(true)
             .Build());
+
 
         client.OnMessageReceived += (eventObject, args) =>
         {
