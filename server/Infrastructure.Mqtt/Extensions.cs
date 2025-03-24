@@ -2,6 +2,7 @@ using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
 using HiveMQtt.Client;
+using HiveMQtt.Client.Exceptions;
 using HiveMQtt.MQTT5.Types;
 using Infrastructure.Mqtt;
 using Infrastructure.Mqtt.PublishingHandlers;
@@ -40,13 +41,20 @@ client.OnDisconnectReceived += (sender, args) =>
             logger.LogInformation("Global handler - Message Received: {payload}", 
                 args.PublishMessage.PayloadAsString);
         };
-
-        var connectResult = client.ConnectAsync().GetAwaiter().GetResult();
-        logger.LogInformation("Connection result: {result}", JsonSerializer.Serialize(new
+        try
         {
-            connectResult.ResponseInformation,
-            connectResult.ReasonString
-        }));
+            var connectResult = client.ConnectAsync().GetAwaiter().GetResult();
+            logger.LogInformation("Connection result: {result}", JsonSerializer.Serialize(new
+            {
+                connectResult.ResponseInformation,
+                connectResult.ReasonString
+            }));
+        }
+        catch (HiveMQttClientException ex)
+        {
+            logger.LogError(ex, "Error connecting to MQTT broker");
+        }
+
 
         return client;
     });
