@@ -23,10 +23,15 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
             .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
             .WithPort(8883)
             .WithUseTls(true)
+
             .WithKeepAlive(60) 
             .WithCleanStart(true)
             .Build());
 
+client.OnDisconnectReceived += (sender, args) =>
+{
+    logger.LogInformation("Disconnect received: {reason}", args.DisconnectPacket.DisconnectReasonCode);
+};
 
         client.OnMessageReceived += (eventObject, args) =>
         {
