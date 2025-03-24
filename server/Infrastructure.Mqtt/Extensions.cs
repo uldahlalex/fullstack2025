@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Application.Interfaces.Infrastructure.Mqtt;
 using Application.Models;
@@ -17,17 +18,27 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
     {
         var optionsMonitor = sp.GetRequiredService<IOptionsMonitor<AppOptions>>();
         var logger = sp.GetRequiredService<ILogger<HiveMQClient>>();
-        
-        var client = new HiveMQClient(new HiveMQClientOptionsBuilder()
+        var options = new HiveMQClientOptionsBuilder()
             .WithBroker(optionsMonitor.CurrentValue.MQTT_BROKER_HOST)
+            .WithPort(8883)
+            .WithClientId("myClientId")
+            .WithAllowInvalidBrokerCertificates(true)
+            .WithUseTls(true)
+            .WithCleanStart(true)
+            .WithKeepAlive(60)
+      
+            .WithMaximumPacketSize(1024)
+            .WithReceiveMaximum(100)
+            .WithSessionExpiryInterval(3600)
             .WithUserName(optionsMonitor.CurrentValue.MQTT_USERNAME)
             .WithPassword(optionsMonitor.CurrentValue.MQTT_PASSWORD)
-            .WithPort(8883)
-            .WithUseTls(true)
-
-            .WithKeepAlive(60) 
-            .WithCleanStart(true)
-            .Build());
+            .WithPreferIPv6(true)
+            .WithTopicAliasMaximum(10)
+            .WithRequestProblemInformation(true)
+            .WithRequestResponseInformation(true)
+            .Build();
+        
+        var client = new HiveMQClient(options);
 
 client.OnDisconnectReceived += (sender, args) =>
 {
