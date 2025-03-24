@@ -113,16 +113,18 @@ public static async Task<WebApplication> SetupMqttClient(this WebApplication app
         .WithTcpServer(_options.MQTT_BROKER_HOST, 8883)
         .WithCredentials(_options.MQTT_USERNAME, _options.MQTT_PASSWORD)
         .WithClientId($"cloudrun_{Environment.GetEnvironmentVariable("K_SERVICE")}_{Guid.NewGuid()}")
-        .WithTlsOptions(new MqttClientTlsOptions()
+        .WithTlsOptions(new MqttClientTlsOptions
         {
             UseTls = true,
             AllowUntrustedCertificates = true,
+            IgnoreCertificateChainErrors = true,
+            IgnoreCertificateRevocationErrors = true,
+            CertificateValidationHandler = _ => true 
         })
-        .WithCleanSession(true)
+        .WithCleanSession()
         .WithKeepAlivePeriod(TimeSpan.FromSeconds(60))
         .WithTimeout(TimeSpan.FromSeconds(30))
-        .WithProtocolVersion(MqttProtocolVersion.V500) 
-
+        .WithProtocolVersion(MqttProtocolVersion.V311) 
         .Build();
 
     var connectTimeout = TimeSpan.FromSeconds(30);
