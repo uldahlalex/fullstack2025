@@ -71,16 +71,14 @@ public static IServiceCollection RegisterMqttInfrastructure(this IServiceCollect
                     connectResult.ReasonString
                 }));
                 
-            break; // Connection successful
+            break; 
         }
         catch (HiveMQttClientException ex)
         {
             logger.LogError(ex, "Error connecting to MQTT broker on attempt {attempt}", attempt);
             
             if (attempt == maxRetries)
-                throw;
-                
-            // Exponential backoff
+                logger.LogError("Max retries reached");
             Thread.Sleep(TimeSpan.FromSeconds(Math.Pow(2, attempt)));
         }
     }

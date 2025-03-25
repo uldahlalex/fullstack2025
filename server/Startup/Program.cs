@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using Api.Rest;
 using Api.Websocket;
 using Application;
@@ -75,13 +77,18 @@ public class Program
         app.Services.GetRequiredService<ILogger<string>>()
             .LogInformation("App starting with app options: " + JsonSerializer.Serialize(appOptions));
 
+        var restPort = PortHelper.FindAvailablePort(5000, 5100);
+        var wsPort = PortHelper.FindAvailablePort(8180, 8280);
         app.Urls.Clear();
-        app.Urls.Add($"http://0.0.0.0:{appOptions.REST_PORT}");
+        app.Urls.Add($"http://0.0.0.0:{restPort}");
         app.Services.GetRequiredService<IProxyConfig>()
-            .StartProxyServer(appOptions.PORT, appOptions.REST_PORT, appOptions.WS_PORT, appOptions.MQTT_PORT);
-
+            .StartProxyServer(
+                publicPort: appOptions.PORT, 
+                restPort: restPort,
+                wsPort: wsPort
+                );
         app.ConfigureRestApi();
-        await app.ConfigureWebsocketApi(appOptions.WS_PORT);
+        await app.ConfigureWebsocketApi(wsPort);
         if (!string.IsNullOrEmpty(appOptions.MQTT_BROKER_HOST))
         {
             await app.ConfigureMqtt();
@@ -105,5 +112,28 @@ public class Program
 
         app.GenerateTypeScriptClient("/../../client/src/generated-client.ts").GetAwaiter().GetResult();
 
+    }
+}
+
+public static class PortHelper
+{
+    public static int FindAvailablePort(int startPort = 5000, int endPort = 6000)
+    {
+        var ipAddress = IPAddress.Parse("0.0.0.0");
+        for (int port = startPort; port <= endPort; port++)
+        {
+            try
+            {
+                using var testListener = new TcpListener(ipAddress, port);
+                testListener.Start();
+                testListener.Stop();
+                return port;
+            }
+            catch
+            {
+                continue;
+            }
+        }
+        throw new Exception($"No available ports found between {startPort} and {endPort}");
     }
 }

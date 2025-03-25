@@ -17,7 +17,6 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
 
     public Task StartAsync(int port)
     {
-        port = GetAvailablePort(port);
         Environment.SetEnvironmentVariable("PORT", port.ToString());
         var url = $"ws://0.0.0.0:{port}";
         logger.LogInformation("WS running on url: " + url);
@@ -81,26 +80,26 @@ public class FleckWebSocketServerHost(WebApplication app, ILogger<FleckWebSocket
         _server?.Dispose();
     }
 
-    private int GetAvailablePort(int startPort)
-    {
-        var port = startPort;
-        var isPortAvailable = false;
-
-        do
-        {
-            try
-            {
-                var tcpListener = new TcpListener(IPAddress.Loopback, port);
-                tcpListener.Start();
-                tcpListener.Stop();
-                isPortAvailable = true;
-            }
-            catch (SocketException)
-            {
-                port++;
-            }
-        } while (!isPortAvailable);
-
-        return port;
-    }
+    // private int GetAvailablePort(int startPort)
+    // {
+    //     var port = startPort;
+    //     var isPortAvailable = false;
+    //
+    //     do
+    //     {
+    //         try
+    //         {
+    //             var tcpListener = new TcpListener(IPAddress.Loopback, port);
+    //             tcpListener.Start();
+    //             tcpListener.Stop();
+    //             isPortAvailable = true;
+    //         }
+    //         catch (SocketException)
+    //         {
+    //             port++;
+    //         }
+    //     } while (!isPortAvailable);
+    //
+    //     return port;
+    // }
 }

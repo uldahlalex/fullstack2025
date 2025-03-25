@@ -6,13 +6,14 @@ namespace Startup.Proxy;
 
 public class CustomProxy : TcpProxyConfiguration
 {
-    public Host MqttHost { get; set; }
+    //public Host MqttHost { get; set; }
 }
 
 
-public class ProxyConfig : IProxyConfig
+public class ProxyConfig(ILogger<ProxyConfig> logger) : IProxyConfig
 {
-    public void StartProxyServer(int publicPort, int restPort, int wsPort, int mqttPort)
+    public void StartProxyServer(int publicPort, int restPort, int wsPort//, int mqttPort
+    )
     {
         var proxyConfiguration = new CustomProxy()
         {
@@ -31,11 +32,11 @@ public class ProxyConfig : IProxyConfig
                 IpAddress = IPAddress.Loopback,
                 Port = wsPort
             },
-          MqttHost = new Host
-          {
-              IpAddress = IPAddress.Loopback,
-              Port = mqttPort
-          }
+          // MqttHost = new Host
+          // {
+          //     IpAddress = IPAddress.Loopback,
+          //     Port = mqttPort
+          // }
         };
         new TcpProxyServer(proxyConfiguration).Start();
     }
