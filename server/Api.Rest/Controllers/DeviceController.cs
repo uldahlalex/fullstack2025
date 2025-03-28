@@ -14,11 +14,13 @@ namespace Api.Rest.Controllers;
 [ApiController]
 public class DeviceController(
     IDataRepository repository,
+    IConnectionManager connectionManager,
     IMqttPublisher publisher) : ControllerBase
 {
     [HttpPost]
     [Route(nameof(AdminWantsToChangePreferencesForDevice))]
-    public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] AdminWantsToChangePreferencesForDeviceDto dto)
+    public ActionResult AdminWantsToChangePreferencesForDevice([FromBody] 
+        AdminWantsToChangePreferencesForDeviceDto dto)
     {
         publisher.Publish(dto, "device/" + dto.DeviceId + "/adminWantsToChangePreferencesForDevice");
         return Ok();

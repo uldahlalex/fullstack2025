@@ -11,8 +11,8 @@ public class MqttPublisher(HiveMQClient client) : IMqttPublisher
 { 
     public Task Publish(object dto, string topic)
     {
-        
-        client.PublishAsync(topic, JsonSerializer.Serialize(dto, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }), QualityOfService.AtLeastOnceDelivery);
+        client.PublishAsync(topic, JsonSerializer.Serialize(dto, new JsonSerializerOptions() 
+        { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }), QualityOfService.AtLeastOnceDelivery);
         return Task.CompletedTask;
     }
 }

@@ -9,7 +9,6 @@ using HiveMQtt.MQTT5.Types;
 namespace Infrastructure.Mqtt.SubscriptionHandlers;
 
 public class DeviceSendsMetricToServerEventHandler(
-    
     ILogger<DeviceSendsMetricToServerEventHandler> logger,
     IDataRepository repo,
     IConnectionManager connectionManager
@@ -27,10 +26,10 @@ public class DeviceSendsMetricToServerEventHandler(
                                 " as an " + nameof(DeviceSendsMetricToServerDto));
 
         logger.LogInformation(JsonSerializer.Serialize(deserialized));
-        // repo.AddMetric(new Devicelog()
-        // {
-        //
-        // });
+        repo.AddMetric(new Devicelog()
+        {
+        
+        });
         connectionManager.BroadcastToTopic("alex",
             new ServerSendsMetricToAdminDto() { Metrics= repo.GetAllMetrics() });
         

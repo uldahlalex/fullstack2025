@@ -27,7 +27,7 @@ public class ClientWantsToEnterDashboard(
     public override async Task Handle(ClientWantsToEnterDashboardDto dto, IWebSocketConnection socket)
     {
         securityService.VerifyJwtOrThrow(dto.Jwt);
-        var clientId = await connectionManager.GetClientIdFromSocketId(socket.ConnectionInfo.Id.ToString());
+        var clientId =  connectionManager.GetClientIdFromSocket(socket.ConnectionInfo.Id.ToString());
         await connectionManager.AddToTopic("dashboard", clientId);
         var allMetrics = repo.GetAllMetrics();
         socket.SendDto(new ServerAddsAdminToDashboard
