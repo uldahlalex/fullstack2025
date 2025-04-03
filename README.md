@@ -1,3 +1,5 @@
+# ⚠️ Archived / deprecated in favor of the repo here: https://github.com/uldahlalex/fs25_14_2
+
 # Fullstack 2025
 
 ## Diagram overview
